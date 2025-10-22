@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cognira</title>
+
+  <link rel="stylesheet" href="./styles/style.css">
+</head>
+
+<body>
+  <div class="main-menu-container" id="mainMenu">
+    <h1>Cognira</h1>
+    <button id="joinGameButton">Join Game</button>
+    <div id="waitingMessage" style="display: none; margin-top: 20px;">
+      <p>Waiting for players... <span id="playerCount">(0/4)</span></p>
+    </div>
+  </div>
+
+  <!-- Card Container - Will be populated dynamically -->
+  <div class="select-card-container" id="cardContainer" style="display: none;">
+    <h1>Pick a card</h1>
+    <div class="timer-container">
+      <div class="timer-bar">
+        <div class="timer-progress" id="timerProgress"></div>
+      </div>
+      <div class="timer-text">Time left: <span id="timerCount">10</span>s</div>
+    </div>
+    <div class="card-container" id="dynamicCardContainer">
+      <!-- Cards will be dynamically inserted here -->
+    </div>
+  </div>
+
+  <!-- Question Container - Will be populated dynamically -->
+  <div class="question-container" id="questionContainer" style="display: none;">
+    <h1>Question</h1>
+    <div class="question-timer-container">
+      <div class="question-timer-bar">
+        <div class="question-timer-progress" id="questionTimerProgress"></div>
+      </div>
+      <div class="question-timer-text">Time left: <span id="questionTimerCount">15</span>s</div>
+    </div>
+    <div class="question-content">
+      <div class="question-description" id="questionDescription">
+        <!-- Question text will be inserted here -->
+      </div>
+      <div class="question-image-container" id="questionImageContainer" style="display: none;">
+        <img id="questionImage" src="" alt="Question image">
+      </div>
+      <div class="question-options" id="questionOptions">
+        <!-- Answer buttons will be dynamically inserted here -->
+      </div>
+    </div>
+  </div>
+
+  <canvas class="game" id="gameCanvas"></canvas>
+  <div id="controls">
+    <div>
+      <button id="forward">▲</button>
+      <button id="left">◀</button>
+      <button id="backward">▼</button>
+      <button id="right">▶</button>
+    </div>
+  </div>
+
+  <script src="./bundle.js" type="application/javascript"></script>
+</body>
+
+</html>
