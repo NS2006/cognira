@@ -18,6 +18,7 @@ body {
   height: 100vh;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 }
 
 /* Main Menu */
@@ -88,20 +89,21 @@ body {
 /* Card Selection Styles - Light Theme */
 .select-card-container {
   display: none; /* Hidden by default */
-  width: 60%;
-  max-width: 800px;
+  width: 70%;
+  max-width: 1000px;
   text-align: center;
   position: absolute;
-  top: 50%;
+  top: 80%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 100;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgb(144, 144, 144);
   border-radius: 20px;
-  padding: 30px;
+  padding-top: 30px;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
   border: 2px solid rgba(255, 255, 255, 0.3);
+  overflow: hidden;
 }
 
 .select-card-container h1 {
@@ -117,53 +119,65 @@ body {
   animation: subtle-glow 3s ease-in-out infinite alternate;
 }
 
-.card-container {
+/* .card-container {
   display: flex;
   justify-content: center;
-  gap: 25px;
-  flex-wrap: wrap;
-  min-height: 200px; /* Ensure space for dynamic cards */
-}
-
-.card {
-  background: linear-gradient(145deg, #ffffff, #f0f0f0);
-  border-radius: 15px;
-  width: 300px;
-  padding: 20px;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 2px solid #e0e0e0;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  gap: 1.2rem;
+  flex-wrap: nowrap;
   position: relative;
-  overflow: hidden;
+  bottom: 0;
+  width: 100%;
+  min-height: 250px;
+  perspective: 1000px;
+  padding: 20px 0;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+} */
+
+#dynamicCardContainer {
+  display: flex;
+  justify-content: space-between; /* 👈 spread cards apart */
+  align-items: flex-end;
+  gap: 2rem;
+  perspective: 1000px;
+  position: relative;
+  height: 350px;
+  width: 80%; /* 👈 make sure container has width to allow spacing */
+  margin: 0 auto; /* center container on screen */
 }
 
-.card::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  z-index: -1;
-  border-radius: 17px;
+/* Base card look */
+#dynamicCardContainer .card {
+  width: 280px;
+  height: 320px;
+  background: #fff;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transform-origin: bottom center;
+  transform: translateY(200px) scale(0);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  animation: dealCard 0.5s ease-out forwards;
+  animation-fill-mode: forwards;
 }
 
-.card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-  border-color: #2196F3;
+#dynamicCardContainer .card:nth-child(1) {
+  animation-delay: 0s;
+  --i: -1;
 }
 
-.card:hover::before {
-  opacity: 1;
+#dynamicCardContainer .card:nth-child(2) {
+  animation-delay: 0.3s;
+  --i: 0;
 }
+
+#dynamicCardContainer .card:nth-child(3) {
+  animation-delay: 0.5s;
+  --i: 1;
+}
+
 
 .card-title {
   text-align: center;
+  top: 0;
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 2px solid #e0e0e0;
@@ -192,7 +206,7 @@ body {
   gap: 15px;
   padding: 12px;
   background: rgba(33, 150, 243, 0.05);
-  border-radius: 10px;
+  /* border-radius: 10px; */
   transition: background 0.3s ease;
   border: 1px solid rgba(33, 150, 243, 0.1);
 }
@@ -289,21 +303,56 @@ body {
     }
 }
 
-/* Animation for card appearance */
-@keyframes cardAppear {
-  from {
+/* Animation for card appearance  */
+@keyframes dealCard {
+  0% {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(200px) rotate(15deg) scale(0.8);
   }
-  to {
+  60% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(-20px) rotate(-5deg) scale(1.05);
   }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+}
+#dynamicCardContainer:hover .card {
+  transform: rotate(calc(var(--i) * 10deg)) translate(calc(var(--i) * 70px), -40px) scale(1.05);
 }
 
-.card {
-  animation: cardAppear 0.5s ease-out;
+#dynamicCardContainer .card:hover {
+  transform: translateY(-40px) scale(1.15) rotate(0deg) !important;
+  z-index: 10;
+  box-shadow: 0 20px 40px rgba(208, 255, 215, 0.3);
+  transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
 }
+
+/* When a card is selected */
+#dynamicCardContainer .card.selected {
+  transform: translateY(-40px) scale(1.25) rotate(0deg);
+  box-shadow: 0 0 40px rgba(76, 175, 80, 0.6);
+  z-index: 20;
+  border: 3px solid #4CAF50;
+}
+
+/* Fade the unselected card */
+#dynamicCardContainer .card.dimmed {
+  opacity: 0.4;
+  transform: translateY(10px) scale(0.95);
+  filter: blur(1px);
+}
+
+/* When card is selected */
+.selected-card {
+  transform: translateY(-20px) scale(1.5) rotate(0deg);
+  border-color: #2196F3;
+  box-shadow: 0 15px 30px rgba(33, 150, 243, 0.4);
+  transition: transform 0.25s ease, box-shadow 0.3s ease;
+}
+
+/* Fanned layout */
 
 @keyframes subtle-glow {
   from {

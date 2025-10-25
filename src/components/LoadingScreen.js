@@ -107,7 +107,7 @@ function createLoadingOverlay() {
       <div id="loading-progress" style="height: 100%; background: linear-gradient(90deg, #ff6b6b, #4ecdc4); width: 0%; transition: width 0.3s ease;"></div>
     </div>
     <div style="margin-top: 30px; font-size: 0.9em; opacity: 0.8;">
-      Please wait while we prepare your experience...
+      2 is the only even prime number
     </div>
   `;
   
