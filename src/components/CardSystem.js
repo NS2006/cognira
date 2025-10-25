@@ -18,28 +18,33 @@ export class CardSystem {
 
     handleCardSelection(event) {
         if (!this.cardSelectionActive) return;
-
-        const cardType = event.currentTarget.getAttribute('data-card-type');
+      
+        const cardElement = event.currentTarget;
+        const cardType = cardElement.getAttribute('data-card-type');
         console.log(`Card selected: ${cardType}`);
-
-        // Don't hide card selection immediately - just notify
-        // The main.js will handle the phase transition after 10 seconds
-
+      
+        // Add animation effects
+        this.dynamicCardContainer.querySelectorAll('.card').forEach(c => {
+          c.classList.remove('selected', 'dimmed');
+          if (c !== cardElement) c.classList.add('dimmed');
+        });
+        cardElement.classList.add('selected');
+      
         // Send card selection to server
         if (this.socketClient && this.socketClient.selectCard) {
-            this.socketClient.selectCard(cardType);
+          this.socketClient.selectCard(cardType);
         }
-
-        // Notify main.js about card selection
+      
         if (this.onCardSelect) {
-            this.onCardSelect(cardType);
+          this.onCardSelect(cardType);
         }
-    }
+    }  
 
-    createCardElement(cardData) {
+    createCardElement(cardData, index = 0) {
         const cardElement = document.createElement('button');
         cardElement.className = 'card';
         cardElement.setAttribute('data-card-type', cardData.id);
+        cardElement.style.setProperty('--i', index);
 
         cardElement.innerHTML = `
             <div class="card-title">
@@ -50,7 +55,7 @@ export class CardSystem {
                     <div class="card-description">
                         <div class="card-image ${desc.type}">
                             <img src="./assets/images/${desc.type}.png" alt="${desc.type}">
-                        </div>  
+                        </div>
                         <div class="card-attribute">
                             <p>${desc.text}</p>
                         </div>
@@ -67,14 +72,14 @@ export class CardSystem {
         if (this.cardSelectionActive) return;
 
         // Get random cards
-        this.currentCards = this.cardList.getRandomCards(2);
+        this.currentCards = this.cardList.getRandomCards(3);
 
         // Clear previous cards
         this.dynamicCardContainer.innerHTML = '';
 
         // Create and append new cards
-        this.currentCards.forEach(card => {
-            const cardElement = this.createCardElement(card);
+        this.currentCards.forEach((card, index) => {
+            const cardElement = this.createCardElement(card, index);
             this.dynamicCardContainer.appendChild(cardElement);
         });
 

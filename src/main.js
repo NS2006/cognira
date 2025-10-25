@@ -49,7 +49,7 @@ function updatePlayerCount(count) {
   playerCountSpan.textContent = `(${count}/4)`;
 
   // Check if we have enough players and game isn't initialized yet
-  if (count >= 2 && !gameInitialized) {
+  if (count >= 1 && !gameInitialized) {
     // Hide waiting message and show controls
     mainMenu.style.display = "none";
     controlsButton.style.display = "flex";
@@ -118,7 +118,7 @@ function showInitialCountdownMessage() {
     countdownMsg.id = 'initialCountdownMessage';
     countdownMsg.style.cssText = `
       position: fixed;
-      top: 50%;
+      top: 20%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: rgba(0, 0, 0, 0.9);
@@ -583,6 +583,62 @@ function animate() {
 
     dirLight.position.set(mapCenterX, mapCenterY, 50);
     dirLightTarget.position.set(mapCenterX, mapCenterY, 0);
+  }
+
+  // Animate floating tiles after 4th row
+  if (map && map.children) {
+    if (!animate._startTime) animate._startTime = performance.now();
+
+    // Ensure appear animation starts once the scene is visible
+    if (!animate._initializedAppear) {
+      map.children.forEach(tile => {
+        if (tile.userData?.appearing) {
+          tile.userData.appearing.startTime = performance.now();
+          // Force initial position from startZ
+          tile.position.z = tile.userData.appearing.startZ;
+        }
+        // Store originalZ for float animation later
+        if (tile.userData?.floating && tile.userData.originalZ === undefined) {
+          tile.userData.originalZ = tile.position.z;
+        }
+      });
+      animate._initializedAppear = true;
+      console.log("🎬 Tile appear animations initialized!");
+    }
+
+    const now = performance.now();
+    const elapsed = (now - animate._startTime) / 1000;
+
+    map.children.forEach(tile => {
+      const { appearing, floating } = tile.userData || {};
+      const originalZ = tile.userData.originalZ ?? 0;
+      const now = performance.now();
+    
+      // --- Appear from below ---
+      if (appearing) {
+        const progress = (now - appearing.startTime) / appearing.duration;
+        if (progress < 1) {
+          const eased = 1 - Math.pow(1 - progress, 3);
+          tile.position.z = appearing.startZ + (appearing.endZ - appearing.startZ) * eased;
+        } else {
+          tile.position.z = appearing.endZ;
+          delete tile.userData.appearing;
+    
+          // 👇 start floating *after* appear ends
+          if (tile.userData.floating) {
+            tile.userData.floating.startTime = now + 200; // small delay (200ms)
+            tile.userData.floating.startZ = tile.position.z;
+          }
+        }
+      }
+    
+      // --- Floating animation (after appear finishes) ---
+      else if (floating && now > (floating.startTime ?? 0)) {
+        const { amplitude, speed, phase, startZ } = floating;
+        const elapsed = (now - floating.startTime) / 1000;
+        tile.position.z = startZ - amplitude * (1 - Math.abs(Math.sin(speed * elapsed + phase)));
+      }
+    });    
   }
 
   renderer.render(scene, camera);
