@@ -15,57 +15,57 @@ export function Tile(positionY, platformWidthScale = 0.7, modelName = 'grass.glt
   loader.load(modelName,
     (gltf) => {
       const model = gltf.scene;
-      
-      // Rotate first
+
+      // Rotate first to lay flat
       model.rotation.x = Math.PI / 2;
-      
-      // Calculate scale to match original tile size exactly
+
+      // Get bounding box
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
-      
+      const center = box.getCenter(new THREE.Vector3());
+
+      // Scale model to match target tile size
       const scaleX = targetWidth / size.x;
       const scaleY = targetHeight / size.y;
       const uniformScale = Math.min(scaleX, scaleY);
-      
       model.scale.setScalar(uniformScale);
-      
-      // Calculate the correct Z position so character stands on top
-      const center = box.getCenter(new THREE.Vector3());
-      const scaledSize = size.multiplyScalar(uniformScale);
-      
-      // Position so the TOP of the block is at Z=0 (or your desired ground level)
-      // This places the block so character stands on its top surface
+
+      // Compute scaled dimensions
+      const scaledSize = size.clone().multiplyScalar(uniformScale);
+      const scaledCenter = center.clone().multiplyScalar(uniformScale);
+
+      // ✅ Position so TOP of tile sits exactly at z = 0
       model.position.set(
-        -center.x * uniformScale, 
-        -center.y * uniformScale, 
-        -2*(scaledSize.z / 2) // This positions the top at Z=0
+        -scaledCenter.x, 
+        -scaledCenter.y, 
+        -box.max.z * uniformScale // move so top aligns with z=0
       );
-      
-      // Alternative: if you want the top at a specific height (like original Z=1.5)
-      // model.position.set(-center.x * uniformScale, -center.y * uniformScale, 1.5 - scaledSize.z/2);
-      
+
       model.traverse((child) => {
         if (child.isMesh) {
           child.receiveShadow = true;
           child.castShadow = true;
         }
       });
-      
+
       tile.add(model);
     },
     undefined,
     (error) => {
-      console.error('Failed to load grass.gltf:', error);
-      // Fallback - make sure positioning matches
-      const platformGeometry = new THREE.BoxGeometry(targetWidth, targetHeight, 3);
-      const platformMaterial = new THREE.MeshPhongMaterial({ 
-        color: 0xdc743d,
-        shininess: 30
-      });
-      const platform = new THREE.Mesh(platformGeometry, platformMaterial);
-      // Position so top is at Z=1.5 (original height)
-      platform.position.z = 1.5 - 1.5; // Adjust based on your character's expected ground level
-      tile.add(platform);
+      console.error('Failed to load model:', error);
+
+      // Fallback cube with correct top alignment
+      const height = 3;
+      const geometry = new THREE.BoxGeometry(targetWidth, targetHeight, height);
+      const material = new THREE.MeshPhongMaterial({ color: 0xdc743d, shininess: 30 });
+      const fallback = new THREE.Mesh(geometry, material);
+
+      // ✅ Align top of fallback tile to z = 0
+      fallback.position.z = -height / 2;
+      fallback.receiveShadow = true;
+      fallback.castShadow = true;
+
+      tile.add(fallback);
     }
   );
 

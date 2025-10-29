@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { Renderer } from "./components/Renderer";
 import { Camera } from "./components/Camera";
 import { DirectionalLight } from "./components/DirectionalLight";
-import { map, initializeMap } from "./components/Map";
+import { map, initializeMap, loadTrees } from "./components/Map";
 import { SocketClient } from "./socketClient";
 import { CardSystem } from "./components/CardSystem";
 import { CardManager } from "./components/CardManager";
@@ -511,6 +511,7 @@ function initializeGame() {
   new SkyBox(scene);
 
   initializeMap();
+  loadTrees();
 }
 
 function animate() {

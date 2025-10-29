@@ -1,16 +1,24 @@
-@import url("https://fonts.googleapis.com/css?family=Press+Start+2P");
+/* @import url("https://fonts.googleapis.com/css?family=Press+Start+2P"); */
+
+@font-face {
+  font-family: "Balatro";
+  src: url("../assets/fonts/balatro.otf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Press Start 2P", cursive;
+  font-family: "Balatro";
 }
 
 body {
   margin: 0;
   display: flex;
-  font-family: "Press Start 2P", cursive;
+  font-family: "Balatro";
   overflow-x: hidden;
   background: linear-gradient(135deg, #e0f7fa 0%, #bbdefb 100%);
   color: #333;
@@ -34,7 +42,7 @@ body {
 }
 
 #joinGameButton{
-  font-family: "Press Start 2P", cursive;
+  font-family: "Balatro", cursive;
   padding: 1.2em;
   font-size: 0.6em;
   background-color: gainsboro;
@@ -288,7 +296,7 @@ body {
 
 /* Add to your style.css */
 #initialCountdownMessage {
-    font-family: "Press Start 2P", cursive;
+    font-family: "Balatro", cursive;
     animation: pulse-glow 1s infinite alternate;
 }
 
@@ -543,7 +551,7 @@ body {
 
 /* Waiting Period Styles */
 #waitingPeriodMessage {
-    font-family: "Press Start 2P", cursive;
+    font-family: "Balatro", cursive;
     background: rgba(0, 0, 0, 0.9) !important;
     border: 2px solid #2196F3;
     box-shadow: 0 0 20px rgba(33, 150, 243, 0.5);
