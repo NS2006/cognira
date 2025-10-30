@@ -26,6 +26,8 @@ let gameInitialized = false;
 let cardSystem, cardManager, questionSystem;
 let currentCardType = null;
 let canMove = false; // Start with movement disabled
+let isMinigameActive = false; // Block movement during minigames
+window.isMinigameActive = isMinigameActive;
 let phaseTimer = null;
 let currentPhase = "waiting";
 
@@ -84,7 +86,9 @@ function initializeGameSystems() {
   cardSystem = new CardSystem(socketClient, handleCardSelection);
 
   // Initialize question system with socket client and callback
+  console.log("🔄 Initializing QuestionSystem with callback...");
   questionSystem = new QuestionSystem(socketClient, handleQuestionComplete);
+  console.log("✅ QuestionSystem initialized, callback set:", !!questionSystem.onQuestionComplete);
 }
 
 function startInitialCountdown() {
@@ -255,12 +259,12 @@ function highlightSelectedCard(cardType) {
 }
 
 function startQuestionPhase() {
-  console.log("❓ Starting question phase (15 seconds)");
+  console.log("❓ Starting question phase");
   currentPhase = 'question';
   canMove = false;
 
   if (refreshMovementUI) {
-    refreshMovementUI();
+      refreshMovementUI();
   }
 
   // Clear any existing timers
@@ -269,94 +273,139 @@ function startQuestionPhase() {
   // Show question
   questionSystem.showQuestion();
 
-  // Set timer to automatically move to movement phase after 15 seconds
-  phaseTimer = setTimeout(() => {
-    console.log("⏰ Question phase over, processing results");
-    endQuestionPhase();
-  }, 15000);
+  // For logic questions only, set a timer to auto-complete
+  // For spatial questions, the minigame callback will handle completion
+  if (!questionSystem.isSpatialQuestion) {
+      console.log("⏰ Setting 15s timer for logic question");
+      phaseTimer = setTimeout(() => {
+          console.log("⏰ Logic question timer expired");
+          endQuestionPhase();
+      }, 15000);
+  } else {
+      console.log("🎮 Spatial question - no phase timer, minigame will handle completion");
+  }
 }
 
 function endQuestionPhase() {
-  // If no answer was selected, treat as incorrect
-  const isCorrect = questionSystem.selectedAnswer !== null ?
-    questionSystem.isAnswerCorrect(questionSystem.selectedAnswer) : false;
+  // For logic questions, check if answer was selected
+  // For spatial questions, this will be called by the minigame callback
+  if (!questionSystem.isSpatialQuestion) {
+      const isCorrect = questionSystem.selectedAnswer !== null ?
+          questionSystem.isAnswerCorrect(questionSystem.selectedAnswer) : false;
 
-  // Complete the question with the result
-  handleQuestionComplete(isCorrect, questionSystem.selectedAnswer);
+      handleQuestionComplete(isCorrect, questionSystem.selectedAnswer);
+  }
+  // For spatial questions, completion is handled by the minigame callback
 }
 
 function handleQuestionComplete(isCorrect, selectedAnswer) {
-  console.log("Question completed. Correct:", isCorrect, "Answer:", selectedAnswer);
+  console.log("🔄 [MAIN] handleQuestionComplete called with:", { isCorrect, selectedAnswer });
 
   // Apply card effects based on question result
   if (localPlayer && currentCardType) {
-    applyCardEffectsBasedOnQuestion(isCorrect, currentCardType);
+      console.log("🔄 [MAIN] Applying card effects for card:", currentCardType);
+      applyCardEffectsBasedOnQuestion(isCorrect, currentCardType);
 
-    // Show movement info in console
-    const movementInfo = localPlayer.getMovementInfo();
-    console.log("Movement Info after card effects:", movementInfo);
+      // Show movement info in console
+      const movementInfo = localPlayer.getMovementInfo();
+      console.log("Movement Info after card effects:", movementInfo);
 
-    // Log the active effects to debug
-    console.log("Active effects:", localPlayer.activeEffects);
+      // Log the active effects to debug
+      console.log("Active effects:", localPlayer.activeEffects);
+  } else {
+      console.log("🔄 [MAIN] No local player or current card type");
   }
 
   // Reset current card
   currentCardType = null;
 
-  // Move to movement phase
-  startMovementPhase();
+  console.log("🔄 [MAIN] Moving to movement phase...");
+  
+  // Small delay to ensure all cleanup is done before starting movement
+  setTimeout(() => {
+      console.log("🔄 [MAIN] Starting movement phase now");
+      startMovementPhase();
+  }, 500);
 }
 
+function isAnyMinigameActive() {
+  const spatialMinigame = document.getElementById('spatialMinigame');
+  const questionContainer = document.getElementById('questionContainer');
+  
+  // Check both UI elements and the question system state
+  const uiMinigameActive = (spatialMinigame && spatialMinigame.style.display === 'block') ||
+                          (questionContainer && questionContainer.style.display === 'block');
+  
+  // Also check the question system's internal state
+  const systemMinigameActive = questionSystem && 
+                              (questionSystem.questionActive || questionSystem.spatialMinigameActive);
+  
+  console.log("🔍 Minigame check - UI:", uiMinigameActive, "System:", systemMinigameActive);
+  
+  return uiMinigameActive || systemMinigameActive;
+}
 
 function startMovementPhase() {
-  console.log("🎮 Starting movement phase (15 seconds)");
+  console.log("🎮 [MAIN] startMovementPhase called");
   currentPhase = 'movement';
 
+  // Double-check that no minigames are active
+  if (isAnyMinigameActive()) {
+      console.log("⏳ Minigame still active, delaying movement phase");
+      // Wait a bit and check again
+      setTimeout(() => {
+          if (!isAnyMinigameActive()) {
+              console.log("✅ Minigame finished, starting movement phase");
+              startMovementPhase();
+          } else {
+              // If still active, wait another second
+              console.log("⏳ Minigame still active, waiting...");
+              setTimeout(() => startMovementPhase(), 1000);
+          }
+      }, 500);
+      return;
+  }
+
+  console.log("✅ [MAIN] All minigames finished, proceeding with movement phase");
+
+  // Rest of your existing movement phase code...
   if (localPlayer) {
-    console.log("=== MOVEMENT PHASE DEBUG ===");
+      console.log("=== MOVEMENT PHASE DEBUG ===");
+      localPlayer.movesQueue.length = 0;
+      localPlayer.updateRemainingSteps();
 
-    // Only reset the moves queue, NOT the steps
-    localPlayer.movesQueue.length = 0;
+      console.log("Active effects:", localPlayer.activeEffects);
 
-    // Update steps based on current effects (don't reset)
-    localPlayer.updateRemainingSteps();
+      // Check for move_or_stop_negative effect
+      const hasMoveStopNegative = localPlayer.activeEffects &&
+          localPlayer.activeEffects.some(effect => effect.type === 'move_or_stop_negative');
+      console.log("Has move_or_stop_negative effect:", hasMoveStopNegative);
 
-    console.log("Active effects:", localPlayer.activeEffects);
+      // Check movement status
+      const canPlayerMove = localPlayer.canMove();
+      const movementInfo = localPlayer.getMovementInfo();
 
-    // Check for move_or_stop_negative effect
-    const hasMoveStopNegative = localPlayer.activeEffects &&
-      localPlayer.activeEffects.some(effect => effect.type === 'move_or_stop_negative');
-    console.log("Has move_or_stop_negative effect:", hasMoveStopNegative);
-
-    // Check movement status
-    const canPlayerMove = localPlayer.canMove();
-    const movementInfo = localPlayer.getMovementInfo();
-
-    console.log("Movement check - canMove:", canPlayerMove);
-    console.log("Remaining steps:", localPlayer.remainingSteps);
-    console.log("Final step:", movementInfo.finalStep);
-    console.log("=== END DEBUG ===");
+      console.log("Movement check - canMove:", canPlayerMove);
+      console.log("Remaining steps:", localPlayer.remainingSteps);
+      console.log("Final step:", movementInfo.finalStep);
+      console.log("=== END DEBUG ===");
   }
 
   // Allow movement based on card effects
-  canMove = localPlayer ? localPlayer.canMove() : false;
-  console.log(`Movement phase - Player can move: ${canMove}`);
+  canMove = localPlayer ? localPlayer.canMove() && !isMinigameActive : false;
+  window.isMinigameActive = isMinigameActive;
+  
+  console.log(`🎮 [MAIN] Movement phase - Player can move: ${canMove}`);
 
-  // Update UI to reflect movement state
   if (refreshMovementUI) {
-    refreshMovementUI();
+      refreshMovementUI();
   }
 
-  // Show movement message
   showMovementMessage();
-
-  // Clear any existing timers
   clearPhaseTimer();
-
-  // Set timer to automatically move to next card phase after 15 seconds
   phaseTimer = setTimeout(() => {
-    console.log("⏰ Movement phase over, starting next cycle");
-    endMovementPhase();
+      console.log("⏰ Movement phase over, starting next cycle");
+      endMovementPhase();
   }, 15000);
 }
 
@@ -446,6 +495,15 @@ function clearPhaseTimer() {
     moveMsg.remove();
   }
 }
+
+// Add this function for manual testing
+function debugForceMovementPhase() {
+  console.log("🔄 [DEBUG] Manually forcing movement phase");
+  startMovementPhase();
+}
+
+// Make it available globally for testing
+window.debugForceMovementPhase = debugForceMovementPhase;
 
 function applyCardEffectsBasedOnQuestion(isCorrect, cardType) {
   console.log(`🔄 Applying card effects: isCorrect=${isCorrect}, cardType=${cardType}`);
@@ -736,6 +794,18 @@ function debugScene() {
     console.log(`🎭 Child ${index}:`, child.constructor.name, "position:", child.position);
   });
 }
+
+// Add this function to test the callback manually
+function testQuestionCompleteCallback() {
+  console.log("🧪 Testing question complete callback manually...");
+  if (questionSystem && questionSystem.onQuestionComplete) {
+      questionSystem.onQuestionComplete(true, 'test');
+  } else {
+      console.error("❌ Cannot test - questionSystem or callback not available");
+  }
+}
+
+window.testQuestionCompleteCallback = testQuestionCompleteCallback;
 
 function debugCameraView() {
   console.log("📷 Camera view debug:");

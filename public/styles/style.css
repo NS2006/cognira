@@ -367,8 +367,8 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 300px;
-  height: 600px;
+  width: 350px;
+  height: 650px;
   z-index: 1000;
   background: #222;
   border-radius: 8px;

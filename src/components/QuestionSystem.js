@@ -17,7 +17,10 @@ export class QuestionSystem {
         this.questionActive = false;
         this.currentQuestion = null;
         this.selectedAnswer = null;
-        this.QUESTION_TIME = 15000; // 15 seconds
+        this.LOGIC_QUESTION_TIME = 15000; // 15 seconds for logic questions
+        this.SPATIAL_QUESTION_TIME = 30000; // 30 seconds for spatial questions
+        this.isSpatialQuestion = false;
+        this.spatialMinigameActive = false; // Track spatial minigame separately
     }
 
     // Sample questions database
@@ -149,25 +152,27 @@ export class QuestionSystem {
     }
 
     showQuestion() {
-        if (this.questionActive) return; // prevent re-entry
+        if (this.questionActive) return;
         this.currentQuestion = this.getRandomQuestion();
         this.selectedAnswer = null;
-    
+        this.isSpatialQuestion = false;
+        this.spatialMinigameActive = false;
+
         if (this.currentQuestion.type === "logic") {
-            // Show description + type label
             this.questionDescription.innerHTML = `
                 <div class="question-type-label"><b>Type:</b> Logic</div>
                 <div class="question-text">${this.currentQuestion.description}</div>
             `;
             this.showLogicQuestion();
         } else if (this.currentQuestion.type === "spatial") {
-            // Only show type label, NO description
+            this.isSpatialQuestion = true;
+            this.spatialMinigameActive = true;
             this.questionDescription.innerHTML = `<div class="question-type-label"><b>Type:</b> Spatial</div>`;
             this.showSpatialMinigame();
         }
     }
     
-    
+    // In the showSpatialMinigame method, update the callback handling:
     showSpatialMinigame() {
         if (this.questionActive) return;
     
@@ -177,17 +182,40 @@ export class QuestionSystem {
     
         pauseWorld(true);
         this.questionActive = true;
+        this.spatialMinigameActive = true;
     
-        startTetrisGame(() => {
-            if (!this.questionActive) return; // prevent double call
-            this.questionActive = false;
+        // Clear any existing question phase timer for spatial questions
+        if (this.questionTimer) {
+            clearInterval(this.questionTimer);
+            this.questionTimer = null;
+        }
     
-            tetrisContainer.style.display = 'none';
-            pauseWorld(false);
-            this.questionOptions.style.display = 'flex';
-            this.completeQuestion(true);
-        }, 30000); // 30s
-    }    
+        console.log("🎮 Starting spatial minigame (Tetris) for 30 seconds");
+        console.log("🔄 onQuestionComplete callback exists:", !!this.onQuestionComplete);
+        
+        startTetrisGame((success, score) => {
+            console.log(`🎮 Spatial minigame callback triggered - Success: ${success}`);
+            
+            if (!this.questionActive && !this.spatialMinigameActive) {
+                console.log("⚠️ Question already inactive, ignoring callback");
+                return;
+            }
+            
+            console.log(`🎮 Spatial minigame completed - Success: ${success}, Score: ${score}`);
+            
+            // For spatial questions, success is based on clearing at least 1 full row
+            const isCorrect = success;
+            
+            if (success) {
+                console.log(`✅ Player cleared at least 1 row - will get card effect`);
+            } else {
+                console.log(`❌ Player failed to clear any rows - will get debuff`);
+            }
+            
+            console.log(`🔄 Calling completeQuestion with isCorrect: ${isCorrect}`);
+            this.completeQuestion(isCorrect);
+        }, this.SPATIAL_QUESTION_TIME);
+    }
 
     showLogicQuestion() {
         if (this.currentQuestion.image) {
@@ -196,14 +224,13 @@ export class QuestionSystem {
         } else {
             this.questionImageContainer.style.display = 'none';
         }
-    
+
         this.createAnswerButtons();
         this.questionContainer.style.display = 'block';
         this.questionActive = true;
-        this.startQuestionTimer();
+        this.startQuestionTimer(this.LOGIC_QUESTION_TIME);
     }
     
-
     createAnswerButtons() {
         this.questionOptions.innerHTML = '';
         this.currentQuestion.options.forEach(option => {
@@ -247,15 +274,15 @@ export class QuestionSystem {
         }, 500);
     }
 
-    startQuestionTimer() {
-        let timeLeft = this.QUESTION_TIME / 1000;
+    startQuestionTimer(time) {
+        let timeLeft = time / 1000;
         this.questionTimerCount.textContent = timeLeft;
         this.questionTimerProgress.style.width = '100%';
 
         this.questionTimer = setInterval(() => {
             timeLeft--;
             this.questionTimerCount.textContent = timeLeft;
-            this.questionTimerProgress.style.width = `${(timeLeft / (this.QUESTION_TIME / 1000)) * 100}%`;
+            this.questionTimerProgress.style.width = `${(timeLeft / (time / 1000)) * 100}%`;
 
             if (timeLeft <= 0) {
                 clearInterval(this.questionTimer);
@@ -266,33 +293,65 @@ export class QuestionSystem {
 
     handleQuestionTimeExpired() {
         this.selectedAnswer = null;
+        
+        if (this.isSpatialQuestion && this.spatialMinigameActive) {
+            // For spatial questions, don't complete if minigame is still running
+            console.log("⏰ Question timer expired but spatial minigame still active, waiting...");
+            return;
+        }
+        
         this.completeQuestion(false);
     }
 
     completeQuestion(isCorrect) {
-        if (!this.questionActive) return;
+        if (!this.questionActive && !this.spatialMinigameActive) {
+            console.log("⚠️ Question already completed, ignoring");
+            return;
+        }
+        
+        console.log(`🔄 [QuestionSystem] completeQuestion called with isCorrect: ${isCorrect}`);
+        
         this.questionActive = false;
-
+        this.spatialMinigameActive = false;
+    
         if (this.questionTimer) {
             clearInterval(this.questionTimer);
             this.questionTimer = null;
         }
-
+    
         this.questionContainer.style.display = 'none';
-
+    
+        // Hide spatial minigame if it's visible
+        const tetrisContainer = document.getElementById('spatialMinigame');
+        if (tetrisContainer) {
+            tetrisContainer.style.display = 'none';
+        }
+    
+        // Ensure world is unpaused
+        pauseWorld(false);
+    
+        console.log(`🔄 [QuestionSystem] Calling onQuestionComplete callback...`);
+        
         if (this.onQuestionComplete) {
             this.onQuestionComplete(isCorrect, this.selectedAnswer);
+        } else {
+            console.error('❌ [QuestionSystem] onQuestionComplete callback is not defined!');
         }
     }
 
     hideQuestion() {
         this.questionContainer.style.display = 'none';
         this.questionActive = false;
+        this.spatialMinigameActive = false;
 
         if (this.questionTimer) {
             clearInterval(this.questionTimer);
             this.questionTimer = null;
         }
+    }
+
+    isMinigameActive() {
+        return this.spatialMinigameActive;
     }
 }
 

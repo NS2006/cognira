@@ -18,6 +18,30 @@ export function startTetrisGame(callback, duration = 30000) {
     container.appendChild(canvas);
     const ctx = canvas.getContext('2d');
 
+    // Add score display
+    const scoreDisplay = document.createElement('div');
+    scoreDisplay.style.cssText = `
+        color: white;
+        font-size: 18px;
+        text-align: center;
+        margin-bottom: 10px;
+        font-family: Arial, sans-serif;
+    `;
+    scoreDisplay.innerHTML = `Score: 0 | Rows Cleared: 0`;
+    container.insertBefore(scoreDisplay, canvas);
+
+    // Add objective display
+    const objectiveDisplay = document.createElement('div');
+    objectiveDisplay.style.cssText = `
+        color: #ffcc00;
+        font-size: 14px;
+        text-align: center;
+        margin-bottom: 10px;
+        font-family: Arial, sans-serif;
+    `;
+    objectiveDisplay.innerHTML = `🎯 Objective: Clear at least 1 full row to get card effect!`;
+    container.insertBefore(objectiveDisplay, canvas);
+
     const SHAPES = [
         [[1,1,1,1]], [[1,1],[1,1]], [[0,1,0],[1,1,1]],
         [[1,0,0],[1,1,1]], [[0,0,1],[1,1,1]], [[0,1,1],[1,1,0]],
@@ -27,6 +51,7 @@ export function startTetrisGame(callback, duration = 30000) {
 
     let board = Array.from({length: ROWS}, () => Array(COLS).fill(0));
     let currentPiece = null, score = 0, dropCounter = 0, lastTime = 0;
+    let rowsCleared = 0; // Track how many full rows were cleared
 
     function drawBoard() {
         ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -63,13 +88,47 @@ export function startTetrisGame(callback, duration = 30000) {
     }
 
     function clearLines(){
+        let linesClearedThisTurn = 0;
         for(let r=ROWS-1;r>=0;r--){
             if(board[r].every(cell=>cell!==0)){
                 board.splice(r,1);
                 board.unshift(Array(COLS).fill(0));
                 score += 10;
-                r++;
+                linesClearedThisTurn++;
+                r++; // Check the same row again after shifting
             }
+        }
+        
+        if (linesClearedThisTurn > 0) {
+            rowsCleared += linesClearedThisTurn;
+            updateScoreDisplay();
+            
+            // Visual feedback for clearing rows
+            if (linesClearedThisTurn === 1) {
+                objectiveDisplay.innerHTML = `🎉 Success! You cleared ${rowsCleared} row(s) - You'll get the card effect!`;
+                objectiveDisplay.style.color = '#00ff00';
+            } else if (linesClearedThisTurn > 1) {
+                objectiveDisplay.innerHTML = `🎉 Amazing! You cleared ${linesClearedThisTurn} rows at once! Total: ${rowsCleared} rows`;
+                objectiveDisplay.style.color = '#00ff00';
+            }
+        }
+        
+        return linesClearedThisTurn;
+    }
+
+    function updateScoreDisplay() {
+        scoreDisplay.innerHTML = `Score: ${score} | Rows Cleared: ${rowsCleared}`;
+        
+        // Update objective display based on progress
+        if (rowsCleared === 0) {
+            objectiveDisplay.innerHTML = `🎯 Objective: Clear at least 1 full row to get card effect!`;
+            objectiveDisplay.style.color = '#ffcc00';
+        } else if (rowsCleared === 1) {
+            objectiveDisplay.innerHTML = `✅ Objective Complete! You cleared 1 row - You'll get the card effect!`;
+            objectiveDisplay.style.color = '#00ff00';
+        } else {
+            objectiveDisplay.innerHTML = `🎉 Excellent! You cleared ${rowsCleared} rows - You'll get the card effect!`;
+            objectiveDisplay.style.color = '#00ff00';
         }
     }
 
@@ -127,9 +186,24 @@ export function startTetrisGame(callback, duration = 30000) {
     update();
 
     // End game after fixed duration
+    // In the setTimeout at the end of startTetrisGame, add more cleanup:
     setTimeout(() => {
         gameOver = true;
         container.style.display = 'none';
-        callback(true, score);
+        
+        // Clear any keyboard events
+        document.onkeydown = null;
+        
+        // Determine success based on rows cleared
+        const success = rowsCleared >= 1;
+        
+        console.log(`🎮 Tetris completed - Rows cleared: ${rowsCleared}, Success: ${success}, Score: ${score}`);
+        
+        // Ensure callback is called only once
+        if (callback) {
+            callback(success, score);
+        } else {
+            console.error('❌ Tetris callback is undefined!');
+        }
     }, duration);
 }
