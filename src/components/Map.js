@@ -101,6 +101,7 @@ const treePositions = [
   { model: 0, x: -100, y: 120, z: -100 },
   { model: 1, x: -110, y: 200, z: -80 },
   { model: 2, x: -200, y: 20, z: -80 },
+  { model: 2, x: -200, y: 200, z: -80 },
   { model: 1, x: -200, y: 0, z: -100 },
   { model: 1, x: 200, y: 220, z: -70 },
   { model: 2, x: 350, y: 100, z: -95 },
@@ -111,29 +112,44 @@ export function loadTrees() {
   const promises = treeModels.map((path) => loadModel(path));
 
   Promise.all(promises).then((models) => {
-    treePositions.forEach((pos) => {
-      const baseModel = models[pos.model];
+    const treeCount = 70;
+    const yMin = -100;
+    const yMax = 1000;
+    const yStep = (yMax - yMin) / (treeCount - 1);
+    for (let i = 0; i < treeCount; i++) {
+      // 🎲 pick a random model
+      const baseModel = models[Math.floor(Math.random() * models.length)];
+      if (!baseModel) continue;
 
-      if (!baseModel) return;
-
-      // Clone so each can be placed independently
       const tree = baseModel.clone();
 
-      // Apply transform
-      tree.position.set(pos.x, pos.y, pos.z);
-      tree.scale.set(0.5, 0.5, 0.5);
-      // tree.rotation.y = Math.random() * Math.PI * 2;
-      tree.rotation.x = Math.PI / 2;
+      // 🎯 pick random zone for X
+      let x;
+      if (Math.random() < 0.5) {
+        // left zone
+        x = THREE.MathUtils.randFloat(-200, -190);
+      } else {
+        // right zone
+        x = THREE.MathUtils.randFloat(200, 300);
+      }
 
-      // Optional: small tilt randomness
-      tree.rotation.z = (Math.random() - 0.5) * 0.1;
+      // 🎯 random Y and Z
+      const y = yMin + i * yStep;
+      const z = THREE.MathUtils.randFloat(-100, -80);
+
+      // 🪵 apply transforms
+      tree.position.set(x, y, z);
+      tree.scale.set(0.5, 0.5, 0.5);
+      tree.rotation.x = Math.PI / 2;
+      tree.rotation.z = (Math.random() - 1) * 0.1;
 
       map.add(tree);
-    });
+    }
 
-    console.log("🌲 All trees added to the map!");
+    console.log("🌲 Random trees added across both zones!");
   });
 }
+
 
 // Helper to load a glTF model
 function loadModel(path) {
@@ -151,6 +167,31 @@ function loadModel(path) {
       }
     );
   });
+}
+
+export function loadRiver() {
+  loader.load(
+    '/assets/model/River.gltf',
+    (gltf) => {
+      const river = gltf.scene;
+
+      // Set position — ground level
+      river.position.set(50, 500, -40);
+
+      river.rotation.x = Math.PI / 2;
+      // Optional: scale or rotate if needed
+      river.scale.set(55, 55, 55);
+      // river.rotation.y = Math.PI / 2;
+
+      // Add to map or scene
+      map.add(river);
+      console.log('✅ River loaded');
+    },
+    undefined,
+    (error) => {
+      console.error('❌ Error loading river.gltf:', error);
+    }
+  );
 }
 
 function getMapBounds() {

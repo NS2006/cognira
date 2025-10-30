@@ -1,3 +1,5 @@
+import { startTetrisGame } from './SpatialMinigame.js';
+
 export class QuestionSystem {
     constructor(socketClient, onQuestionCompleteCallback) {
         this.socketClient = socketClient;
@@ -23,6 +25,7 @@ export class QuestionSystem {
         return [
             {
                 id: 1,
+                type: "logic",
                 description: "&nbsp;&nbsp;&nbsp; A B <br> &nbsp;&nbsp;&nbsp; A B <br> _______ + <br> &nbsp; B C C <br><br>What is A B C?",
                 image: null,
                 options: [
@@ -35,6 +38,7 @@ export class QuestionSystem {
             },
             {
                 id: 2,
+                type: "logic",
                 description: "What is the last digit of 3<sup>205</sup>?",
                 image: null,
                 options: [
@@ -47,6 +51,7 @@ export class QuestionSystem {
             },
             {
                 id: 3,
+                type: "logic",
                 description: "NS, JPP, FL, TS, and KF compete in a running race. The current position is NS, JPP, TS, KF, and FL, so NS is the nearest to the finish line. After 3 seconds, KF gets ahead of TS. At the same time, JPP gets ahead of NS. At the last 4 seconds, FL finally gets ahead of NS. Now, who is at the third position?",
                 image: null,
                 options: [
@@ -56,6 +61,20 @@ export class QuestionSystem {
                     { id: 'D', text: "TS", correct: false }
                 ],
                 category: "Numeric Logic"
+            },
+            // Example spatial question
+            {
+                id: 4,
+                type: "spatial",
+                description: "Which shape can be formed by folding this net?",
+                image: "assets/images/spatial_net_example.png",
+                options: [
+                    { id: 'A', text: "Cube", correct: true },
+                    { id: 'B', text: "Pyramid", correct: false },
+                    { id: 'C', text: "Cylinder", correct: false },
+                    { id: 'D', text: "Cone", correct: false }
+                ],
+                category: "Spatial Reasoning"
             },
             // {
             //     id: 1,
@@ -122,41 +141,71 @@ export class QuestionSystem {
 
     getRandomQuestion() {
         const questions = this.getQuestionBank();
-        const randomIndex = Math.floor(Math.random() * questions.length);
-        return questions[randomIndex];
+        const types = ['logic', 'spatial'];
+        const chosenType = types[Math.floor(Math.random() * types.length)];
+        const filteredQuestions = questions.filter(q => q.type === chosenType);
+        const randomIndex = Math.floor(Math.random() * filteredQuestions.length);
+        return filteredQuestions[randomIndex];
     }
 
     showQuestion() {
-        if (this.questionActive) return;
-
+        if (this.questionActive) return; // prevent re-entry
         this.currentQuestion = this.getRandomQuestion();
         this.selectedAnswer = null;
+    
+        if (this.currentQuestion.type === "logic") {
+            // Show description + type label
+            this.questionDescription.innerHTML = `
+                <div class="question-type-label"><b>Type:</b> Logic</div>
+                <div class="question-text">${this.currentQuestion.description}</div>
+            `;
+            this.showLogicQuestion();
+        } else if (this.currentQuestion.type === "spatial") {
+            // Only show type label, NO description
+            this.questionDescription.innerHTML = `<div class="question-type-label"><b>Type:</b> Spatial</div>`;
+            this.showSpatialMinigame();
+        }
+    }
+    
+    
+    showSpatialMinigame() {
+        if (this.questionActive) return;
+    
+        this.questionOptions.style.display = 'none';
+        const tetrisContainer = document.getElementById('spatialMinigame');
+        tetrisContainer.style.display = 'block';
+    
+        pauseWorld(true);
+        this.questionActive = true;
+    
+        startTetrisGame(() => {
+            if (!this.questionActive) return; // prevent double call
+            this.questionActive = false;
+    
+            tetrisContainer.style.display = 'none';
+            pauseWorld(false);
+            this.questionOptions.style.display = 'flex';
+            this.completeQuestion(true);
+        }, 30000); // 30s
+    }    
 
-        // Update question content
-        this.questionDescription.innerHTML = this.currentQuestion.description;
-
-        // Handle image (if any)
+    showLogicQuestion() {
         if (this.currentQuestion.image) {
             this.questionImage.src = this.currentQuestion.image;
             this.questionImageContainer.style.display = 'block';
         } else {
             this.questionImageContainer.style.display = 'none';
         }
-
-        // Create answer buttons
+    
         this.createAnswerButtons();
-
-        // Show question container
         this.questionContainer.style.display = 'block';
         this.questionActive = true;
-
-        // Start timer
         this.startQuestionTimer();
     }
+    
 
     createAnswerButtons() {
         this.questionOptions.innerHTML = '';
-
         this.currentQuestion.options.forEach(option => {
             const button = document.createElement('button');
             button.className = 'question-option';
@@ -165,25 +214,15 @@ export class QuestionSystem {
                 <span class="option-id">${option.id}.</span>
                 <span class="option-text">${option.text}</span>
             `;
-
             button.addEventListener('click', () => this.handleAnswerSelection(option.id));
             this.questionOptions.appendChild(button);
         });
-    }
-
-    isAnswerCorrect(selectedAnswer) {
-        if (!this.currentQuestion || !selectedAnswer) return false;
-
-        const correctOption = this.currentQuestion.options.find(opt => opt.correct);
-        return correctOption && selectedAnswer === correctOption.id;
     }
 
     handleAnswerSelection(optionId) {
         if (!this.questionActive || this.selectedAnswer !== null) return;
 
         this.selectedAnswer = optionId;
-
-        // Highlight selected answer
         const buttons = this.questionOptions.querySelectorAll('.question-option');
         buttons.forEach(button => {
             button.classList.remove('selected');
@@ -192,23 +231,16 @@ export class QuestionSystem {
             }
         });
 
-        // Find the correct answer
         const correctOption = this.currentQuestion.options.find(opt => opt.correct);
 
-        // Show correct/incorrect styling after a brief delay
         setTimeout(() => {
             buttons.forEach(button => {
-                const buttonOptionId = button.getAttribute('data-option-id');
-                const option = this.currentQuestion.options.find(opt => opt.id === buttonOptionId);
-
-                if (option.correct) {
-                    button.classList.add('correct');
-                } else if (buttonOptionId === optionId && !option.correct) {
-                    button.classList.add('incorrect');
-                }
+                const id = button.getAttribute('data-option-id');
+                const option = this.currentQuestion.options.find(opt => opt.id === id);
+                if (option.correct) button.classList.add('correct');
+                else if (id === optionId && !option.correct) button.classList.add('incorrect');
             });
 
-            // Complete the question after showing results
             setTimeout(() => {
                 this.completeQuestion(optionId === correctOption.id);
             }, 1500);
@@ -216,14 +248,14 @@ export class QuestionSystem {
     }
 
     startQuestionTimer() {
-        let timeLeft = 15;
+        let timeLeft = this.QUESTION_TIME / 1000;
         this.questionTimerCount.textContent = timeLeft;
         this.questionTimerProgress.style.width = '100%';
 
         this.questionTimer = setInterval(() => {
             timeLeft--;
             this.questionTimerCount.textContent = timeLeft;
-            this.questionTimerProgress.style.width = `${(timeLeft / 15) * 100}%`;
+            this.questionTimerProgress.style.width = `${(timeLeft / (this.QUESTION_TIME / 1000)) * 100}%`;
 
             if (timeLeft <= 0) {
                 clearInterval(this.questionTimer);
@@ -233,14 +265,12 @@ export class QuestionSystem {
     }
 
     handleQuestionTimeExpired() {
-        console.log("Question time expired!");
-
-        // Auto-select no answer (failed)
         this.selectedAnswer = null;
         this.completeQuestion(false);
     }
 
     completeQuestion(isCorrect) {
+        if (!this.questionActive) return;
         this.questionActive = false;
 
         if (this.questionTimer) {
@@ -248,15 +278,11 @@ export class QuestionSystem {
             this.questionTimer = null;
         }
 
-        // Hide question after a delay to show results
-        setTimeout(() => {
-            this.questionContainer.style.display = 'none';
+        this.questionContainer.style.display = 'none';
 
-            // Notify main.js about question completion
-            if (this.onQuestionComplete) {
-                this.onQuestionComplete(isCorrect, this.selectedAnswer);
-            }
-        }, 1000);
+        if (this.onQuestionComplete) {
+            this.onQuestionComplete(isCorrect, this.selectedAnswer);
+        }
     }
 
     hideQuestion() {
@@ -267,5 +293,18 @@ export class QuestionSystem {
             clearInterval(this.questionTimer);
             this.questionTimer = null;
         }
+    }
+}
+
+export function pauseWorld(pause = true) {
+    const gameCanvas = document.getElementById('gameCanvas');
+    if (!gameCanvas) return;
+
+    if (pause) {
+        gameCanvas.classList.add('blur');
+        gameCanvas.style.pointerEvents = 'none';
+    } else {
+        gameCanvas.classList.remove('blur');
+        gameCanvas.style.pointerEvents = 'auto';
     }
 }

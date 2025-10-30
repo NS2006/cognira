@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { Renderer } from "./components/Renderer";
 import { Camera } from "./components/Camera";
 import { DirectionalLight } from "./components/DirectionalLight";
-import { map, initializeMap, loadTrees } from "./components/Map";
+import { map, initializeMap, loadTrees, loadRiver } from "./components/Map";
 import { SocketClient } from "./socketClient";
 import { CardSystem } from "./components/CardSystem";
 import { CardManager } from "./components/CardManager";
@@ -10,7 +10,7 @@ import { QuestionSystem } from "./components/QuestionSystem";
 import { refreshMovementUI } from "./utilities/collectUserInputs";
 import "./utilities/collectUserInputs";
 import { SkyBox } from "./components/SkyBox";
-import { loadingManager } from "./components/LoadingManager";
+import { loadingManager } from "./components/LoadingManager"; 
 
 const mainMenu = document.getElementById("mainMenu");
 const gameCanvas = document.getElementById("gameCanvas");
@@ -512,6 +512,7 @@ function initializeGame() {
 
   initializeMap();
   loadTrees();
+  loadRiver();
 }
 
 function animate() {

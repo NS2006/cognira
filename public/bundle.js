@@ -30934,7 +30934,7 @@ class LoadingManager {
 exports.LoadingManager = LoadingManager;
 const loadingManager = exports.loadingManager = LoadingManager.getInstance();
 
-},{"../components/LoadingScreen":47,"../components/TextManager":53,"./Camera":41,"./Renderer":51,"three":35}],47:[function(require,module,exports){
+},{"../components/LoadingScreen":47,"../components/TextManager":54,"./Camera":41,"./Renderer":51,"three":35}],47:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31061,6 +31061,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.initializeMap = initializeMap;
+exports.loadRiver = loadRiver;
 exports.loadTrees = loadTrees;
 exports.metadata = exports.map = void 0;
 var THREE = _interopRequireWildcard(require("three"));
@@ -31169,6 +31170,11 @@ const treePositions = [{
   y: 20,
   z: -80
 }, {
+  model: 2,
+  x: -200,
+  y: 200,
+  z: -80
+}, {
   model: 1,
   x: -200,
   y: 0,
@@ -31192,24 +31198,38 @@ const treePositions = [{
 function loadTrees() {
   const promises = treeModels.map(path => loadModel(path));
   Promise.all(promises).then(models => {
-    treePositions.forEach(pos => {
-      const baseModel = models[pos.model];
-      if (!baseModel) return;
-
-      // Clone so each can be placed independently
+    const treeCount = 70;
+    const yMin = -100;
+    const yMax = 1000;
+    const yStep = (yMax - yMin) / (treeCount - 1);
+    for (let i = 0; i < treeCount; i++) {
+      // 🎲 pick a random model
+      const baseModel = models[Math.floor(Math.random() * models.length)];
+      if (!baseModel) continue;
       const tree = baseModel.clone();
 
-      // Apply transform
-      tree.position.set(pos.x, pos.y, pos.z);
-      tree.scale.set(0.5, 0.5, 0.5);
-      // tree.rotation.y = Math.random() * Math.PI * 2;
-      tree.rotation.x = Math.PI / 2;
+      // 🎯 pick random zone for X
+      let x;
+      if (Math.random() < 0.5) {
+        // left zone
+        x = THREE.MathUtils.randFloat(-200, -190);
+      } else {
+        // right zone
+        x = THREE.MathUtils.randFloat(200, 300);
+      }
 
-      // Optional: small tilt randomness
-      tree.rotation.z = (Math.random() - 0.5) * 0.1;
+      // 🎯 random Y and Z
+      const y = yMin + i * yStep;
+      const z = THREE.MathUtils.randFloat(-100, -80);
+
+      // 🪵 apply transforms
+      tree.position.set(x, y, z);
+      tree.scale.set(0.5, 0.5, 0.5);
+      tree.rotation.x = Math.PI / 2;
+      tree.rotation.z = (Math.random() - 1) * 0.1;
       map.add(tree);
-    });
-    console.log("🌲 All trees added to the map!");
+    }
+    console.log("🌲 Random trees added across both zones!");
   });
 }
 
@@ -31225,6 +31245,24 @@ function loadModel(path) {
     });
   });
 }
+function loadRiver() {
+  loader.load('/assets/model/River.gltf', gltf => {
+    const river = gltf.scene;
+
+    // Set position — ground level
+    river.position.set(50, 500, -40);
+    river.rotation.x = Math.PI / 2;
+    // Optional: scale or rotate if needed
+    river.scale.set(55, 55, 55);
+    // river.rotation.y = Math.PI / 2;
+
+    // Add to map or scene
+    map.add(river);
+    console.log('✅ River loaded');
+  }, undefined, error => {
+    console.error('❌ Error loading river.gltf:', error);
+  });
+}
 function getMapBounds() {
   const box = new THREE.Box3().setFromObject(map);
   return {
@@ -31234,7 +31272,7 @@ function getMapBounds() {
   };
 }
 
-},{"../constants":55,"./Tile":54,"three":35,"three/examples/jsm/loaders/GLTFLoader.js":39}],49:[function(require,module,exports){
+},{"../constants":56,"./Tile":55,"three":35,"three/examples/jsm/loaders/GLTFLoader.js":39}],49:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31607,13 +31645,15 @@ class Player extends THREE.Object3D {
 }
 exports.Player = Player;
 
-},{"../constants":55,"three":35,"three/examples/jsm/loaders/GLTFLoader":39}],50:[function(require,module,exports){
+},{"../constants":56,"three":35,"three/examples/jsm/loaders/GLTFLoader":39}],50:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.QuestionSystem = void 0;
+exports.pauseWorld = pauseWorld;
+var _SpatialMinigame = require("./SpatialMinigame.js");
 class QuestionSystem {
   constructor(socketClient, onQuestionCompleteCallback) {
     this.socketClient = socketClient;
@@ -31636,6 +31676,7 @@ class QuestionSystem {
   getQuestionBank() {
     return [{
       id: 1,
+      type: "logic",
       description: "&nbsp;&nbsp;&nbsp; A B <br> &nbsp;&nbsp;&nbsp; A B <br> _______ + <br> &nbsp; B C C <br><br>What is A B C?",
       image: null,
       options: [{
@@ -31658,6 +31699,7 @@ class QuestionSystem {
       category: "Numeric Logic"
     }, {
       id: 2,
+      type: "logic",
       description: "What is the last digit of 3<sup>205</sup>?",
       image: null,
       options: [{
@@ -31680,6 +31722,7 @@ class QuestionSystem {
       category: "Numeric Logic"
     }, {
       id: 3,
+      type: "logic",
       description: "NS, JPP, FL, TS, and KF compete in a running race. The current position is NS, JPP, TS, KF, and FL, so NS is the nearest to the finish line. After 3 seconds, KF gets ahead of TS. At the same time, JPP gets ahead of NS. At the last 4 seconds, FL finally gets ahead of NS. Now, who is at the third position?",
       image: null,
       options: [{
@@ -31700,6 +31743,31 @@ class QuestionSystem {
         correct: false
       }],
       category: "Numeric Logic"
+    },
+    // Example spatial question
+    {
+      id: 4,
+      type: "spatial",
+      description: "Which shape can be formed by folding this net?",
+      image: "assets/images/spatial_net_example.png",
+      options: [{
+        id: 'A',
+        text: "Cube",
+        correct: true
+      }, {
+        id: 'B',
+        text: "Pyramid",
+        correct: false
+      }, {
+        id: 'C',
+        text: "Cylinder",
+        correct: false
+      }, {
+        id: 'D',
+        text: "Cone",
+        correct: false
+      }],
+      category: "Spatial Reasoning"
     }
     // {
     //     id: 1,
@@ -31765,33 +31833,55 @@ class QuestionSystem {
   }
   getRandomQuestion() {
     const questions = this.getQuestionBank();
-    const randomIndex = Math.floor(Math.random() * questions.length);
-    return questions[randomIndex];
+    const types = ['logic', 'spatial'];
+    const chosenType = types[Math.floor(Math.random() * types.length)];
+    const filteredQuestions = questions.filter(q => q.type === chosenType);
+    const randomIndex = Math.floor(Math.random() * filteredQuestions.length);
+    return filteredQuestions[randomIndex];
   }
   showQuestion() {
-    if (this.questionActive) return;
+    if (this.questionActive) return; // prevent re-entry
     this.currentQuestion = this.getRandomQuestion();
     this.selectedAnswer = null;
-
-    // Update question content
-    this.questionDescription.innerHTML = this.currentQuestion.description;
-
-    // Handle image (if any)
+    if (this.currentQuestion.type === "logic") {
+      // Show description + type label
+      this.questionDescription.innerHTML = `
+                <div class="question-type-label"><b>Type:</b> Logic</div>
+                <div class="question-text">${this.currentQuestion.description}</div>
+            `;
+      this.showLogicQuestion();
+    } else if (this.currentQuestion.type === "spatial") {
+      // Only show type label, NO description
+      this.questionDescription.innerHTML = `<div class="question-type-label"><b>Type:</b> Spatial</div>`;
+      this.showSpatialMinigame();
+    }
+  }
+  showSpatialMinigame() {
+    if (this.questionActive) return;
+    this.questionOptions.style.display = 'none';
+    const tetrisContainer = document.getElementById('spatialMinigame');
+    tetrisContainer.style.display = 'block';
+    pauseWorld(true);
+    this.questionActive = true;
+    (0, _SpatialMinigame.startTetrisGame)(() => {
+      if (!this.questionActive) return; // prevent double call
+      this.questionActive = false;
+      tetrisContainer.style.display = 'none';
+      pauseWorld(false);
+      this.questionOptions.style.display = 'flex';
+      this.completeQuestion(true);
+    }, 30000); // 30s
+  }
+  showLogicQuestion() {
     if (this.currentQuestion.image) {
       this.questionImage.src = this.currentQuestion.image;
       this.questionImageContainer.style.display = 'block';
     } else {
       this.questionImageContainer.style.display = 'none';
     }
-
-    // Create answer buttons
     this.createAnswerButtons();
-
-    // Show question container
     this.questionContainer.style.display = 'block';
     this.questionActive = true;
-
-    // Start timer
     this.startQuestionTimer();
   }
   createAnswerButtons() {
@@ -31808,16 +31898,9 @@ class QuestionSystem {
       this.questionOptions.appendChild(button);
     });
   }
-  isAnswerCorrect(selectedAnswer) {
-    if (!this.currentQuestion || !selectedAnswer) return false;
-    const correctOption = this.currentQuestion.options.find(opt => opt.correct);
-    return correctOption && selectedAnswer === correctOption.id;
-  }
   handleAnswerSelection(optionId) {
     if (!this.questionActive || this.selectedAnswer !== null) return;
     this.selectedAnswer = optionId;
-
-    // Highlight selected answer
     const buttons = this.questionOptions.querySelectorAll('.question-option');
     buttons.forEach(button => {
       button.classList.remove('selected');
@@ -31825,36 +31908,26 @@ class QuestionSystem {
         button.classList.add('selected');
       }
     });
-
-    // Find the correct answer
     const correctOption = this.currentQuestion.options.find(opt => opt.correct);
-
-    // Show correct/incorrect styling after a brief delay
     setTimeout(() => {
       buttons.forEach(button => {
-        const buttonOptionId = button.getAttribute('data-option-id');
-        const option = this.currentQuestion.options.find(opt => opt.id === buttonOptionId);
-        if (option.correct) {
-          button.classList.add('correct');
-        } else if (buttonOptionId === optionId && !option.correct) {
-          button.classList.add('incorrect');
-        }
+        const id = button.getAttribute('data-option-id');
+        const option = this.currentQuestion.options.find(opt => opt.id === id);
+        if (option.correct) button.classList.add('correct');else if (id === optionId && !option.correct) button.classList.add('incorrect');
       });
-
-      // Complete the question after showing results
       setTimeout(() => {
         this.completeQuestion(optionId === correctOption.id);
       }, 1500);
     }, 500);
   }
   startQuestionTimer() {
-    let timeLeft = 15;
+    let timeLeft = this.QUESTION_TIME / 1000;
     this.questionTimerCount.textContent = timeLeft;
     this.questionTimerProgress.style.width = '100%';
     this.questionTimer = setInterval(() => {
       timeLeft--;
       this.questionTimerCount.textContent = timeLeft;
-      this.questionTimerProgress.style.width = `${timeLeft / 15 * 100}%`;
+      this.questionTimerProgress.style.width = `${timeLeft / (this.QUESTION_TIME / 1000) * 100}%`;
       if (timeLeft <= 0) {
         clearInterval(this.questionTimer);
         this.handleQuestionTimeExpired();
@@ -31862,28 +31935,20 @@ class QuestionSystem {
     }, 1000);
   }
   handleQuestionTimeExpired() {
-    console.log("Question time expired!");
-
-    // Auto-select no answer (failed)
     this.selectedAnswer = null;
     this.completeQuestion(false);
   }
   completeQuestion(isCorrect) {
+    if (!this.questionActive) return;
     this.questionActive = false;
     if (this.questionTimer) {
       clearInterval(this.questionTimer);
       this.questionTimer = null;
     }
-
-    // Hide question after a delay to show results
-    setTimeout(() => {
-      this.questionContainer.style.display = 'none';
-
-      // Notify main.js about question completion
-      if (this.onQuestionComplete) {
-        this.onQuestionComplete(isCorrect, this.selectedAnswer);
-      }
-    }, 1000);
+    this.questionContainer.style.display = 'none';
+    if (this.onQuestionComplete) {
+      this.onQuestionComplete(isCorrect, this.selectedAnswer);
+    }
   }
   hideQuestion() {
     this.questionContainer.style.display = 'none';
@@ -31895,8 +31960,19 @@ class QuestionSystem {
   }
 }
 exports.QuestionSystem = QuestionSystem;
+function pauseWorld(pause = true) {
+  const gameCanvas = document.getElementById('gameCanvas');
+  if (!gameCanvas) return;
+  if (pause) {
+    gameCanvas.classList.add('blur');
+    gameCanvas.style.pointerEvents = 'none';
+  } else {
+    gameCanvas.classList.remove('blur');
+    gameCanvas.style.pointerEvents = 'auto';
+  }
+}
 
-},{}],51:[function(require,module,exports){
+},{"./SpatialMinigame.js":53}],51:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -32033,6 +32109,139 @@ class SkyBox {
 exports.SkyBox = SkyBox;
 
 },{"three":35,"three/examples/jsm/loaders/GLTFLoader.js":39}],53:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.startTetrisGame = startTetrisGame;
+function startTetrisGame(callback, duration = 30000) {
+  const container = document.getElementById('spatialMinigame');
+  container.innerHTML = '';
+  container.style.display = 'block';
+  container.style.position = 'fixed';
+  container.style.top = '50%';
+  container.style.left = '50%';
+  container.style.transform = 'translate(-50%, -50%)';
+  container.style.zIndex = '1000';
+  container.style.background = 'rgba(0,0,0,0.8)';
+  container.style.padding = '20px';
+  container.style.borderRadius = '10px';
+  const COLS = 10,
+    ROWS = 20,
+    BLOCK_SIZE = 30;
+  const canvas = document.createElement('canvas');
+  canvas.width = COLS * BLOCK_SIZE;
+  canvas.height = ROWS * BLOCK_SIZE;
+  container.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  const SHAPES = [[[1, 1, 1, 1]], [[1, 1], [1, 1]], [[0, 1, 0], [1, 1, 1]], [[1, 0, 0], [1, 1, 1]], [[0, 0, 1], [1, 1, 1]], [[0, 1, 1], [1, 1, 0]], [[1, 1, 0], [0, 1, 1]]];
+  const COLORS = ['cyan', 'yellow', 'purple', 'orange', 'blue', 'green', 'red'];
+  let board = Array.from({
+    length: ROWS
+  }, () => Array(COLS).fill(0));
+  let currentPiece = null,
+    score = 0,
+    dropCounter = 0,
+    lastTime = 0;
+  function drawBoard() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) if (board[r][c]) {
+      ctx.fillStyle = COLORS[board[r][c] - 1];
+      ctx.fillRect(c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
+    }
+    if (currentPiece) {
+      for (let r = 0; r < currentPiece.shape.length; r++) for (let c = 0; c < currentPiece.shape[r].length; c++) if (currentPiece.shape[r][c]) {
+        ctx.fillStyle = COLORS[currentPiece.color - 1];
+        ctx.fillRect((currentPiece.x + c) * BLOCK_SIZE, (currentPiece.y + r) * BLOCK_SIZE, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
+      }
+    }
+  }
+  function collide(board, piece) {
+    for (let r = 0; r < piece.shape.length; r++) for (let c = 0; c < piece.shape[r].length; c++) if (piece.shape[r][c]) {
+      let newY = piece.y + r,
+        newX = piece.x + c;
+      if (newY >= ROWS || newX < 0 || newX >= COLS || board[newY][newX]) return true;
+    }
+    return false;
+  }
+  function merge(board, piece) {
+    for (let r = 0; r < piece.shape.length; r++) for (let c = 0; c < piece.shape[r].length; c++) if (piece.shape[r][c]) board[piece.y + r][piece.x + c] = piece.color;
+  }
+  function clearLines() {
+    for (let r = ROWS - 1; r >= 0; r--) {
+      if (board[r].every(cell => cell !== 0)) {
+        board.splice(r, 1);
+        board.unshift(Array(COLS).fill(0));
+        score += 10;
+        r++;
+      }
+    }
+  }
+  function newPiece() {
+    const idx = Math.floor(Math.random() * SHAPES.length);
+    currentPiece = {
+      shape: SHAPES[idx],
+      color: idx + 1,
+      x: Math.floor(COLS / 2) - 1,
+      y: 0
+    };
+  }
+  function dropPiece() {
+    currentPiece.y++;
+    if (collide(board, currentPiece)) {
+      currentPiece.y--;
+      merge(board, currentPiece);
+      clearLines();
+      newPiece();
+      // Never end the game prematurely
+      if (collide(board, currentPiece)) {
+        // just reset piece
+        currentPiece.y = 0;
+        currentPiece.x = Math.floor(COLS / 2) - 1;
+      }
+    }
+  }
+  function movePiece(dir) {
+    currentPiece.x += dir;
+    if (collide(board, currentPiece)) currentPiece.x -= dir;
+  }
+  function rotatePiece() {
+    const temp = currentPiece.shape;
+    currentPiece.shape = currentPiece.shape[0].map((_, i) => currentPiece.shape.map(row => row[i]).reverse());
+    if (collide(board, currentPiece)) currentPiece.shape = temp;
+  }
+  function update(time = 0) {
+    const delta = time - lastTime;
+    lastTime = time;
+    dropCounter += delta;
+    if (dropCounter > 500) {
+      dropPiece();
+      dropCounter = 0;
+    }
+    drawBoard();
+    if (!gameOver) requestAnimationFrame(update);
+  }
+  document.onkeydown = function (e) {
+    if (gameOver) return;
+    if (e.key === 'ArrowLeft') movePiece(-1);
+    if (e.key === 'ArrowRight') movePiece(1);
+    if (e.key === 'ArrowDown') dropPiece();
+    if (e.key === 'ArrowUp') rotatePiece();
+  };
+  let gameOver = false;
+  newPiece();
+  update();
+
+  // End game after fixed duration
+  setTimeout(() => {
+    gameOver = true;
+    container.style.display = 'none';
+    callback(true, score);
+  }, duration);
+}
+
+},{}],54:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -32355,7 +32564,7 @@ class TextManager {
 exports.TextManager = TextManager;
 const textManager = exports.textManager = new TextManager();
 
-},{"three":35,"three/examples/fonts/helvetiker_regular.typeface.json":36,"three/examples/jsm/geometries/TextGeometry.js":37,"three/examples/jsm/loaders/FontLoader.js":38}],54:[function(require,module,exports){
+},{"three":35,"three/examples/fonts/helvetiker_regular.typeface.json":36,"three/examples/jsm/geometries/TextGeometry.js":37,"three/examples/jsm/loaders/FontLoader.js":38}],55:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -32425,7 +32634,7 @@ function Tile(positionY, platformWidthScale = 0.7, modelName = 'grass.gltf') {
   return tile;
 }
 
-},{"../constants":55,"three":35,"three/examples/jsm/loaders/GLTFLoader.js":39}],55:[function(require,module,exports){
+},{"../constants":56,"three":35,"three/examples/jsm/loaders/GLTFLoader.js":39}],56:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -32438,7 +32647,7 @@ const MAP_SIZE_Y = exports.MAP_SIZE_Y = 23;
 const TILE_SIZE = exports.TILE_SIZE = 42;
 const GAP_SIZE = exports.GAP_SIZE = 6;
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -32904,6 +33113,7 @@ function initializeGame() {
   new _SkyBox.SkyBox(scene);
   (0, _Map.initializeMap)();
   (0, _Map.loadTrees)();
+  (0, _Map.loadRiver)();
 }
 function animate() {
   if (localPlayer && canMove) {
@@ -33125,7 +33335,7 @@ function debugCameraView() {
   });
 }
 
-},{"./components/Camera":41,"./components/CardManager":43,"./components/CardSystem":44,"./components/DirectionalLight":45,"./components/LoadingManager":46,"./components/Map":48,"./components/QuestionSystem":50,"./components/Renderer":51,"./components/SkyBox":52,"./socketClient":57,"./utilities/collectUserInputs":58,"three":35}],57:[function(require,module,exports){
+},{"./components/Camera":41,"./components/CardManager":43,"./components/CardSystem":44,"./components/DirectionalLight":45,"./components/LoadingManager":46,"./components/Map":48,"./components/QuestionSystem":50,"./components/Renderer":51,"./components/SkyBox":52,"./socketClient":58,"./utilities/collectUserInputs":59,"three":35}],58:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33258,7 +33468,7 @@ class SocketClient {
 }
 exports.SocketClient = SocketClient;
 
-},{"./components/Player":49,"socket.io-client":26}],58:[function(require,module,exports){
+},{"./components/Player":49,"socket.io-client":26}],59:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33379,4 +33589,4 @@ function refreshMovementUI() {
   updateMovementUI();
 }
 
-},{"../main.js":56}]},{},[56]);
+},{"../main.js":57}]},{},[57]);
