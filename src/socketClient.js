@@ -1,5 +1,6 @@
 import { io } from 'socket.io-client';
 import { Player } from './components/Player';
+import { physicsWorld } from './main.js';
 
 export class SocketClient {
     constructor(addPlayer, removePlayer, updatePlayerCount) {
@@ -99,7 +100,7 @@ export class SocketClient {
         }
 
         console.log("Creating remote player:", playerData.id);
-        const player = new Player(playerData.id, this.players.size);
+        const player = new Player(playerData.id, this.players.size, physicsWorld);
 
         // Set initial position if available
         // player.move(playerData.position, playerData.rotation);

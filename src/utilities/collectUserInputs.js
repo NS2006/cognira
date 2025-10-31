@@ -1,5 +1,13 @@
 import { getLocalPlayer, getSocketClient, canPlayerMove } from "../main.js";
 
+// Track which directions are currently held (to prevent repeat moves)
+const keyHeld = {
+    forward: false,
+    backward: false,
+    left: false,
+    right: false
+};
+
 function setupInputHandlers() {
     console.log("🎮 Setting up input handlers");
     
@@ -8,14 +16,23 @@ function setupInputHandlers() {
     const leftBtn = document.getElementById("left");
     const rightBtn = document.getElementById("right");
 
-    // Add event listeners
-    forwardBtn?.addEventListener("click", () => handleMove("forward"));
-    backwardBtn?.addEventListener("click", () => handleMove("backward"));
-    leftBtn?.addEventListener("click", () => handleMove("left"));
-    rightBtn?.addEventListener("click", () => handleMove("right"));
+    // Add event listeners for buttons (one move per press)
+    forwardBtn?.addEventListener("mousedown", () => handleMoveOnce("forward"));
+    backwardBtn?.addEventListener("mousedown", () => handleMoveOnce("backward"));
+    leftBtn?.addEventListener("mousedown", () => handleMoveOnce("left"));
+    rightBtn?.addEventListener("mousedown", () => handleMoveOnce("right"));
+
+    // Reset on mouse up (to allow next click)
+    ["mouseup", "mouseleave"].forEach(evt => {
+        forwardBtn?.addEventListener(evt, () => (keyHeld.forward = false));
+        backwardBtn?.addEventListener(evt, () => (keyHeld.backward = false));
+        leftBtn?.addEventListener(evt, () => (keyHeld.left = false));
+        rightBtn?.addEventListener(evt, () => (keyHeld.right = false));
+    });
 
     // Keyboard events
     window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
     
     console.log("🎮 Input handlers setup complete");
 }
@@ -45,38 +62,64 @@ function handleMove(direction) {
     }
 }
 
+// Button handler with anti-repeat lock
+function handleMoveOnce(direction) {
+    if (keyHeld[direction]) return; // prevent holding spam
+    keyHeld[direction] = true;
+    handleMove(direction);
+
+    // Slight debounce to prevent double triggering
+    setTimeout(() => (keyHeld[direction] = false), 150);
+}
+
 function handleKeyDown(event) {
-    // Check if player can move first
-    if (!canPlayerMove()) {
-        // Still prevent default for arrow keys to avoid scrolling
-        if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "W", "w", "S", "s", "A", "a", "D", "d"].includes(event.key)) {
-            event.preventDefault();
-        }
-        return;
-    }
-    
-    // Additional check: ensure player can move based on card effects and steps
-    const localPlayer = getLocalPlayer();
-    if (localPlayer && !localPlayer.canMove()) {
-        if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "W", "w", "S", "s", "A", "a", "D", "d"].includes(event.key)) {
-            event.preventDefault();
-        }
-        return;
-    }
-    
-    if (event.key === "ArrowUp" || event.key === "W" || event.key === "w") {
-        event.preventDefault();
-        handleMove("forward");
-    } else if (event.key === "ArrowDown" || event.key === "S" || event.key === "s") {
-        event.preventDefault();
-        handleMove("backward");
-    } else if (event.key === "ArrowLeft" || event.key === "A" || event.key === "a") {
-        event.preventDefault();
-        handleMove("left");
-    } else if (event.key === "ArrowRight" || event.key === "D" || event.key === "d") {
-        event.preventDefault();
-        handleMove("right");
-    }
+    const keyMap = {
+        "ArrowUp": "forward",
+        "w": "forward",
+        "W": "forward",
+        "ArrowDown": "backward",
+        "s": "backward",
+        "S": "backward",
+        "ArrowLeft": "left",
+        "a": "left",
+        "A": "left",
+        "ArrowRight": "right",
+        "d": "right",
+        "D": "right"
+    };
+
+    const direction = keyMap[event.key];
+    if (!direction) return;
+
+    event.preventDefault();
+
+    // Prevent repeat fire when holding down key
+    if (keyHeld[direction]) return;
+
+    keyHeld[direction] = true;
+    handleMove(direction);
+}
+
+function handleKeyUp(event) {
+    const keyMap = {
+        "ArrowUp": "forward",
+        "w": "forward",
+        "W": "forward",
+        "ArrowDown": "backward",
+        "s": "backward",
+        "S": "backward",
+        "ArrowLeft": "left",
+        "a": "left",
+        "A": "left",
+        "ArrowRight": "right",
+        "d": "right",
+        "D": "right"
+    };
+
+    const direction = keyMap[event.key];
+    if (!direction) return;
+
+    keyHeld[direction] = false;
 }
 
 // Add visual feedback for blocked movement
