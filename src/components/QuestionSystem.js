@@ -69,82 +69,33 @@ export class QuestionSystem {
             {
                 id: 4,
                 type: "spatial",
-                description: "Which shape can be formed by folding this net?",
+                description: "",
                 image: "assets/images/spatial_net_example.png",
-                options: [
-                    { id: 'A', text: "Cube", correct: true },
-                    { id: 'B', text: "Pyramid", correct: false },
-                    { id: 'C', text: "Cylinder", correct: false },
-                    { id: 'D', text: "Cone", correct: false }
-                ],
+                options: [],
                 category: "Spatial Reasoning"
             },
-            // {
-            //     id: 1,
-            //     description: "What is the capital of France?",
-            //     image: null,
-            //     options: [
-            //         { id: 'A', text: "London", correct: false },
-            //         { id: 'B', text: "Paris", correct: true },
-            //         { id: 'C', text: "Berlin", correct: false },
-            //         { id: 'D', text: "Madrid", correct: false }
-            //     ],
-            //     category: "Geography"
-            // },
-            // {
-            //     id: 2,
-            //     description: "Which planet is known as the Red Planet?",
-            //     image: null,
-            //     options: [
-            //         { id: 'A', text: "Venus", correct: false },
-            //         { id: 'B', text: "Mars", correct: true },
-            //         { id: 'C', text: "Jupiter", correct: false },
-            //         { id: 'D', text: "Saturn", correct: false }
-            //     ],
-            //     category: "Science"
-            // },
-            // {
-            //     id: 3,
-            //     description: "What is 8 × 7?",
-            //     image: null,
-            //     options: [
-            //         { id: 'A', text: "48", correct: false },
-            //         { id: 'B', text: "56", correct: true },
-            //         { id: 'C', text: "64", correct: false },
-            //         { id: 'D', text: "72", correct: false }
-            //     ],
-            //     category: "Math"
-            // },
-            // {
-            //     id: 4,
-            //     description: "Which programming language is known for web development?",
-            //     image: null,
-            //     options: [
-            //         { id: 'A', text: "Java", correct: false },
-            //         { id: 'B', text: "Python", correct: false },
-            //         { id: 'C', text: "JavaScript", correct: true },
-            //         { id: 'D', text: "C++", correct: false }
-            //     ],
-            //     category: "Programming"
-            // },
-            // {
-            //     id: 5,
-            //     description: "What is the largest mammal in the world?",
-            //     image: null,
-            //     options: [
-            //         { id: 'A', text: "Elephant", correct: false },
-            //         { id: 'B', text: "Blue Whale", correct: true },
-            //         { id: 'C', text: "Giraffe", correct: false },
-            //         { id: 'D', text: "Polar Bear", correct: false }
-            //     ],
-            //     category: "Biology"
-            // }
+            {
+                id: 5,
+                type: "memory",
+                description: "Memorize the 2×2 color pattern shown below:",
+                matrix: [
+                  ["#ff0000", "#00ff00"],
+                  ["#0000ff", "#ffff00"]
+                ],
+                options: [
+                  { id: 'A', matrix: [["#ff0000", "#00ff00"], ["#0000ff", "#ffff00"]], correct: true },
+                  { id: 'B', matrix: [["#00ff00", "#ff0000"], ["#0000ff", "#ffff00"]], correct: false },
+                  { id: 'C', matrix: [["#ff0000", "#ffff00"], ["#0000ff", "#00ff00"]], correct: false },
+                  { id: 'D', matrix: [["#0000ff", "#ff0000"], ["#00ff00", "#ffff00"]], correct: false }
+                ],
+                category: "Memory Pattern"
+              },              
         ];
     }
 
     getRandomQuestion() {
         const questions = this.getQuestionBank();
-        const types = ['logic', 'spatial'];
+        const types = ['logic', 'spatial', 'memory'];
         const chosenType = types[Math.floor(Math.random() * types.length)];
         const filteredQuestions = questions.filter(q => q.type === chosenType);
         const randomIndex = Math.floor(Math.random() * filteredQuestions.length);
@@ -164,12 +115,18 @@ export class QuestionSystem {
                 <div class="question-text">${this.currentQuestion.description}</div>
             `;
             this.showLogicQuestion();
+        } else if (this.currentQuestion.type === "memory") {
+            this.questionDescription.innerHTML = `
+                <div class="question-type-label"><b>Type:</b> Logic</div>
+                <div class="question-text">${this.currentQuestion.description}</div>
+            `;
+            this.showMemoryQuestion();
         } else if (this.currentQuestion.type === "spatial") {
             this.isSpatialQuestion = true;
             this.spatialMinigameActive = true;
             this.questionDescription.innerHTML = `<div class="question-type-label"><b>Type:</b> Spatial</div>`;
             this.showSpatialMinigame();
-        }
+        } 
     }
     
     // In the showSpatialMinigame method, update the callback handling:
@@ -216,6 +173,32 @@ export class QuestionSystem {
             this.completeQuestion(isCorrect);
         }, this.SPATIAL_QUESTION_TIME);
     }
+    
+    showMemoryQuestion() {
+        if (this.questionActive) return;
+    
+        const question = this.currentQuestion;
+        this.questionContainer.style.display = 'block';
+        this.questionOptions.style.display = 'none';
+        this.questionActive = true;
+    
+        // Step 1: Show the original matrix to memorize
+        const matrixContainer = document.createElement('div');
+        matrixContainer.classList.add('memory-matrix');
+        this.questionDescription.innerHTML = `
+            <div class="question-type-label"><b>Type:</b> Memory</div>
+            <div class="question-text">${question.description}</div>
+        `;
+        this.questionDescription.appendChild(matrixContainer);
+    
+        this.renderColorMatrix(matrixContainer, question.matrix);
+    
+        // Step 2: After a few seconds, hide it and show answer choices
+        setTimeout(() => {
+            matrixContainer.remove();
+            this.showMemoryOptions();
+        }, 3000); // Show for 3 seconds
+    }    
 
     showLogicQuestion() {
         if (this.currentQuestion.image) {
@@ -224,12 +207,69 @@ export class QuestionSystem {
         } else {
             this.questionImageContainer.style.display = 'none';
         }
-
+    
+        // 🔧 FIX: Make sure the options container is visible again
+        this.questionOptions.style.display = 'grid'; 
+        this.questionOptions.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        this.questionOptions.style.gap = '12px';
+        this.questionOptions.style.justifyContent = 'center';
+    
         this.createAnswerButtons();
         this.questionContainer.style.display = 'block';
         this.questionActive = true;
         this.startQuestionTimer(this.LOGIC_QUESTION_TIME);
+    }    
+
+    renderColorMatrix(container, matrix) {
+        container.innerHTML = '';
+        container.style.display = 'grid';
+        container.style.gridTemplateColumns = 'repeat(2, 50px)';
+        container.style.gridTemplateRows = 'repeat(2, 50px)';
+        container.style.gap = '4px';
+        container.style.margin = '10px auto';
+    
+        matrix.forEach(row => {
+            row.forEach(color => {
+                const cell = document.createElement('div');
+                cell.style.width = '50px';
+                cell.style.height = '50px';
+                cell.style.background = color;
+                cell.style.border = '1px solid #333';
+                container.appendChild(cell);
+            });
+        });
     }
+    
+    showMemoryOptions() {
+        const question = this.currentQuestion;
+        this.questionOptions.innerHTML = '';
+        this.questionOptions.style.display = 'grid';
+        this.questionOptions.style.gridTemplateColumns = 'repeat(2, auto)';
+        this.questionOptions.style.gap = '20px';
+        this.questionOptions.style.justifyContent = 'center';
+    
+        question.options.forEach(option => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'memory-option';
+            wrapper.setAttribute('data-option-id', option.id);
+            wrapper.style.cursor = 'pointer';
+            wrapper.style.padding = '10px';
+            wrapper.style.border = '2px solid #888';
+            wrapper.style.borderRadius = '8px';
+            wrapper.style.transition = '0.2s';
+    
+            wrapper.innerHTML = `<div class="option-id">${option.id}</div>`;
+            const matrixDiv = document.createElement('div');
+            this.renderColorMatrix(matrixDiv, option.matrix);
+            wrapper.appendChild(matrixDiv);
+    
+            wrapper.addEventListener('click', () => this.handleAnswerSelection(option.id));
+    
+            this.questionOptions.appendChild(wrapper);
+        });
+    
+        this.startQuestionTimer(this.LOGIC_QUESTION_TIME);
+    }    
     
     createAnswerButtons() {
         this.questionOptions.innerHTML = '';
@@ -248,31 +288,37 @@ export class QuestionSystem {
 
     handleAnswerSelection(optionId) {
         if (!this.questionActive || this.selectedAnswer !== null) return;
-
+    
         this.selectedAnswer = optionId;
-        const buttons = this.questionOptions.querySelectorAll('.question-option');
-        buttons.forEach(button => {
-            button.classList.remove('selected');
-            if (button.getAttribute('data-option-id') === optionId) {
-                button.classList.add('selected');
-            }
-        });
-
+    
+        // Determine correct option
         const correctOption = this.currentQuestion.options.find(opt => opt.correct);
-
+    
+        // Handle logic or memory question differently
+        const isMemory = this.currentQuestion.type === "memory";
+        const elements = isMemory 
+            ? this.questionOptions.querySelectorAll('.memory-option')
+            : this.questionOptions.querySelectorAll('.question-option');
+    
+        // Disable all options
+        elements.forEach(el => el.style.pointerEvents = 'none');
+    
         setTimeout(() => {
-            buttons.forEach(button => {
-                const id = button.getAttribute('data-option-id');
+            elements.forEach(el => {
+                const id = el.getAttribute('data-option-id');
                 const option = this.currentQuestion.options.find(opt => opt.id === id);
-                if (option.correct) button.classList.add('correct');
-                else if (id === optionId && !option.correct) button.classList.add('incorrect');
+                if (option.correct) {
+                    el.classList.add('correct'); // ✅ green
+                } else if (id === optionId && !option.correct) {
+                    el.classList.add('incorrect'); // ❌ red
+                }
             });
-
+    
             setTimeout(() => {
                 this.completeQuestion(optionId === correctOption.id);
             }, 1500);
-        }, 500);
-    }
+        }, 300);
+    }    
 
     startQuestionTimer(time) {
         let timeLeft = time / 1000;

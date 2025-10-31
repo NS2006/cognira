@@ -44,7 +44,7 @@ export function Tile(positionY, platformWidthScale = 0.7, modelName = 'grass.glt
       model.traverse((child) => {
         if (child.isMesh) {
           child.receiveShadow = true;
-          child.castShadow = true;
+          child.castShadow = false;
         }
       });
 

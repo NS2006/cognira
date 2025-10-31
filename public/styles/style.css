@@ -368,7 +368,7 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   width: 350px;
-  height: 650px;
+  height: 700px;
   z-index: 1000;
   background: #222;
   border-radius: 8px;
@@ -380,6 +380,20 @@ body {
   pointer-events: none; /* optional: prevent clicks */
 }
 
+.memory-matrix, .memory-option div {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+}
+
+.memory-option {
+  transition: transform 0.2s ease;
+}
+
+.memory-option:hover {
+  transform: scale(1.05);
+  border-color: #FF5722;
+}
 
 /* Fanned layout */
 
@@ -553,13 +567,13 @@ body {
   background: linear-gradient(145deg, #fff8f6, #ffeae6);
 }
 
-.question-option.correct {
+.question-option.correct, .memory-option.correct {
   background: linear-gradient(145deg, #e8f5e8, #c8e6c9);
   border-color: #4CAF50;
   color: #2e7d32;
 }
 
-.question-option.incorrect {
+.question-option.incorrect, .memory-option.incorrect {
   background: linear-gradient(145deg, #ffebee, #ffcdd2);
   border-color: #f44336;
   color: #c62828;

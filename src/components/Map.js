@@ -96,17 +96,17 @@ const treeModels = [
 
 // 📍 Manual positions for trees
 // You can tweak or expand this as needed
-const treePositions = [
-  { model: 0, x: -200, y: 50, z: -90 },
-  { model: 0, x: -100, y: 120, z: -100 },
-  { model: 1, x: -110, y: 200, z: -80 },
-  { model: 2, x: -200, y: 20, z: -80 },
-  { model: 2, x: -200, y: 200, z: -80 },
-  { model: 1, x: -200, y: 0, z: -100 },
-  { model: 1, x: 200, y: 220, z: -70 },
-  { model: 2, x: 350, y: 100, z: -95 },
-  { model: 2, x: 220, y: 50, z: -100 },
-];
+// const treePositions = [
+//   { model: 0, x: -200, y: 50, z: -90 },
+//   { model: 0, x: -100, y: 120, z: -100 },
+//   { model: 1, x: -110, y: 200, z: -80 },
+//   { model: 2, x: -200, y: 20, z: -80 },
+//   { model: 2, x: -200, y: 200, z: -80 },
+//   { model: 1, x: -200, y: 0, z: -100 },
+//   { model: 1, x: 200, y: 220, z: -70 },
+//   { model: 2, x: 350, y: 100, z: -95 },
+//   { model: 2, x: 220, y: 50, z: -100 },
+// ];
 
 export function loadTrees() {
   const promises = treeModels.map((path) => loadModel(path));

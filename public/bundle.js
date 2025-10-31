@@ -31149,52 +31149,18 @@ const treeModels = ["assets/model/tree_1.gltf", "assets/model/tree_2.gltf", "ass
 
 // 📍 Manual positions for trees
 // You can tweak or expand this as needed
-const treePositions = [{
-  model: 0,
-  x: -200,
-  y: 50,
-  z: -90
-}, {
-  model: 0,
-  x: -100,
-  y: 120,
-  z: -100
-}, {
-  model: 1,
-  x: -110,
-  y: 200,
-  z: -80
-}, {
-  model: 2,
-  x: -200,
-  y: 20,
-  z: -80
-}, {
-  model: 2,
-  x: -200,
-  y: 200,
-  z: -80
-}, {
-  model: 1,
-  x: -200,
-  y: 0,
-  z: -100
-}, {
-  model: 1,
-  x: 200,
-  y: 220,
-  z: -70
-}, {
-  model: 2,
-  x: 350,
-  y: 100,
-  z: -95
-}, {
-  model: 2,
-  x: 220,
-  y: 50,
-  z: -100
-}];
+// const treePositions = [
+//   { model: 0, x: -200, y: 50, z: -90 },
+//   { model: 0, x: -100, y: 120, z: -100 },
+//   { model: 1, x: -110, y: 200, z: -80 },
+//   { model: 2, x: -200, y: 20, z: -80 },
+//   { model: 2, x: -200, y: 200, z: -80 },
+//   { model: 1, x: -200, y: 0, z: -100 },
+//   { model: 1, x: 200, y: 220, z: -70 },
+//   { model: 2, x: 350, y: 100, z: -95 },
+//   { model: 2, x: 220, y: 50, z: -100 },
+// ];
+
 function loadTrees() {
   const promises = treeModels.map(path => loadModel(path));
   Promise.all(promises).then(models => {
@@ -31751,92 +31717,38 @@ class QuestionSystem {
     {
       id: 4,
       type: "spatial",
-      description: "Which shape can be formed by folding this net?",
+      description: "",
       image: "assets/images/spatial_net_example.png",
+      options: [],
+      category: "Spatial Reasoning"
+    }, {
+      id: 5,
+      type: "memory",
+      description: "Memorize the 2×2 color pattern shown below:",
+      matrix: [["#ff0000", "#00ff00"], ["#0000ff", "#ffff00"]],
       options: [{
         id: 'A',
-        text: "Cube",
+        matrix: [["#ff0000", "#00ff00"], ["#0000ff", "#ffff00"]],
         correct: true
       }, {
         id: 'B',
-        text: "Pyramid",
+        matrix: [["#00ff00", "#ff0000"], ["#0000ff", "#ffff00"]],
         correct: false
       }, {
         id: 'C',
-        text: "Cylinder",
+        matrix: [["#ff0000", "#ffff00"], ["#0000ff", "#00ff00"]],
         correct: false
       }, {
         id: 'D',
-        text: "Cone",
+        matrix: [["#0000ff", "#ff0000"], ["#00ff00", "#ffff00"]],
         correct: false
       }],
-      category: "Spatial Reasoning"
-    }
-    // {
-    //     id: 1,
-    //     description: "What is the capital of France?",
-    //     image: null,
-    //     options: [
-    //         { id: 'A', text: "London", correct: false },
-    //         { id: 'B', text: "Paris", correct: true },
-    //         { id: 'C', text: "Berlin", correct: false },
-    //         { id: 'D', text: "Madrid", correct: false }
-    //     ],
-    //     category: "Geography"
-    // },
-    // {
-    //     id: 2,
-    //     description: "Which planet is known as the Red Planet?",
-    //     image: null,
-    //     options: [
-    //         { id: 'A', text: "Venus", correct: false },
-    //         { id: 'B', text: "Mars", correct: true },
-    //         { id: 'C', text: "Jupiter", correct: false },
-    //         { id: 'D', text: "Saturn", correct: false }
-    //     ],
-    //     category: "Science"
-    // },
-    // {
-    //     id: 3,
-    //     description: "What is 8 × 7?",
-    //     image: null,
-    //     options: [
-    //         { id: 'A', text: "48", correct: false },
-    //         { id: 'B', text: "56", correct: true },
-    //         { id: 'C', text: "64", correct: false },
-    //         { id: 'D', text: "72", correct: false }
-    //     ],
-    //     category: "Math"
-    // },
-    // {
-    //     id: 4,
-    //     description: "Which programming language is known for web development?",
-    //     image: null,
-    //     options: [
-    //         { id: 'A', text: "Java", correct: false },
-    //         { id: 'B', text: "Python", correct: false },
-    //         { id: 'C', text: "JavaScript", correct: true },
-    //         { id: 'D', text: "C++", correct: false }
-    //     ],
-    //     category: "Programming"
-    // },
-    // {
-    //     id: 5,
-    //     description: "What is the largest mammal in the world?",
-    //     image: null,
-    //     options: [
-    //         { id: 'A', text: "Elephant", correct: false },
-    //         { id: 'B', text: "Blue Whale", correct: true },
-    //         { id: 'C', text: "Giraffe", correct: false },
-    //         { id: 'D', text: "Polar Bear", correct: false }
-    //     ],
-    //     category: "Biology"
-    // }
-    ];
+      category: "Memory Pattern"
+    }];
   }
   getRandomQuestion() {
     const questions = this.getQuestionBank();
-    const types = ['logic', 'spatial'];
+    const types = ['logic', 'spatial', 'memory'];
     const chosenType = types[Math.floor(Math.random() * types.length)];
     const filteredQuestions = questions.filter(q => q.type === chosenType);
     const randomIndex = Math.floor(Math.random() * filteredQuestions.length);
@@ -31854,6 +31766,12 @@ class QuestionSystem {
                 <div class="question-text">${this.currentQuestion.description}</div>
             `;
       this.showLogicQuestion();
+    } else if (this.currentQuestion.type === "memory") {
+      this.questionDescription.innerHTML = `
+                <div class="question-type-label"><b>Type:</b> Logic</div>
+                <div class="question-text">${this.currentQuestion.description}</div>
+            `;
+      this.showMemoryQuestion();
     } else if (this.currentQuestion.type === "spatial") {
       this.isSpatialQuestion = true;
       this.spatialMinigameActive = true;
@@ -31898,6 +31816,29 @@ class QuestionSystem {
       this.completeQuestion(isCorrect);
     }, this.SPATIAL_QUESTION_TIME);
   }
+  showMemoryQuestion() {
+    if (this.questionActive) return;
+    const question = this.currentQuestion;
+    this.questionContainer.style.display = 'block';
+    this.questionOptions.style.display = 'none';
+    this.questionActive = true;
+
+    // Step 1: Show the original matrix to memorize
+    const matrixContainer = document.createElement('div');
+    matrixContainer.classList.add('memory-matrix');
+    this.questionDescription.innerHTML = `
+            <div class="question-type-label"><b>Type:</b> Memory</div>
+            <div class="question-text">${question.description}</div>
+        `;
+    this.questionDescription.appendChild(matrixContainer);
+    this.renderColorMatrix(matrixContainer, question.matrix);
+
+    // Step 2: After a few seconds, hide it and show answer choices
+    setTimeout(() => {
+      matrixContainer.remove();
+      this.showMemoryOptions();
+    }, 3000); // Show for 3 seconds
+  }
   showLogicQuestion() {
     if (this.currentQuestion.image) {
       this.questionImage.src = this.currentQuestion.image;
@@ -31905,9 +31846,58 @@ class QuestionSystem {
     } else {
       this.questionImageContainer.style.display = 'none';
     }
+
+    // 🔧 FIX: Make sure the options container is visible again
+    this.questionOptions.style.display = 'grid';
+    this.questionOptions.style.gridTemplateColumns = 'repeat(2, 1fr)';
+    this.questionOptions.style.gap = '12px';
+    this.questionOptions.style.justifyContent = 'center';
     this.createAnswerButtons();
     this.questionContainer.style.display = 'block';
     this.questionActive = true;
+    this.startQuestionTimer(this.LOGIC_QUESTION_TIME);
+  }
+  renderColorMatrix(container, matrix) {
+    container.innerHTML = '';
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = 'repeat(2, 50px)';
+    container.style.gridTemplateRows = 'repeat(2, 50px)';
+    container.style.gap = '4px';
+    container.style.margin = '10px auto';
+    matrix.forEach(row => {
+      row.forEach(color => {
+        const cell = document.createElement('div');
+        cell.style.width = '50px';
+        cell.style.height = '50px';
+        cell.style.background = color;
+        cell.style.border = '1px solid #333';
+        container.appendChild(cell);
+      });
+    });
+  }
+  showMemoryOptions() {
+    const question = this.currentQuestion;
+    this.questionOptions.innerHTML = '';
+    this.questionOptions.style.display = 'grid';
+    this.questionOptions.style.gridTemplateColumns = 'repeat(2, auto)';
+    this.questionOptions.style.gap = '20px';
+    this.questionOptions.style.justifyContent = 'center';
+    question.options.forEach(option => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'memory-option';
+      wrapper.setAttribute('data-option-id', option.id);
+      wrapper.style.cursor = 'pointer';
+      wrapper.style.padding = '10px';
+      wrapper.style.border = '2px solid #888';
+      wrapper.style.borderRadius = '8px';
+      wrapper.style.transition = '0.2s';
+      wrapper.innerHTML = `<div class="option-id">${option.id}</div>`;
+      const matrixDiv = document.createElement('div');
+      this.renderColorMatrix(matrixDiv, option.matrix);
+      wrapper.appendChild(matrixDiv);
+      wrapper.addEventListener('click', () => this.handleAnswerSelection(option.id));
+      this.questionOptions.appendChild(wrapper);
+    });
     this.startQuestionTimer(this.LOGIC_QUESTION_TIME);
   }
   createAnswerButtons() {
@@ -31927,24 +31917,30 @@ class QuestionSystem {
   handleAnswerSelection(optionId) {
     if (!this.questionActive || this.selectedAnswer !== null) return;
     this.selectedAnswer = optionId;
-    const buttons = this.questionOptions.querySelectorAll('.question-option');
-    buttons.forEach(button => {
-      button.classList.remove('selected');
-      if (button.getAttribute('data-option-id') === optionId) {
-        button.classList.add('selected');
-      }
-    });
+
+    // Determine correct option
     const correctOption = this.currentQuestion.options.find(opt => opt.correct);
+
+    // Handle logic or memory question differently
+    const isMemory = this.currentQuestion.type === "memory";
+    const elements = isMemory ? this.questionOptions.querySelectorAll('.memory-option') : this.questionOptions.querySelectorAll('.question-option');
+
+    // Disable all options
+    elements.forEach(el => el.style.pointerEvents = 'none');
     setTimeout(() => {
-      buttons.forEach(button => {
-        const id = button.getAttribute('data-option-id');
+      elements.forEach(el => {
+        const id = el.getAttribute('data-option-id');
         const option = this.currentQuestion.options.find(opt => opt.id === id);
-        if (option.correct) button.classList.add('correct');else if (id === optionId && !option.correct) button.classList.add('incorrect');
+        if (option.correct) {
+          el.classList.add('correct'); // ✅ green
+        } else if (id === optionId && !option.correct) {
+          el.classList.add('incorrect'); // ❌ red
+        }
       });
       setTimeout(() => {
         this.completeQuestion(optionId === correctOption.id);
       }, 1500);
-    }, 500);
+    }, 300);
   }
   startQuestionTimer(time) {
     let timeLeft = time / 1000;
@@ -32732,7 +32728,7 @@ function Tile(positionY, platformWidthScale = 0.7, modelName = 'grass.gltf') {
     model.traverse(child => {
       if (child.isMesh) {
         child.receiveShadow = true;
-        child.castShadow = true;
+        child.castShadow = false;
       }
     });
     tile.add(model);
@@ -33662,6 +33658,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.refreshMovementUI = refreshMovementUI;
 var _main = require("../main.js");
+// Track which directions are currently held (to prevent repeat moves)
+const keyHeld = {
+  forward: false,
+  backward: false,
+  left: false,
+  right: false
+};
 function setupInputHandlers() {
   console.log("🎮 Setting up input handlers");
   const forwardBtn = document.getElementById("forward");
@@ -33669,14 +33672,23 @@ function setupInputHandlers() {
   const leftBtn = document.getElementById("left");
   const rightBtn = document.getElementById("right");
 
-  // Add event listeners
-  forwardBtn?.addEventListener("click", () => handleMove("forward"));
-  backwardBtn?.addEventListener("click", () => handleMove("backward"));
-  leftBtn?.addEventListener("click", () => handleMove("left"));
-  rightBtn?.addEventListener("click", () => handleMove("right"));
+  // Add event listeners for buttons (one move per press)
+  forwardBtn?.addEventListener("mousedown", () => handleMoveOnce("forward"));
+  backwardBtn?.addEventListener("mousedown", () => handleMoveOnce("backward"));
+  leftBtn?.addEventListener("mousedown", () => handleMoveOnce("left"));
+  rightBtn?.addEventListener("mousedown", () => handleMoveOnce("right"));
+
+  // Reset on mouse up (to allow next click)
+  ["mouseup", "mouseleave"].forEach(evt => {
+    forwardBtn?.addEventListener(evt, () => keyHeld.forward = false);
+    backwardBtn?.addEventListener(evt, () => keyHeld.backward = false);
+    leftBtn?.addEventListener(evt, () => keyHeld.left = false);
+    rightBtn?.addEventListener(evt, () => keyHeld.right = false);
+  });
 
   // Keyboard events
   window.addEventListener("keydown", handleKeyDown);
+  window.addEventListener("keyup", handleKeyUp);
   console.log("🎮 Input handlers setup complete");
 }
 function handleMove(direction) {
@@ -33700,37 +33712,58 @@ function handleMove(direction) {
     console.log("🎮 No local player found for movement");
   }
 }
-function handleKeyDown(event) {
-  // Check if player can move first
-  if (!(0, _main.canPlayerMove)()) {
-    // Still prevent default for arrow keys to avoid scrolling
-    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "W", "w", "S", "s", "A", "a", "D", "d"].includes(event.key)) {
-      event.preventDefault();
-    }
-    return;
-  }
 
-  // Additional check: ensure player can move based on card effects and steps
-  const localPlayer = (0, _main.getLocalPlayer)();
-  if (localPlayer && !localPlayer.canMove()) {
-    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "W", "w", "S", "s", "A", "a", "D", "d"].includes(event.key)) {
-      event.preventDefault();
-    }
-    return;
-  }
-  if (event.key === "ArrowUp" || event.key === "W" || event.key === "w") {
-    event.preventDefault();
-    handleMove("forward");
-  } else if (event.key === "ArrowDown" || event.key === "S" || event.key === "s") {
-    event.preventDefault();
-    handleMove("backward");
-  } else if (event.key === "ArrowLeft" || event.key === "A" || event.key === "a") {
-    event.preventDefault();
-    handleMove("left");
-  } else if (event.key === "ArrowRight" || event.key === "D" || event.key === "d") {
-    event.preventDefault();
-    handleMove("right");
-  }
+// Button handler with anti-repeat lock
+function handleMoveOnce(direction) {
+  if (keyHeld[direction]) return; // prevent holding spam
+  keyHeld[direction] = true;
+  handleMove(direction);
+
+  // Slight debounce to prevent double triggering
+  setTimeout(() => keyHeld[direction] = false, 150);
+}
+function handleKeyDown(event) {
+  const keyMap = {
+    "ArrowUp": "forward",
+    "w": "forward",
+    "W": "forward",
+    "ArrowDown": "backward",
+    "s": "backward",
+    "S": "backward",
+    "ArrowLeft": "left",
+    "a": "left",
+    "A": "left",
+    "ArrowRight": "right",
+    "d": "right",
+    "D": "right"
+  };
+  const direction = keyMap[event.key];
+  if (!direction) return;
+  event.preventDefault();
+
+  // Prevent repeat fire when holding down key
+  if (keyHeld[direction]) return;
+  keyHeld[direction] = true;
+  handleMove(direction);
+}
+function handleKeyUp(event) {
+  const keyMap = {
+    "ArrowUp": "forward",
+    "w": "forward",
+    "W": "forward",
+    "ArrowDown": "backward",
+    "s": "backward",
+    "S": "backward",
+    "ArrowLeft": "left",
+    "a": "left",
+    "A": "left",
+    "ArrowRight": "right",
+    "d": "right",
+    "D": "right"
+  };
+  const direction = keyMap[event.key];
+  if (!direction) return;
+  keyHeld[direction] = false;
 }
 
 // Add visual feedback for blocked movement
