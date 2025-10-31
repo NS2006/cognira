@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { Renderer } from "./components/Renderer";
 import { Camera } from "./components/Camera";
 import { DirectionalLight } from "./components/DirectionalLight";
-import { map, initializeMap, loadTrees, loadRiver } from "./components/Map";
+import { map, initializeMap, loadTrees, loadRiver, updateMapPhysicsAndAnimation } from "./components/Map";
 import { SocketClient } from "./socketClient";
 import { CardSystem } from "./components/CardSystem";
 import { CardManager } from "./components/CardManager";
@@ -587,6 +587,8 @@ function initializeGame() {
 
 function animate() {
   updatePhysics();
+
+  updateMapPhysicsAndAnimation();
 
   if (socketClient && socketClient.players) {
     socketClient.players.forEach(player => {

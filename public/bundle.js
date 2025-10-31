@@ -42710,6 +42710,7 @@ exports.initializeMap = initializeMap;
 exports.loadRiver = loadRiver;
 exports.loadTrees = loadTrees;
 exports.metadata = exports.map = void 0;
+exports.updateMapPhysicsAndAnimation = updateMapPhysicsAndAnimation;
 var THREE = _interopRequireWildcard(require("three"));
 var _Tile = require("./Tile");
 var _constants = require("../constants");
@@ -42736,7 +42737,7 @@ function initializeMap() {
         // Floating grass tiles
         const grassVariants = ["grass.gltf", "grass2.gltf", "grassFlower1.gltf", "grassFlower2.gltf"];
         const randomModel = grassVariants[Math.floor(Math.random() * grassVariants.length)];
-        tile = (0, _Tile.Tile)(positionY, 0.7, randomModel);
+        tile = (0, _Tile.Tile)(positionY, 0.7, randomModel, _main.physicsWorld);
 
         // Animated floating tiles
         tile.userData.isAnimated = true;
@@ -42791,6 +42792,47 @@ function initializeMap() {
       });
     }
   }
+}
+
+// 🧩 Called every frame from animate()
+function updateMapPhysicsAndAnimation(deltaTime = 0.016) {
+  const time = performance.now() / 1000;
+  map.children.forEach(tile => {
+    // --- Skip tiles without animation data
+    if (!tile.userData.isAnimated) return;
+
+    // --- Appear animation (spawn rising up)
+    if (tile.userData.appearing) {
+      const appear = tile.userData.appearing;
+      const elapsed = Math.min(appear.duration, appear.elapsed || 0) + deltaTime * 1000;
+      appear.elapsed = elapsed;
+      const t = Math.min(elapsed / appear.duration, 1);
+      tile.position.z = THREE.MathUtils.lerp(appear.startZ, appear.endZ, t);
+      if (t >= 1) {
+        delete tile.userData.appearing;
+        tile.position.z = appear.endZ;
+      }
+    }
+
+    // --- Floating idle motion (sinusoidal up/down)
+    const float = tile.userData.floating;
+    if (float) {
+      const floatZ = Math.sin(time * float.speed + float.phase) * float.amplitude;
+      tile.position.z += floatZ * deltaTime; // smooth subtle motion
+    }
+
+    // --- Physics body sync (critical!)
+    if (tile.cannonBody) {
+      // Body uses center, not top — so adjust accordingly
+      const visualZ = tile.position.z;
+      const tileHeight = 3; // must match in Tile.js
+
+      // small lift (+0.2) to prevent player feet clipping through
+      tile.cannonBody.position.set(tile.position.x, tile.position.y, visualZ - tileHeight / 2 + 0.2);
+      tile.cannonBody.velocity.set(0, 0, 0); // static
+      tile.cannonBody.angularVelocity.set(0, 0, 0);
+    }
+  });
 }
 const treeModels = ["assets/model/tree_1.gltf", "assets/model/tree_2.gltf", "assets/model/tree_3.gltf"];
 
@@ -42933,18 +42975,23 @@ class Player extends THREE.Object3D {
   }
   _createPhysicsBody(initX) {
     const shape = new CANNON.Sphere(this.radius);
+    const baseZ = -4 + this.radius; // center at ground level
+
     this.body = new CANNON.Body({
-      mass: 10,
-      // static body, no gravity
+      mass: 0,
+      // 🔧 static, no gravity or falling
       shape: shape,
-      position: new CANNON.Vec3(initX * _constants.TILE_SIZE, 0, -4),
-      type: CANNON.Body.KINEMATIC // allow manual movement
+      position: new CANNON.Vec3(initX * _constants.TILE_SIZE, 0, baseZ),
+      fixedRotation: true
     });
     this.physicsWorld.addBody(this.body);
   }
   updatePhysics() {
-    // Keep Three synced to Cannon (in case of world step)
-    this.position.copy(this.body.position);
+    if (!this.body) return;
+    // keep model aligned with physics body
+    this.position.x = this.body.position.x;
+    this.position.y = this.body.position.y;
+    this.position.z = -4; // always grounded baseline
   }
   dispose() {
     if (this.physicsWorld && this.body) {
@@ -43235,8 +43282,6 @@ class Player extends THREE.Object3D {
   }
   animatePlayer() {
     if (!this.movesQueue.length) return;
-
-    // Start movement
     if (!this.moveClock.running) {
       this.moveClock.start();
     }
@@ -43247,27 +43292,28 @@ class Player extends THREE.Object3D {
     const startY = this.gridPosition.currentY * _constants.TILE_SIZE;
     const endX = startX + (direction === "left" ? -_constants.TILE_SIZE : direction === "right" ? _constants.TILE_SIZE : 0);
     const endY = startY + (direction === "forward" ? _constants.TILE_SIZE : direction === "backward" ? -_constants.TILE_SIZE : 0);
-
-    // Interpolate position
     this.position.x = THREE.MathUtils.lerp(startX, endX, progress);
     this.position.y = THREE.MathUtils.lerp(startY, endY, progress);
 
-    // Visual jump arc (z only)
+    // Jump arc
     const jumpHeight = Math.sin(progress * Math.PI) * 8;
     this.position.z = -4 + jumpHeight;
-
-    // Sync Cannon (even though it's kinematic)
-    this.body.position.copy(this.position);
 
     // Complete move
     if (progress >= 1) {
       this._stepCompleted();
       this.moveClock.stop();
-      this.position.z = -4; // reset height
-      this.body.position.copy(this.position);
+
+      // ✅ Snap player exactly to target tile
+      this.position.set(this.gridPosition.currentX * _constants.TILE_SIZE, this.gridPosition.currentY * _constants.TILE_SIZE, -4);
+
+      // ✅ Sync Cannon body center (if used)
+      if (this.body) {
+        this.body.position.set(this.position.x, this.position.y, this.position.z + this.radius);
+      }
     }
 
-    // Visual facing direction
+    // Rotate player facing direction
     this._setRotation(0.3);
   }
   _setPosition(progress) {
@@ -44991,6 +45037,7 @@ function initializeGame() {
 }
 function animate() {
   updatePhysics();
+  (0, _Map.updateMapPhysicsAndAnimation)();
   if (socketClient && socketClient.players) {
     socketClient.players.forEach(player => {
       if (player.updatePhysics) player.updatePhysics();
