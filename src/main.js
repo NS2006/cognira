@@ -11,6 +11,18 @@ import { refreshMovementUI } from "./utilities/collectUserInputs";
 import "./utilities/collectUserInputs";
 import { SkyBox } from "./components/SkyBox";
 import { loadingManager } from "./components/LoadingManager"; 
+import * as CANNON from 'cannon-es';
+
+export const physicsWorld = new CANNON.World();
+physicsWorld.gravity.set(0, 0, -9.82); // Z-axis gravity (you can adjust or disable)
+physicsWorld.broadphase = new CANNON.NaiveBroadphase();
+physicsWorld.solver.iterations = 10;
+
+
+const timeStep = 1 / 60;
+export function updatePhysics() {
+  physicsWorld.step(timeStep);
+}
 
 const mainMenu = document.getElementById("mainMenu");
 const gameCanvas = document.getElementById("gameCanvas");
@@ -574,6 +586,14 @@ function initializeGame() {
 }
 
 function animate() {
+  updatePhysics();
+
+  if (socketClient && socketClient.players) {
+    socketClient.players.forEach(player => {
+      if (player.updatePhysics) player.updatePhysics();
+    });
+  }
+
   if (localPlayer && canMove) {
     console.log("🎮 Animating with local player");
     localPlayer.animatePlayer();

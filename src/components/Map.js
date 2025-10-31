@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { Tile } from "./Tile";
 import { MAP_SIZE_X, MAP_SIZE_Y, TILE_SIZE } from "../constants";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { physicsWorld } from "../main";
 
 export const metadata = [];
 export const map = new THREE.Group();
@@ -21,7 +22,7 @@ export function initializeMap() {
 
       // Normal walkable platform rows
       if (positionY < 4) {
-        tile = Tile(positionY, 1, "walktile.gltf");
+        tile = Tile(positionY, 1, "walktile.gltf", physicsWorld);
       } else {
         // Floating grass tiles
         const grassVariants = [

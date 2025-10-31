@@ -1,9 +1,10 @@
 import * as THREE from "three";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { TILE_SIZE, MAP_SIZE_X, MAP_SIZE_Y } from "../constants"
+import { TILE_SIZE, MAP_SIZE_X, MAP_SIZE_Y } from "../constants";
+import * as CANNON from "cannon-es";
 
 export class Player extends THREE.Object3D {
-  constructor(playerId, initX) {
+  constructor(playerId, initX, physicsWorld) {
     super();
 
     initX %= 4;
@@ -11,6 +12,8 @@ export class Player extends THREE.Object3D {
     console.log("Player Constructor: " + playerId + " | " + initX);
 
     this.playerId = playerId;
+    this.physicsWorld = physicsWorld;
+    this.radius = 5;
     this.movesQueue = [];
 
     this.gridPosition = {
@@ -30,6 +33,8 @@ export class Player extends THREE.Object3D {
     this.activeEffects = [];
     this.cardManager = null;
 
+    this._createPhysicsBody(initX);
+
     this._createPlayerModel();
     this.initialize(initX);
   }
@@ -39,11 +44,36 @@ export class Player extends THREE.Object3D {
   }
 
   _createPlayerModel() {
-    // Create a temporary placeholder while loading
-    this._createPlaceholderModel();
-
     // Load the chicken GLTF model
     this._loadChickenGLTF();
+  }
+
+  _createPhysicsBody(initX) {
+    const shape = new CANNON.Sphere(this.radius);
+  
+    this.body = new CANNON.Body({
+      mass: 10, // static body, no gravity
+      shape: shape,
+      position: new CANNON.Vec3(initX * TILE_SIZE, 0, -4),
+      type: CANNON.Body.KINEMATIC, // allow manual movement
+    });
+  
+    this.physicsWorld.addBody(this.body);
+  }
+
+  updatePhysics() {
+    // Keep Three synced to Cannon (in case of world step)
+    this.position.copy(this.body.position);
+  }
+  
+  dispose() {
+    if (this.physicsWorld && this.body) {
+      this.physicsWorld.removeBody(this.body);
+    }
+    this.children.forEach(child => {
+      if (child.geometry) child.geometry.dispose();
+      if (child.material) child.material.dispose();
+    });
   }
 
   _createPlaceholderModel() {
@@ -137,7 +167,8 @@ export class Player extends THREE.Object3D {
 
   // Initialize player with base step
   initialize(initX) {
-    this.position.set(initX * TILE_SIZE, 0, 0);
+    // Set Z position to 10 at spawn
+    this.position.set(initX * TILE_SIZE, 0, -4);
     this.gridPosition.currentY = 0;
     this.gridPosition.currentX = initX;
     this.movesQueue.length = 0;
@@ -342,9 +373,16 @@ export class Player extends THREE.Object3D {
   }
 
   _update3DPosition(startX, startY, endX, endY, progress) {
-    this.position.x = THREE.MathUtils.lerp(startX, endX, progress);
-    this.position.y = THREE.MathUtils.lerp(startY, endY, progress);
+    const x = THREE.MathUtils.lerp(startX, endX, progress);
+    const y = THREE.MathUtils.lerp(startY, endY, progress);
+  
+    this.position.x = x;
+    this.position.y = y;
+  
+    // Keep physics body aligned (no jump physics, only ground contact)
+    // No forced X/Y snapping; let physics handle movement naturally
   }
+  
 
   setColor(color) {
     if (this.chickenModel && this.isModelLoaded) {
@@ -358,23 +396,43 @@ export class Player extends THREE.Object3D {
 
   animatePlayer() {
     if (!this.movesQueue.length) return;
-
-    if (!this.moveClock.running) this.moveClock.start();
-
-    const stepTime = 0.2;
-    const progress = Math.min(1, this.moveClock.getElapsedTime() / stepTime);
-
-    this._setPosition(progress);
-    this._setRotation(progress);
-
+  
+    // Start movement
+    if (!this.moveClock.running) {
+      this.moveClock.start();
+    }
+  
+    const duration = 0.5; // seconds per tile
+    const progress = Math.min(this.moveClock.getElapsedTime() / duration, 1);
+  
+    const direction = this.movesQueue[0];
+    const startX = this.gridPosition.currentX * TILE_SIZE;
+    const startY = this.gridPosition.currentY * TILE_SIZE;
+    const endX = startX + (direction === "left" ? -TILE_SIZE : direction === "right" ? TILE_SIZE : 0);
+    const endY = startY + (direction === "forward" ? TILE_SIZE : direction === "backward" ? -TILE_SIZE : 0);
+  
+    // Interpolate position
+    this.position.x = THREE.MathUtils.lerp(startX, endX, progress);
+    this.position.y = THREE.MathUtils.lerp(startY, endY, progress);
+  
+    // Visual jump arc (z only)
+    const jumpHeight = Math.sin(progress * Math.PI) * 8;
+    this.position.z = -4 + jumpHeight;
+  
+    // Sync Cannon (even though it's kinematic)
+    this.body.position.copy(this.position);
+  
+    // Complete move
     if (progress >= 1) {
-      const oldSteps = this.remainingSteps;
       this._stepCompleted();
       this.moveClock.stop();
-
-      console.log(`🔄 Animation completed: ${oldSteps} -> ${this.remainingSteps} steps remaining`);
+      this.position.z = -4; // reset height
+      this.body.position.copy(this.position);
     }
-  }
+  
+    // Visual facing direction
+    this._setRotation(0.3);
+  }  
 
   _setPosition(progress) {
     const startX = this.gridPosition.currentX * TILE_SIZE;
@@ -391,8 +449,7 @@ export class Player extends THREE.Object3D {
 
     // Animate jumping
     const jumpHeight = Math.sin(progress * Math.PI) * 8;
-    this.position.z = jumpHeight;
-  }
+  } 
 
   _setRotation(progress) {
     let endRotation = 0;
@@ -417,12 +474,5 @@ export class Player extends THREE.Object3D {
     if (rotation !== undefined) {
       this.rotation.set(rotation.x, rotation.y, rotation.z);
     }
-  }
-
-  dispose() {
-    this.children.forEach(child => {
-      if (child.geometry) child.geometry.dispose();
-      if (child.material) child.material.dispose();
-    });
   }
 }
