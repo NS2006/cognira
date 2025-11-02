@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { updateMapPhysicsAndAnimation } from "../components/Map";
+import { updatePhysics } from "./worldRelated";
 
 let animationState = {
     startTime: null,
@@ -11,8 +13,19 @@ export function createAnimationLoop(scene, camera, dirLight, dirLightTarget, map
         const localPlayer = getLocalPlayer();
         const socketClient = getSocketClient();
 
+        updatePhysics();
+
+        // CHANGED: Added socketClient players physics update
+        if (socketClient && socketClient.players) {
+            socketClient.players.forEach(player => {
+                if (player.updatePhysics) player.updatePhysics();
+            });
+        }
+
         // Animate player if exists
         animatePlayer(localPlayer, socketClient);
+
+        updateMapPhysicsAndAnimation();
         
         // Update camera and lighting
         updateCameraAndLighting(localPlayer, camera, dirLight, dirLightTarget);
@@ -121,9 +134,9 @@ function animateMapTiles(map) {
     }
 
     // Initialize appear animations
-    if (!animationState.initializedAppear) {
+    if (!animateMapTiles._initializedAppear) {
         initializeTileAnimations(map);
-        animationState.initializedAppear = true;
+        animateMapTiles._initializedAppear = true;
         console.log("🎬 Tile appear animations initialized!");
     }
 
@@ -188,6 +201,9 @@ export function resetAnimationState() {
         initializedAppear: false,
         lastSentPosition: new THREE.Vector3()
     };
+
+    animateMapTiles._startTime = null;
+    animateMapTiles._initializedAppear = false;
 }
 
 export function getAnimationState() {

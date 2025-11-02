@@ -1,6 +1,6 @@
-import { pauseWorld } from '../utilities/pauseWorld.js';
+import { pauseWorld } from '../../../utilities/worldRelated.js';
 import { QuestionList } from './QuestionList.js';
-import { QUESTION_PHASE_TIME } from '../constants.js';
+import { QUESTION_PHASE_TIME } from '../../../constants.js';
 
 export class QuestionSystem {
     constructor(socketClient) {

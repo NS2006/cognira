@@ -5,12 +5,13 @@ import { DirectionalLight } from "./components/DirectionalLight";
 import { map, initializeMap, loadTrees, loadRiver } from "./components/Map";
 import { SocketClient } from "./socketClient";
 import { CardSystem } from "./components/CardSystem";
-import { QuestionSystem } from "./components/QuestionSystem";
-import "./utilities/collectUserInputs";
+import { QuestionSystem } from "./components/minigames/question/QuestionSystem";
+import { MemoryMatrixSystem } from "./components/minigames/memoryMatrix/MemoryMatrixSystem";
 import { SkyBox } from "./components/SkyBox";
 import { loadingManager } from "./components/LoadingManager"; 
 import { startInitialCountdown } from "./phases/countdownPhase";
 import { createAnimationLoop, resetAnimationState } from "./utilities/animate";
+import "./utilities/collectUserInputs";
 
 const mainMenu = document.getElementById("mainMenu");
 const gameCanvas = document.getElementById("gameCanvas");
@@ -22,7 +23,7 @@ const playerCountSpan = document.getElementById("playerCount");
 var scene, socketClient, ambientLight, dirLight, dirLightTarget, camera;
 let localPlayer = null;
 let gameInitialized = false;
-export let cardSystem, questionSystem;
+export let cardSystem, questionSystem, memoryMatrixSystem;
 let _phaseTimer = null;
 let animateFunction = null;
 
@@ -87,15 +88,15 @@ function updatePlayerCount(count) {
 }
 
 function initializeGameSystems() {
-  // Initialize card system with socket client and callback
+  // Initialize system with socket client and callback
   cardSystem = new CardSystem(socketClient);
   questionSystem = new QuestionSystem(socketClient);
+  memoryMatrixSystem = new MemoryMatrixSystem(socketClient);
 
-  // Initialize question system with socket client and callback
-  console.log("🔄 Initializing QuestionSystem with callback...");
+  console.log("🔄 Initializing game systems...");
   console.log("✅ QuestionSystem initialized, callback set:", !!questionSystem.onQuestionComplete);
+  console.log("✅ MemoryMatrixSystem initialized, callback set:", !!memoryMatrixSystem.onGameComplete);
 }
-
 export function getPhaseTimer() {
   return _phaseTimer;
 }

@@ -1,46 +1,105 @@
-import { createLoadingScreen, toggleLoadingScreen, updateLoadingProgress } from "../components/LoadingScreen"
-import { textManager } from "../components/TextManager"
-import { Camera } from "./Camera";
-import { Renderer } from "./Renderer";
-import * as THREE from "three";
-
-// Create a flexible loading manager
+// LoadingManager.js - Now uses HTML/CSS instead of Three.js
 export class LoadingManager {
     static instance = null;
 
     static getInstance() {
         if (!LoadingManager.instance) {
-            LoadingManager.instance = new LoadingManager()._initialize();
+            LoadingManager.instance = new LoadingManager();
         }
         return LoadingManager.instance;
     }
 
     constructor() {
         this.isLoading = false;
-        this.loadingAnimationId = null;
-        this.loadingRenderer = null;
-        this.loadingScene = null;
-        this.loadingCamera = null;
-        this.animateLoadingScreen = null;
-        this.loadingText = null;
         this.currentProgress = 0;
+        this.progressInterval = null;
+        this.loadingTimeout = null;
+        
+        // Initialize the loading overlay
+        this._createLoadingOverlay();
     }
 
-    // Initialize loading resources (call this once)
-    _initialize() {
-        const { scene, animate } = createLoadingScreen();
-        this.loadingScene = scene;
-        this.animateLoadingScreen = animate;
-        this.loadingCamera = Camera();
+    // Create loading overlay HTML
+    _createLoadingOverlay() {
+        // Check if overlay already exists
+        if (document.getElementById('loading-overlay')) {
+            return;
+        }
+
+        const overlay = document.createElement('div');
+        overlay.id = 'loading-overlay';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            align-items: center;
+            z-index: 10000;
+            color: white;
+            font-family: Arial, sans-serif;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        `;
         
-        // Optimized camera setup for the new loading screen
-        this.loadingCamera.position.set(0, 0, 200);
-        this.loadingCamera.lookAt(0, 0, 0);
+        overlay.innerHTML = `
+            <div class="loading-content" style="text-align: center; margin-bottom: 30px;">
+                <h1 style="font-size: 2.5em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+                    LOADING
+                </h1>
+                <div class="spinner" style="
+                    width: 60px;
+                    height: 60px;
+                    border: 4px solid rgba(255,255,255,0.3);
+                    border-top: 4px solid #ff6b6b;
+                    border-radius: 50%;
+                    margin: 20px auto;
+                    animation: spin 1s linear infinite;
+                "></div>
+                <div id="loading-text" style="font-size: 1.2em; margin-bottom: 20px;">
+                    Loading... 0%
+                </div>
+            </div>
+            <div style="width: 300px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden;">
+                <div id="loading-progress" style="
+                    height: 100%; 
+                    background: linear-gradient(90deg, #ff6b6b, #4ecdc4); 
+                    width: 0%; 
+                    transition: width 0.3s ease;
+                    border-radius: 2px;
+                "></div>
+            </div>
+            <div style="margin-top: 30px; font-size: 0.9em; opacity: 0.8;">
+                2 is the only even prime number
+            </div>
+            
+            <style>
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                
+                @keyframes pulse {
+                    0% { opacity: 1; }
+                    50% { opacity: 0.7; }
+                    100% { opacity: 1; }
+                }
+                
+                .loading-content h1 {
+                    animation: pulse 2s infinite;
+                }
+            </style>
+        `;
         
-        return this;
+        document.body.appendChild(overlay);
     }
 
-    // Start loading with custom time
+    // Start loading with specified time
     async startLoading(loadingTime = 3000, onComplete = null) {
         if (this.isLoading) {
             console.warn('Loading already in progress');
@@ -49,40 +108,14 @@ export class LoadingManager {
 
         this.isLoading = true;
         this.currentProgress = 0;
-        toggleLoadingScreen(true, 0);
-        this._startLoadingAnimation();
-
+        
+        // Show loading screen
+        this._showLoadingScreen();
+        
         try {
-            // Load font as part of loading process
-            await textManager.loadDefaultFont();
-
-            // Add loading text to the enhanced scene
-            this.loadingText = textManager.createText("LOADING", {
-                size: 8,
-                height: 1,
-                color: 0xffffff,
-                bevelEnabled: true,
-                bevelThickness: 0.2,
-                bevelSize: 0.1,
-                position: { x: 0, y: -60, z: 0 },
-                align: 'center',
-                materialType: 'standard',
-                castShadow: true
-            });
-
-            if (this.loadingText) {
-                this.loadingScene.add(this.loadingText);
-                console.log('✅ Loading text added to enhanced scene');
-            }
-
-            // Simulate progress updates if it's a timed loading
-            if (typeof loadingTime === 'number') {
-                await this._simulateProgress(loadingTime);
-            } else if (typeof loadingTime === 'function') {
-                // For promise-based loading, use the provided function
-                await loadingTime((progress) => this._updateProgress(progress));
-            }
-
+            // Simulate progress over the specified time
+            await this._simulateProgress(loadingTime);
+            
             this._completeLoading();
             if (onComplete) onComplete();
 
@@ -92,26 +125,133 @@ export class LoadingManager {
         }
     }
 
-    // Simulate progress for timed loading
+    // Simulate progress with smooth animation
     async _simulateProgress(totalTime) {
-        const steps = 20;
-        const interval = totalTime / steps;
-        
-        for (let i = 0; i <= steps; i++) {
-            const progress = (i / steps) * 100;
-            this._updateProgress(progress);
-            await this._waitForTime(interval);
+        // Clear any existing interval
+        if (this.progressInterval) {
+            clearInterval(this.progressInterval);
+            this.progressInterval = null;
         }
+
+        return new Promise((resolve) => {
+            const startTime = Date.now();
+            const endTime = startTime + totalTime;
+            
+            // Initial progress update
+            this._updateProgress(0);
+            
+            // Use requestAnimationFrame for smooth progress updates
+            const updateProgress = () => {
+                if (!this.isLoading) {
+                    resolve();
+                    return;
+                }
+                
+                const currentTime = Date.now();
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(100, (elapsed / totalTime) * 100);
+                
+                this._updateProgress(progress);
+                
+                if (currentTime < endTime) {
+                    requestAnimationFrame(updateProgress);
+                } else {
+                    this._updateProgress(100);
+                    // Small delay to ensure 100% is visible
+                    setTimeout(resolve, 200);
+                }
+            };
+            
+            updateProgress();
+        });
     }
 
-    // Update progress with smooth animation
+    // Update progress display
     _updateProgress(progress) {
         this.currentProgress = Math.min(100, Math.max(0, progress));
-        updateLoadingProgress(this.currentProgress);
+        
+        const progressBar = document.getElementById('loading-progress');
+        const progressText = document.getElementById('loading-text');
+        
+        if (progressBar) {
+            progressBar.style.width = `${this.currentProgress}%`;
+        }
+        
+        if (progressText) {
+            progressText.textContent = `Loading... ${Math.round(this.currentProgress)}%`;
+        }
+        
         console.log(`📊 Loading progress: ${this.currentProgress}%`);
     }
 
-    // Start loading with progress tracking
+    // Show loading screen with fade-in effect
+    _showLoadingScreen() {
+        const overlay = document.getElementById('loading-overlay');
+        const gameCanvas = document.querySelector('canvas.game');
+        
+        if (overlay) {
+            overlay.style.display = 'flex';
+            
+            // Trigger fade-in animation
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+            }, 10);
+        }
+        
+        if (gameCanvas) {
+            gameCanvas.style.opacity = '0.3';
+            gameCanvas.style.pointerEvents = 'none';
+        }
+    }
+
+    // Hide loading screen with fade-out effect
+    _hideLoadingScreen() {
+        const overlay = document.getElementById('loading-overlay');
+        const gameCanvas = document.querySelector('canvas.game');
+        
+        if (overlay) {
+            overlay.style.opacity = '0';
+            
+            // Wait for fade-out animation to complete before hiding
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 500);
+        }
+        
+        if (gameCanvas) {
+            gameCanvas.style.opacity = '1';
+            gameCanvas.style.pointerEvents = 'auto';
+        }
+    }
+
+    // Complete the loading process
+    _completeLoading() {
+        this.isLoading = false;
+        this.currentProgress = 100;
+
+        // Clear any intervals
+        if (this.progressInterval) {
+            clearInterval(this.progressInterval);
+            this.progressInterval = null;
+        }
+
+        // Clear any timeouts
+        if (this.loadingTimeout) {
+            clearTimeout(this.loadingTimeout);
+            this.loadingTimeout = null;
+        }
+
+        // Update to 100% and hide
+        this._updateProgress(100);
+        
+        // Wait a moment to show 100%, then hide
+        setTimeout(() => {
+            this._hideLoadingScreen();
+            console.log('✅ Loading completed');
+        }, 300);
+    }
+
+    // Start loading with progress tracking (for async operations)
     async startLoadingWithProgress(loadingPromise, onComplete = null) {
         if (this.isLoading) {
             console.warn('Loading already in progress');
@@ -120,26 +260,9 @@ export class LoadingManager {
 
         this.isLoading = true;
         this.currentProgress = 0;
-        toggleLoadingScreen(true, 0);
-        this._startLoadingAnimation();
+        this._showLoadingScreen();
 
         try {
-            await textManager.loadDefaultFont();
-
-            // Add loading text
-            this.loadingText = textManager.createText("LOADING", {
-                size: 8,
-                height: 1,
-                color: 0xffffff,
-                position: { x: 0, y: -60, z: 0 },
-                align: 'center',
-                materialType: 'standard'
-            });
-
-            if (this.loadingText) {
-                this.loadingScene.add(this.loadingText);
-            }
-
             // Execute the loading promise with progress updates
             await loadingPromise((progress) => this._updateProgress(progress));
 
@@ -157,12 +280,12 @@ export class LoadingManager {
         if (this.isLoading) return;
 
         this.isLoading = true;
-        toggleLoadingScreen(true);
-        this._startLoadingAnimation();
+        this._showLoadingScreen();
 
         try {
-            // Minimal setup for quick loading
-            await this._waitForTime(delay);
+            await new Promise(resolve => {
+                this.loadingTimeout = setTimeout(resolve, delay);
+            });
             
             this._completeLoading();
             if (onComplete) onComplete();
@@ -171,119 +294,6 @@ export class LoadingManager {
             console.error('Quick loading failed:', error);
             this._completeLoading();
         }
-    }
-
-    // Wait for specified time
-    _waitForTime(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    // Start the loading animation - FIXED VERSION
-    _startLoadingAnimation() {
-        const canvas = document.querySelector('canvas.game');
-        if (!canvas) {
-            console.error('Canvas not found');
-            return;
-        }
-
-        this.loadingRenderer = Renderer();
-        console.log('🎬 Starting enhanced loading animation');
-
-        const animateLoading = () => {
-            if (this.isLoading) {
-                try {
-                    // Run the enhanced loading screen animation
-                    // Wrap in try-catch to handle any animation errors gracefully
-                    if (this.animateLoadingScreen && typeof this.animateLoadingScreen === 'function') {
-                        this.animateLoadingScreen();
-                    }
-                    
-                    // Render the scene
-                    this.loadingRenderer.render(this.loadingScene, this.loadingCamera);
-                    this.loadingAnimationId = requestAnimationFrame(animateLoading);
-                } catch (error) {
-                    console.error('Error in loading animation:', error);
-                    // Continue animation despite errors
-                    this.loadingRenderer.render(this.loadingScene, this.loadingCamera);
-                    this.loadingAnimationId = requestAnimationFrame(animateLoading);
-                }
-            }
-        }
-
-        animateLoading();
-    }
-
-    // Alternative: Safe animation method that doesn't rely on element.geometry
-    _startSafeAnimation() {
-        const canvas = document.querySelector('canvas.game');
-        if (!canvas) {
-            console.error('Canvas not found');
-            return;
-        }
-
-        this.loadingRenderer = Renderer();
-        console.log('🎬 Starting safe loading animation');
-
-        // Create our own simple animation if the provided one fails
-        let rotation = 0;
-        
-        const animateLoading = () => {
-            if (this.isLoading) {
-                try {
-                    // Try to use the provided animation first
-                    if (this.animateLoadingScreen && typeof this.animateLoadingScreen === 'function') {
-                        this.animateLoadingScreen();
-                    } else {
-                        // Fallback: simple rotation animation
-                        rotation += 0.01;
-                        this.loadingScene.rotation.y = rotation;
-                    }
-                    
-                    // Render the scene
-                    this.loadingRenderer.render(this.loadingScene, this.loadingCamera);
-                    this.loadingAnimationId = requestAnimationFrame(animateLoading);
-                } catch (error) {
-                    console.warn('Animation error, using fallback:', error);
-                    // Fallback animation
-                    rotation += 0.01;
-                    this.loadingScene.rotation.y = rotation;
-                    this.loadingRenderer.render(this.loadingScene, this.loadingCamera);
-                    this.loadingAnimationId = requestAnimationFrame(animateLoading);
-                }
-            }
-        }
-
-        animateLoading();
-    }
-
-    // Complete the loading process
-    _completeLoading() {
-        this.isLoading = false;
-        this.currentProgress = 100;
-
-        // Clean up text
-        if (this.loadingText) {
-            this.loadingScene.remove(this.loadingText);
-            textManager.disposeText(this.loadingText);
-            this.loadingText = null;
-        }
-
-        // Stop animation
-        if (this.loadingAnimationId) {
-            cancelAnimationFrame(this.loadingAnimationId);
-            this.loadingAnimationId = null;
-        }
-
-        // Clean up loading renderer
-        if (this.loadingRenderer) {
-            this.loadingRenderer.setAnimationLoop(null);
-            this.loadingRenderer.dispose();
-            this.loadingRenderer = null;
-        }
-
-        // Hide loading screen
-        toggleLoadingScreen(false);
-        console.log('✅ Enhanced loading completed');
     }
 
     // Force stop loading (emergency stop)
@@ -295,36 +305,23 @@ export class LoadingManager {
     getLoadingState() {
         return {
             isLoading: this.isLoading,
-            progress: this.currentProgress,
-            hasRenderer: !!this.loadingRenderer,
-            hasAnimation: !!this.loadingAnimationId
+            progress: this.currentProgress
         };
     }
 
     // Update loading text dynamically
-    updateLoadingText(newText, options = {}) {
-        if (!this.isLoading || !this.loadingText) return;
+    updateLoadingText(newText) {
+        if (!this.isLoading) return;
 
-        // Remove old text
-        this.loadingScene.remove(this.loadingText);
-        textManager.disposeText(this.loadingText);
-
-        // Create new text
-        const textOptions = {
-            size: 8,
-            height: 1,
-            color: 0xffffff,
-            position: { x: 0, y: -60, z: 0 },
-            align: 'center',
-            materialType: 'standard',
-            ...options
-        };
-
-        this.loadingText = textManager.createText(newText, textOptions);
-        if (this.loadingText) {
-            this.loadingScene.add(this.loadingText);
-            console.log(`✅ Loading text updated to: ${newText}`);
+        const progressText = document.getElementById('loading-text');
+        if (progressText) {
+            progressText.textContent = `${newText}... ${Math.round(this.currentProgress)}%`;
         }
+    }
+
+    // Set custom loading message
+    setLoadingMessage(message) {
+        this.updateLoadingText(message);
     }
 }
 

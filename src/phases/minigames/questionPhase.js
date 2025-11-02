@@ -24,7 +24,7 @@ export function startQuestionPhase() {
   questionPhaseTimer = setTimeout(() => {
     console.log("⏰ Question phase time limit reached");
     endQuestionPhase(false);
-  }, (QUESTION_PHASE_TIME + 1) * 1000 + 2000); // Add buffer for animations
+  }, (QUESTION_PHASE_TIME + 1) * 1000 + 500); // Add buffer for animations
   
   setPhaseTimer(questionPhaseTimer);
 }

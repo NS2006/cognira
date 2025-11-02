@@ -1,4 +1,4 @@
-import { startTetrisGame } from "../../components/Tetris";
+import { startTetrisGame } from "../../components/minigames/tetris/Tetris";
 import { clearPhaseTimer, phaseTimer } from "../../main";
 
 let tetrisGameInstance = null;

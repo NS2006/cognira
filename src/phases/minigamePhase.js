@@ -3,6 +3,7 @@ import { startQuestionPhase } from "./minigames/questionPhase.js";
 import { startTetrisPhase } from "./minigames/tetrisPhase.js";
 import { startMovementPhase } from "./movePhase.js";
 import { PHASE_TRANSITION_DELAY } from "../constants.js";
+import { startMemoryMatrixPhase } from "./minigames/memoryMatrixPhase.js";
 
 let minigamePhaseActive = false;
 let currentMinigameType = null;
@@ -21,8 +22,8 @@ export function startMinigamePhase() {
 
   // Small delay before starting minigame
   setTimeout(() => {
-    // Randomly choose between question game and tetris
-    const minigameTypes = ['question'];
+    // Randomly choose the minigame
+    const minigameTypes = ['memoryMatrix'];
     currentMinigameType = minigameTypes[Math.floor(Math.random() * minigameTypes.length)];
     
     console.log(`🎯 Selected minigame: ${currentMinigameType}`);
@@ -32,6 +33,8 @@ export function startMinigamePhase() {
       startQuestionPhase();
     } else if (currentMinigameType === 'tetris') {
       startTetrisPhase();
+    } else if (currentMinigameType === 'memoryMatrix') {
+      startMemoryMatrixPhase();
     } else {
       console.error('Unknown minigame type:', currentMinigameType);
       startQuestionPhase();
