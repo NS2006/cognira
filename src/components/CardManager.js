@@ -172,43 +172,43 @@ applyNegativeEffects(cardType, player) {
 
     // Method to calculate final step count
     calculateFinalStep(player, baseStep = 5) {
-  console.log(`🔢 [calculateFinalStep] Starting calculation for player ${player.playerId}`);
-  console.log(`🔢 [calculateFinalStep] baseStep: ${baseStep}, activeEffects:`, player.activeEffects);
-  
-  if (!player.activeEffects || player.activeEffects.length === 0) {
-    console.log(`🔢 [calculateFinalStep] No active effects, returning base step: ${baseStep}`);
-    return baseStep;
-  }
+      console.log(`🔢 [calculateFinalStep] Starting calculation for player ${player.playerId}`);
+      console.log(`🔢 [calculateFinalStep] baseStep: ${baseStep}, activeEffects:`, player.activeEffects);
+      
+      if (!player.activeEffects || player.activeEffects.length === 0) {
+        console.log(`🔢 [calculateFinalStep] No active effects, returning base step: ${baseStep}`);
+        return baseStep;
+      }
 
-  // Check for move_or_stop_negative effect - if found, return 0 steps immediately
-  const moveStopNegativeEffect = player.activeEffects.find(effect => 
-    effect.type === 'move_or_stop_negative'
-  );
-  
-  if (moveStopNegativeEffect) {
-    console.log(`🔢 [calculateFinalStep] Move or Stop negative effect found, returning 0 steps`);
-    return 0;
-  }
+      // Check for move_or_stop_negative effect - if found, return 0 steps immediately
+      const moveStopNegativeEffect = player.activeEffects.find(effect => 
+        effect.type === 'move_or_stop_negative'
+      );
+      
+      if (moveStopNegativeEffect) {
+        console.log(`🔢 [calculateFinalStep] Move or Stop negative effect found, returning 0 steps`);
+        return 0;
+      }
 
-  let finalStep = baseStep;
-  console.log(`🔢 [calculateFinalStep] Starting with base: ${baseStep}`);
+      let finalStep = baseStep;
+      console.log(`🔢 [calculateFinalStep] Starting with base: ${baseStep}`);
 
-  player.activeEffects.forEach((effect, index) => {
-    console.log(`🔢 [calculateFinalStep] Processing effect ${index}:`, effect);
+      player.activeEffects.forEach((effect, index) => {
+        console.log(`🔢 [calculateFinalStep] Processing effect ${index}:`, effect);
 
-    if (effect.stepBonus) {
-      finalStep += effect.stepBonus;
-      console.log(`🔢 [calculateFinalStep] Added step bonus: +${effect.stepBonus}, total: ${finalStep}`);
+        if (effect.stepBonus) {
+          finalStep += effect.stepBonus;
+          console.log(`🔢 [calculateFinalStep] Added step bonus: +${effect.stepBonus}, total: ${finalStep}`);
+        }
+        if (effect.stepPenalty) {
+          finalStep = Math.max(0, finalStep - effect.stepPenalty);
+          console.log(`🔢 [calculateFinalStep] Applied step penalty: -${effect.stepPenalty}, total: ${finalStep}`);
+        }
+      });
+
+      console.log(`🔢 [calculateFinalStep] Final step calculated: ${finalStep}`);
+      return finalStep;
     }
-    if (effect.stepPenalty) {
-      finalStep = Math.max(0, finalStep - effect.stepPenalty);
-      console.log(`🔢 [calculateFinalStep] Applied step penalty: -${effect.stepPenalty}, total: ${finalStep}`);
-    }
-  });
-
-  console.log(`🔢 [calculateFinalStep] Final step calculated: ${finalStep}`);
-  return finalStep;
-}
 
     // Method to check if player has active effects
     hasActiveEffect(player, effectType) {

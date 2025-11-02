@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { Tile } from "./Tile";
 import { MAP_SIZE_X, MAP_SIZE_Y, TILE_SIZE } from "../constants";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { physicsWorld } from "../main";
 
 export const metadata = [];
 export const map = new THREE.Group();
@@ -21,7 +22,7 @@ export function initializeMap() {
 
       // Normal walkable platform rows
       if (positionY < 4) {
-        tile = Tile(positionY, 1, "walktile.gltf");
+        tile = Tile(positionY, 1, "walktile.gltf", physicsWorld);
       } else {
         // Floating grass tiles
         const grassVariants = [
@@ -32,7 +33,7 @@ export function initializeMap() {
         ];
         const randomModel =
           grassVariants[Math.floor(Math.random() * grassVariants.length)];
-        tile = Tile(positionY, 0.7, randomModel);
+        tile = Tile(positionY, 0.7, randomModel, physicsWorld);
 
         // Animated floating tiles
         tile.userData.isAnimated = true;
@@ -88,6 +89,56 @@ export function initializeMap() {
   }
 }
 
+// 🧩 Called every frame from animate()
+export function updateMapPhysicsAndAnimation(deltaTime = 0.016) {
+  const time = performance.now() / 1000;
+
+  map.children.forEach(tile => {
+    // --- Skip tiles without animation data
+    if (!tile.userData.isAnimated) return;
+
+    // --- Appear animation (spawn rising up)
+    if (tile.userData.appearing) {
+      const appear = tile.userData.appearing;
+      const elapsed = Math.min(appear.duration, appear.elapsed || 0) + deltaTime * 1000;
+      appear.elapsed = elapsed;
+
+      const t = Math.min(elapsed / appear.duration, 1);
+      tile.position.z = THREE.MathUtils.lerp(appear.startZ, appear.endZ, t);
+
+      if (t >= 1) {
+        delete tile.userData.appearing;
+        tile.position.z = appear.endZ;
+      }
+    }
+
+    // --- Floating idle motion (sinusoidal up/down)
+    const float = tile.userData.floating;
+    if (float) {
+      const floatZ =
+        Math.sin(time * float.speed + float.phase) * float.amplitude;
+      tile.position.z += floatZ * deltaTime; // smooth subtle motion
+    }
+
+    // --- Physics body sync (critical!)
+    if (tile.cannonBody) {
+      // Body uses center, not top — so adjust accordingly
+      const visualZ = tile.position.z;
+      const tileHeight = 3; // must match in Tile.js
+
+      // small lift (+0.2) to prevent player feet clipping through
+      tile.cannonBody.position.set(
+        tile.position.x,
+        tile.position.y,
+        visualZ - tileHeight / 2 + 0.2
+      );
+
+      tile.cannonBody.velocity.set(0, 0, 0); // static
+      tile.cannonBody.angularVelocity.set(0, 0, 0);
+    }
+  });
+}
+
 const treeModels = [
   "assets/model/tree_1.gltf",
   "assets/model/tree_2.gltf",
@@ -96,17 +147,17 @@ const treeModels = [
 
 // 📍 Manual positions for trees
 // You can tweak or expand this as needed
-const treePositions = [
-  { model: 0, x: -200, y: 50, z: -90 },
-  { model: 0, x: -100, y: 120, z: -100 },
-  { model: 1, x: -110, y: 200, z: -80 },
-  { model: 2, x: -200, y: 20, z: -80 },
-  { model: 2, x: -200, y: 200, z: -80 },
-  { model: 1, x: -200, y: 0, z: -100 },
-  { model: 1, x: 200, y: 220, z: -70 },
-  { model: 2, x: 350, y: 100, z: -95 },
-  { model: 2, x: 220, y: 50, z: -100 },
-];
+// const treePositions = [
+//   { model: 0, x: -200, y: 50, z: -90 },
+//   { model: 0, x: -100, y: 120, z: -100 },
+//   { model: 1, x: -110, y: 200, z: -80 },
+//   { model: 2, x: -200, y: 20, z: -80 },
+//   { model: 2, x: -200, y: 200, z: -80 },
+//   { model: 1, x: -200, y: 0, z: -100 },
+//   { model: 1, x: 200, y: 220, z: -70 },
+//   { model: 2, x: 350, y: 100, z: -95 },
+//   { model: 2, x: 220, y: 50, z: -100 },
+// ];
 
 export function loadTrees() {
   const promises = treeModels.map((path) => loadModel(path));
