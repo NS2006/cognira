@@ -1,7 +1,19 @@
-// 4 x 13 GRID
+// 4 x 23 GRID
 export const MAP_SIZE_X = 4;
 export const MAP_SIZE_Y = 23;
 
 export const TILE_SIZE = 42;
-
 export const GAP_SIZE = 6;
+
+// Phase timing constants (in seconds)
+export const CARD_PHASE_TIME = 10;
+export const MOVEMENT_PHASE_TIME = 30; 
+export const QUESTION_PHASE_TIME = 15;
+export const SPATIAL_QUESTION_TIME = 30;
+export const PHASE_TRANSITION_DELAY = 0.5; 
+
+
+// Animation and UI timing
+export const MESSAGE_DISPLAY_TIME = 3;
+export const MESSAGE_FADE_OUT_TIME = 1; 
+export const STEPS_UPDATE_INTERVAL = 0.5;

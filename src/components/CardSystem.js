@@ -1,9 +1,9 @@
+import { getLocalPlayer } from '../main.js';
 import { CardList } from './CardList.js';
 
 export class CardSystem {
-    constructor(socketClient, onCardSelectCallback) {
+    constructor(socketClient) {
         this.socketClient = socketClient;
-        this.onCardSelect = onCardSelectCallback;
         this.cardList = new CardList();
 
         this.cardContainer = document.getElementById('cardContainer');
@@ -18,68 +18,52 @@ export class CardSystem {
 
     handleCardSelection(event) {
         if (!this.cardSelectionActive) return;
-      
+
         const cardElement = event.currentTarget;
         const cardType = cardElement.getAttribute('data-card-type');
         console.log(`Card selected: ${cardType}`);
-      
+
+        const selectedCard = this.currentCards.find(card => card.id === cardType);
+
+        // Log the selected card information
+        if (selectedCard) {
+            const localPlayer = getLocalPlayer();
+
+            localPlayer.selectedCard = selectedCard;
+            localPlayer.displaySelectedCardInformation();
+        } else {
+            console.warn(`Selected card not found in currentCards: ${cardType}`);
+            console.log('Available cards:', this.currentCards.map(card => card.id));
+        }
+
         // Add animation effects
         this.dynamicCardContainer.querySelectorAll('.card').forEach(c => {
-          c.classList.remove('selected', 'dimmed');
-          if (c !== cardElement) c.classList.add('dimmed');
+            c.classList.remove('selected', 'dimmed');
+            if (c !== cardElement) c.classList.add('dimmed');
         });
         cardElement.classList.add('selected');
-      
+
         // Send card selection to server
-        if (this.socketClient && this.socketClient.selectCard) {
-          this.socketClient.selectCard(cardType);
+        if (this.socketClient?.selectCard) {
+            this.socketClient.selectCard(cardType);
         }
-      
-        if (this.onCardSelect) {
-          this.onCardSelect(cardType);
-        }
-    }  
 
-    createCardElement(cardData, index = 0) {
-        const cardElement = document.createElement('button');
-        cardElement.className = 'card';
-        cardElement.setAttribute('data-card-type', cardData.id);
-        cardElement.style.setProperty('--i', index);
-
-        cardElement.innerHTML = `
-            <div class="card-title">
-                <h1>${cardData.title}</h1>
-            </div>
-            <div class="card-description-container">
-                ${cardData.descriptions.map(desc => `
-                    <div class="card-description">
-                        <div class="card-image ${desc.type}">
-                            <img src="./assets/images/${desc.type}.png" alt="${desc.type}">
-                        </div>
-                        <div class="card-attribute">
-                            <p>${desc.text}</p>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-
-        cardElement.addEventListener('click', (event) => this.handleCardSelection(event));
-        return cardElement;
+        this.onCardSelect?.(cardType);
     }
 
     showCardSelection() {
         if (this.cardSelectionActive) return;
 
-        // Get random cards
+        // Get random cards (now returns Card instances)
         this.currentCards = this.cardList.getRandomCards(3);
 
         // Clear previous cards
         this.dynamicCardContainer.innerHTML = '';
 
-        // Create and append new cards
+        // Use Card's createCardElement method
         this.currentCards.forEach((card, index) => {
-            const cardElement = this.createCardElement(card, index);
+            const cardElement = card.createCardElement(index);
+            cardElement.addEventListener('click', (event) => this.handleCardSelection(event));
             this.dynamicCardContainer.appendChild(cardElement);
         });
 
@@ -90,9 +74,29 @@ export class CardSystem {
         console.log("Cards shown:", this.currentCards.map(card => card.id));
     }
 
-    // Add a method to get current cards for auto-selection
-    getCurrentCards() {
-        return this.currentCards || [];
+    // Apply card effects to player
+    applyCardEffect(cardType, isPositive, player) {
+        const card = this.cardList.getCardById(cardType);
+        if (!card) {
+            console.warn(`Card not found: ${cardType}`);
+            return null;
+        }
+
+        console.log(`🔄 Applying ${isPositive ? 'positive' : 'negative'} ${cardType} to player ${player.playerId}`);
+
+        if (isPositive) {
+            card.applyPositive(player);
+        } else {
+            card.applyNegative(player);
+        }
+    }
+
+    applyPositiveEffect(cardType, player) {
+        return this.applyCardEffect(cardType, true, player);
+    }
+
+    applyNegativeEffect(cardType, player) {
+        return this.applyCardEffect(cardType, false, player);
     }
 
     hideCardSelection() {
@@ -117,7 +121,6 @@ export class CardSystem {
 
             if (timeLeft <= 0) {
                 clearInterval(this.cardTimer);
-                // Don't handle time expired here - main.js controls phase transitions
             }
         }, 1000);
     }

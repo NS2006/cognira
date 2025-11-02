@@ -75,11 +75,6 @@ export class SocketClient {
             // Handle other players' card selections if needed
         });
 
-        this.io.on("card-time-expired", (playerId) => {
-            console.log("Player failed to select card:", playerId);
-            // Handle time expiration for other players
-        });
-
         // And add this event listener in handleSocketEvents
         this.io.on("question-started", (questionData) => {
             console.log("Question started:", questionData);
@@ -126,7 +121,6 @@ export class SocketClient {
     selectAnswer(questionId, answer) {
         this.io.emit("select-answer", questionId, answer);
     }
-
 
     disconnect() {
         this.io.disconnect();

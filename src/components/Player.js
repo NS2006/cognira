@@ -27,8 +27,7 @@ export class Player extends THREE.Object3D {
     // Initialize step system
     this.baseStep = 5; // Base movement steps per turn
     this.remainingSteps = this.baseStep;
-    this.activeEffects = [];
-    this.cardManager = null;
+    this.selectedCard = null;
 
     this._createPlayerModel();
     this.initialize(initX);
@@ -36,6 +35,27 @@ export class Player extends THREE.Object3D {
 
   get id() {
     return this.playerId;
+  }
+
+  displaySelectedCardInformation(){
+    if(this.selectedCard){
+      console.log('Selected Card Information:', {
+        id: this.selectedCard.id,
+        title: this.selectedCard.title,
+        descriptions: this.selectedCard.descriptions,
+        weight: this.selectedCard.weight,
+        positiveEffect: this.selectedCard.positiveEffect ? 'Function defined' : 'No function',
+        negativeEffect: this.selectedCard.negativeEffect ? 'Function defined' : 'No function'
+    });
+    }
+  }
+
+  displayPlayerInformation(){
+    console.log("Player Information: ", {
+      playerId: this.playerId,
+      baseStep: this.baseStep,
+      remainingSteps: this.remainingSteps
+    });
   }
 
   _createPlayerModel() {
@@ -144,99 +164,7 @@ export class Player extends THREE.Object3D {
     this.resetSteps();
   }
 
-  // Apply effect from card system
-  // Apply effect from card system
-  applyEffect(effect) {
-    if (!this.activeEffects) {
-      this.activeEffects = [];
-    }
-
-    // Check if similar effect already exists and remove it
-    this.activeEffects = this.activeEffects.filter(existingEffect =>
-      existingEffect.type !== effect.type
-    );
-
-    this.activeEffects.push({
-      ...effect,
-      appliedAt: Date.now()
-    });
-
-    console.log(`Effect applied to player ${this.playerId}:`, effect);
-    console.log(`Current active effects:`, this.activeEffects);
-
-    // Force immediate step recalculation
-    this.updateRemainingSteps();
-  }
-
-  // Update remaining steps based on active effects
-  updateRemainingSteps() {
-    console.log(`🔄 [updateRemainingSteps] Called for player ${this.playerId}`);
-    console.log(`🔄 [updateRemainingSteps] cardManager exists: ${!!this.cardManager}`);
-
-    if (!this.cardManager) {
-      this.remainingSteps = this.baseStep;
-      console.log(`🔄 [updateRemainingSteps] No card manager, using base step: ${this.remainingSteps}`);
-      return;
-    }
-
-    // Calculate final step based on effects
-    console.log(`🔄 [updateRemainingSteps] Calling calculateFinalStep`);
-    const finalStep = this.cardManager.calculateFinalStep(this, this.baseStep);
-
-    // Always update remaining steps to match final step when not moving
-    if (this.movesQueue.length === 0) {
-      this.remainingSteps = finalStep;
-      console.log(`🔄 [updateRemainingSteps] Updated remaining steps to final step: ${this.remainingSteps}`);
-    } else {
-      // If we're moving, only update if the final step changed
-      const stepsUsed = this.baseStep - this.remainingSteps;
-      this.remainingSteps = Math.max(0, finalStep - stepsUsed);
-      console.log(`🔄 [updateRemainingSteps] Adjusted for used steps: ${this.remainingSteps}`);
-    }
-
-    console.log(`Player ${this.playerId} steps: Base=${this.baseStep}, Final=${finalStep}, Remaining=${this.remainingSteps}`);
-  }
-
-  // Check if player can move
-  canMove() {
-    if (!this.cardManager) return true;
-    return this.cardManager.canPlayerMove(this) && this.remainingSteps > 0;
-  }
-
-  // Get movement information for UI
-  getMovementInfo() {
-    if (!this.cardManager) {
-      return {
-        canMove: true,
-        baseStep: this.baseStep,
-        finalStep: this.baseStep,
-        remainingSteps: this.remainingSteps,
-        messages: ['No card effects active']
-      };
-    }
-
-    return this.cardManager.getEffectsSummary(this);
-  }
-
-  // Set card manager reference
-  setCardManager(cardManager) {
-    this.cardManager = cardManager;
-  }
-
   queueMove(direction) {
-    // Direct check for movement blocking
-    if (this.activeEffects && this.activeEffects.some(effect =>
-      effect.type === 'move_or_stop_negative')) {
-      console.log(`❌ Cannot move: Player ${this.playerId} has movement blocked by move_or_stop_negative`);
-      return false;
-    }
-
-    // Check if player can move based on card effects
-    if (!this.canMove()) {
-      console.log(`Cannot move: Player ${this.playerId} has movement blocked or no steps remaining`);
-      return false;
-    }
-
     // Check if move is valid within map boundaries
     if (!this._isValidMove(direction)) {
       return false;
@@ -265,9 +193,6 @@ export class Player extends THREE.Object3D {
     // Actually decrease remaining steps
     this.remainingSteps = Math.max(0, this.remainingSteps - 1);
 
-    const scoreDOM = document.getElementById("score");
-    if (scoreDOM) scoreDOM.innerText = this.gridPosition.currentY.toString();
-
     console.log(`Step completed. Remaining steps: ${this.remainingSteps}`);
   }
 
@@ -276,43 +201,12 @@ export class Player extends THREE.Object3D {
     // Reset the moves queue
     this.movesQueue.length = 0;
 
-    // Only reset effects and steps at the beginning of a new turn
-    // Don't reset during movement phase
-    if (this.activeEffects) {
-      this.activeEffects = [];
-    }
-
     // Reset to base step
     this.remainingSteps = this.baseStep;
 
+    this.selectedCard = null;
+
     console.log(`Steps reset for player ${this.playerId}: ${this.remainingSteps} steps`);
-  }
-
-  // Clean up effects at end of turn
-  cleanupEffects() {
-    // Clear moves queue
-    this.movesQueue.length = 0;
-
-    // Clear effects
-    if (this.activeEffects) {
-      this.activeEffects = [];
-    }
-
-    // Reset steps for next turn
-    this.resetSteps();
-
-    console.log(`Effects cleaned up for player ${this.playerId}`);
-  }
-
-  setCardManager(cardManager) {
-    console.log(`🔄 [setCardManager] Setting cardManager for player ${this.playerId}`);
-    this.cardManager = cardManager;
-    console.log(`🔄 [setCardManager] cardManager set:`, !!this.cardManager);
-    console.log(`🔄 [setCardManager] cardManager methods:`, {
-      calculateFinalStep: !!this.cardManager.calculateFinalStep,
-      canPlayerMove: !!this.cardManager.canPlayerMove,
-      getEffectsSummary: !!this.cardManager.getEffectsSummary
-    });
   }
 
   _isValidMove(direction) {
