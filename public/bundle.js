@@ -41874,6 +41874,8 @@ class LoadingManager {
     this.currentProgress = 0;
     this.progressInterval = null;
     this.loadingTimeout = null;
+    this.subtitleList = ["2 is the only even prime number", "If you shuffle a deck of cards, the order has probably never existed before in history", "111,111,111 × 111,111,111 = 12,345,678,987,654,321", "The number 5 is pronounced 'ha' in Thai, so 555 means 'hahaha'", "The number 0.999... (repeating) is exactly equal to 1", "Zero is the only number that can't be represented in Roman numerals", "There are more possible iterations of a game of chess than there are atoms in the observable universe", "There are 43,252,003,274,489,856,000 possible configurations of a Rubik's Cube", "There are 80,658,175,170,943,878,571,660,636,856,403,766,975,289,505,440,883,277,824,000,000,000,000 possible sudoku puzzles", "The number 1 is not considered a prime number"];
+    this.subtitle = this.subtitleList[Math.floor(Math.random() * this.subtitleList.length)];
 
     // Initialize the loading overlay
     this._createLoadingOverlay();
@@ -41983,7 +41985,7 @@ class LoadingManager {
                 color: #c8e6c9;
                 position: relative;
                 z-index: 2;
-            ">2 is the only even prime number</div>
+            ">${this.subtitle}</div>
             
             <style>
                 @keyframes spin {
