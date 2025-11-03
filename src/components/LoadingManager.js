@@ -1,4 +1,4 @@
-// LoadingManager.js - Now uses HTML/CSS instead of Three.js
+// LoadingManager.js - Updated with Green Theme
 export class LoadingManager {
     static instance = null;
 
@@ -19,7 +19,7 @@ export class LoadingManager {
         this._createLoadingOverlay();
     }
 
-    // Create loading overlay HTML
+    // Create loading overlay HTML with green theme
     _createLoadingOverlay() {
         // Check if overlay already exists
         if (document.getElementById('loading-overlay')) {
@@ -34,7 +34,7 @@ export class LoadingManager {
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            background: linear-gradient(135deg, #0a1f1c 0%, #1a3d34 50%, #2d6a4f 100%);
             display: none;
             flex-direction: column;
             justify-content: center;
@@ -42,41 +42,90 @@ export class LoadingManager {
             align-items: center;
             z-index: 10000;
             color: white;
-            font-family: Arial, sans-serif;
+            font-family: "Balatro", Arial, sans-serif;
             opacity: 0;
             transition: opacity 0.5s ease;
         `;
         
         overlay.innerHTML = `
-            <div class="loading-content" style="text-align: center; margin-bottom: 30px;">
-                <h1 style="font-size: 2.5em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
-                    LOADING
-                </h1>
+            <!-- Background decorative elements -->
+            <div class="loading-background-decoration">
+                <div class="loading-decoration-circle circle-1"></div>
+                <div class="loading-decoration-circle circle-2"></div>
+                <div class="loading-decoration-circle circle-3"></div>
+                <div class="loading-decoration-circle circle-4"></div>
+            </div>
+
+            <div class="loading-content" style="text-align: center; margin-bottom: 30px; position: relative; z-index: 2;">
+                <!-- Logo -->
+                <div class="loading-logo-container">
+                    <img src="assets/images/logo.jpg" alt="Cognira Logo" class="loading-logo">
+                </div>
+                
+                <!-- Title -->
+                <h1 class="loading-title" style="
+                    font-size: 3em;
+                    font-weight: bold;
+                    background: linear-gradient(45deg, #4caf50, #81c784, #a5d6a7);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                    text-shadow: 0 0 30px rgba(76, 175, 80, 0.5);
+                    margin: 20px 0;
+                    letter-spacing: 3px;
+                    animation: pulse 2s infinite;
+                ">COGNIRA</h1>
+                
+                <!-- Spinner -->
                 <div class="spinner" style="
                     width: 60px;
                     height: 60px;
-                    border: 4px solid rgba(255,255,255,0.3);
-                    border-top: 4px solid #ff6b6b;
+                    border: 4px solid rgba(76, 175, 80, 0.3);
+                    border-top: 4px solid #4caf50;
                     border-radius: 50%;
                     margin: 20px auto;
                     animation: spin 1s linear infinite;
                 "></div>
-                <div id="loading-text" style="font-size: 1.2em; margin-bottom: 20px;">
-                    Loading... 0%
-                </div>
+                
+                <!-- Loading Text -->
+                <div id="loading-text" style="
+                    font-size: 1.2em; 
+                    margin-bottom: 20px;
+                    color: #e8f5e9;
+                    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                ">Loading... 0%</div>
             </div>
-            <div style="width: 300px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden;">
+            
+            <!-- Progress Bar -->
+            <div style="
+                width: 300px; 
+                height: 6px; 
+                background: rgba(76, 175, 80, 0.3); 
+                border-radius: 3px; 
+                overflow: hidden;
+                margin: 10px 0;
+                position: relative;
+                z-index: 2;
+            ">
                 <div id="loading-progress" style="
                     height: 100%; 
-                    background: linear-gradient(90deg, #ff6b6b, #4ecdc4); 
+                    background: linear-gradient(90deg, #4caf50, #81c784, #a5d6a7); 
                     width: 0%; 
                     transition: width 0.3s ease;
-                    border-radius: 2px;
+                    border-radius: 3px;
+                    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
                 "></div>
             </div>
-            <div style="margin-top: 30px; font-size: 0.9em; opacity: 0.8;">
-                2 is the only even prime number
-            </div>
+            
+            <!-- Subtitle -->
+            <div style="
+                margin-top: 20px; 
+                font-size: 0.9em; 
+                opacity: 0.8;
+                color: #c8e6c9;
+                position: relative;
+                z-index: 2;
+            ">2 is the only even prime number</div>
             
             <style>
                 @keyframes spin {
@@ -90,8 +139,119 @@ export class LoadingManager {
                     100% { opacity: 1; }
                 }
                 
-                .loading-content h1 {
-                    animation: pulse 2s infinite;
+                @keyframes float {
+                    0%, 100% {
+                        transform: translateY(0px) scale(1);
+                        opacity: 0.3;
+                    }
+                    50% {
+                        transform: translateY(-20px) scale(1.05);
+                        opacity: 0.5;
+                    }
+                }
+                
+                /* Loading Background Decoration */
+                .loading-background-decoration {
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 1;
+                }
+                
+                .loading-decoration-circle {
+                    position: absolute;
+                    border-radius: 50%;
+                    background: radial-gradient(circle, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0) 70%);
+                    animation: float 6s ease-in-out infinite;
+                }
+                
+                .circle-1 {
+                    width: 200px;
+                    height: 200px;
+                    top: 10%;
+                    left: 10%;
+                    animation-delay: 0s;
+                }
+                
+                .circle-2 {
+                    width: 150px;
+                    height: 150px;
+                    top: 60%;
+                    right: 15%;
+                    animation-delay: 2s;
+                }
+                
+                .circle-3 {
+                    width: 100px;
+                    height: 100px;
+                    bottom: 20%;
+                    left: 20%;
+                    animation-delay: 4s;
+                }
+                
+                .circle-4 {
+                    width: 120px;
+                    height: 120px;
+                    top: 30%;
+                    right: 25%;
+                    animation-delay: 1s;
+                }
+                
+                /* Loading Logo */
+                .loading-logo-container {
+                    margin-bottom: 20px;
+                    animation: fadeInDown 1s ease-out;
+                }
+                
+                .loading-logo {
+                    width: 120px;
+                    height: 120px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 4px solid #4caf50;
+                    box-shadow: 
+                        0 0 30px rgba(76, 175, 80, 0.5),
+                        0 0 60px rgba(76, 175, 80, 0.3),
+                        inset 0 0 20px rgba(76, 175, 80, 0.2);
+                    transition: all 0.3s ease;
+                }
+                
+                @keyframes fadeInDown {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-30px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(30px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                
+                /* Responsive */
+                @media (max-width: 768px) {
+                    .loading-title {
+                        font-size: 2em !important;
+                    }
+                    
+                    .loading-logo {
+                        width: 80px;
+                        height: 80px;
+                    }
+                    
+                    #loading-text {
+                        font-size: 1em !important;
+                    }
                 }
             </style>
         `;

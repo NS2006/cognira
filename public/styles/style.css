@@ -20,17 +20,79 @@ body {
   display: flex;
   font-family: "Balatro";
   overflow-x: hidden;
-  background: linear-gradient(135deg, #e0f7fa 0%, #bbdefb 100%);
-  color: #333;
+  background: linear-gradient(135deg, #0a1f1c 0%, #1a3d34 50%, #2d6a4f 100%);
+  color: #fff;
   width: 100%;
   height: 100vh;
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  position: relative;
 }
 
-/* Main Menu */
-.main-menu-container{
+/* Background Decoration */
+.background-decoration {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.decoration-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0) 70%);
+  animation: float 6s ease-in-out infinite;
+}
+
+.circle-1 {
+  width: 200px;
+  height: 200px;
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.circle-2 {
+  width: 150px;
+  height: 150px;
+  top: 60%;
+  right: 15%;
+  animation-delay: 2s;
+}
+
+.circle-3 {
+  width: 100px;
+  height: 100px;
+  bottom: 20%;
+  left: 20%;
+  animation-delay: 4s;
+}
+
+.circle-4 {
+  width: 120px;
+  height: 120px;
+  top: 30%;
+  right: 25%;
+  animation-delay: 1s;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px) scale(1);
+    opacity: 0.3;
+  }
+
+  50% {
+    transform: translateY(-20px) scale(1.05);
+    opacity: 0.5;
+  }
+}
+
+/* Main Menu Container */
+.main-menu-container {
   display: flex;
   width: 100%;
   height: 100vh;
@@ -39,29 +101,271 @@ body {
   justify-content: center;
   align-items: center;
   gap: 40px;
+  position: relative;
+  z-index: 1;
 }
 
-#joinGameButton{
+/* Logo Container */
+.logo-container {
+  margin-bottom: 20px;
+  animation: fadeInDown 1s ease-out;
+}
+
+.logo-image {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #4caf50;
+  box-shadow:
+    0 0 30px rgba(76, 175, 80, 0.5),
+    0 0 60px rgba(76, 175, 80, 0.3),
+    inset 0 0 20px rgba(76, 175, 80, 0.2);
+  transition: all 0.3s ease;
+}
+
+.logo-image:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 40px rgba(76, 175, 80, 0.7),
+    0 0 80px rgba(76, 175, 80, 0.4),
+    inset 0 0 25px rgba(76, 175, 80, 0.3);
+}
+
+/* Title Section */
+.title-section {
+  text-align: center;
+  animation: fadeInUp 1s ease-out 0.2s both;
+}
+
+.game-title {
+  font-size: 4em;
+  font-weight: bold;
+  background: linear-gradient(45deg, #4caf50, #81c784, #a5d6a7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 30px rgba(76, 175, 80, 0.5);
+  margin: 20px 0;
+  letter-spacing: 3px;
+}
+
+.title-decoration {
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #4caf50, transparent);
+  margin: 10px auto;
+  width: 80%;
+  opacity: 0.7;
+}
+
+.top-decoration {
+  animation: slideInLeft 1s ease-out 0.4s both;
+}
+
+.bottom-decoration {
+  animation: slideInRight 1s ease-out 0.4s both;
+}
+
+/* Button Container */
+.button-container {
+  animation: fadeInUp 1s ease-out 0.6s both;
+}
+
+.join-button {
   font-family: "Balatro", cursive;
-  padding: 1.2em;
-  font-size: 0.6em;
-  background-color: gainsboro;
-  color: darkblue;
-  border-radius: 10px;
-  border: solid 2px rgb(85, 255, 0);
+  padding: 1.5em 3em;
+  font-size: 0.7em;
+  background: linear-gradient(145deg, #4caf50, #388e3c);
+  color: white;
+  border-radius: 15px;
+  border: none;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow:
+    0 8px 20px rgba(76, 175, 80, 0.3),
+    0 4px 10px rgba(0, 0, 0, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.join-button:hover {
+  transform: translateY(-5px);
+  box-shadow:
+    0 15px 30px rgba(76, 175, 80, 0.4),
+    0 8px 15px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(145deg, #66bb6a, #43a047);
+}
+
+.join-button:active {
+  transform: translateY(-2px);
+  box-shadow:
+    0 5px 15px rgba(76, 175, 80, 0.3),
+    0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.button-glow {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent);
+  transition: left 0.5s ease;
+}
+
+.join-button:hover .button-glow {
+  left: 100%;
+}
+
+.button-text {
+  position: relative;
+  z-index: 1;
 }
 
 /* Waiting Message */
-#waitingMessage {
+.waiting-message {
   display: none;
   margin-top: 20px;
   font-size: 0.8em;
-  color: #333;
+  color: #e8f5e9;
+  text-align: center;
+  animation: fadeIn 1s ease-out;
+  background: rgba(76, 175, 80, 0.1);
+  padding: 20px 30px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.loading-dots {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.loading-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #4caf50;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.loading-dots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+.loading-dots span:nth-child(3) {
+  animation-delay: 0s;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+
+  to {
+    opacity: 0.7;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+
+  to {
+    opacity: 0.7;
+    transform: translateX(0);
+  }
+}
+
+@keyframes bounce {
+
+  0%,
+  80%,
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .game-title {
+    font-size: 2.5em;
+  }
+
+  .logo-image {
+    width: 120px;
+    height: 120px;
+  }
+
+  .join-button {
+    padding: 1.2em 2.4em;
+    font-size: 0.6em;
+  }
+
+  .main-menu-container {
+    gap: 30px;
+  }
 }
 
 /* Game Canvas */
-.game{
+.game {
   display: none;
 }
 
@@ -96,7 +400,8 @@ body {
 
 /* Card Selection Styles - Light Theme */
 .select-card-container {
-  display: none; /* Hidden by default */
+  display: none;
+  /* Hidden by default */
   width: 70%;
   max-width: 1000px;
   text-align: center;
@@ -143,14 +448,17 @@ body {
 
 #dynamicCardContainer {
   display: flex;
-  justify-content: space-between; /* 👈 spread cards apart */
+  justify-content: space-between;
+  /* 👈 spread cards apart */
   align-items: flex-end;
   gap: 2rem;
   perspective: 1000px;
   position: relative;
   height: 350px;
-  width: 80%; /* 👈 make sure container has width to allow spacing */
-  margin: 0 auto; /* center container on screen */
+  width: 80%;
+  /* 👈 make sure container has width to allow spacing */
+  margin: 0 auto;
+  /* center container on screen */
 }
 
 /* Base card look */
@@ -280,13 +588,13 @@ body {
 }
 
 .card.selected {
-    border: 3px solid #4CAF50;
-    box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
-    transform: scale(1.05);
+  border: 3px solid #4CAF50;
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+  transform: scale(1.05);
 }
 
 .card.selected::before {
-    opacity: 1;
+  opacity: 1;
 }
 
 /* Dynamic Card System Enhancements */
@@ -296,19 +604,20 @@ body {
 
 /* Add to your style.css */
 #initialCountdownMessage {
-    font-family: "Balatro", cursive;
-    animation: pulse-glow 1s infinite alternate;
+  font-family: "Balatro", cursive;
+  animation: pulse-glow 1s infinite alternate;
 }
 
 @keyframes pulse-glow {
-    from {
-        box-shadow: 0 0 20px rgba(33, 150, 243, 0.5);
-        border-color: #2196F3;
-    }
-    to {
-        box-shadow: 0 0 40px rgba(233, 30, 99, 0.7);
-        border-color: #E91E63;
-    }
+  from {
+    box-shadow: 0 0 20px rgba(33, 150, 243, 0.5);
+    border-color: #2196F3;
+  }
+
+  to {
+    box-shadow: 0 0 40px rgba(233, 30, 99, 0.7);
+    border-color: #E91E63;
+  }
 }
 
 /* Animation for card appearance  */
@@ -317,15 +626,18 @@ body {
     opacity: 0;
     transform: translateY(200px) rotate(15deg) scale(0.8);
   }
+
   60% {
     opacity: 1;
     transform: translateY(-20px) rotate(-5deg) scale(1.05);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) rotate(0deg) scale(1);
   }
 }
+
 #dynamicCardContainer:hover .card {
   transform: rotate(calc(var(--i) * 10deg)) translate(calc(var(--i) * 70px), -40px) scale(1.05);
 }
@@ -363,7 +675,8 @@ body {
 /* Overlay container for Tetris */
 #spatialMinigame {
   display: none;
-  position: fixed;       /* fixed to viewport, not relative parent */
+  position: fixed;
+  /* fixed to viewport, not relative parent */
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -372,15 +685,17 @@ body {
   z-index: 1000;
   background: #222;
   border-radius: 8px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.8);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
 }
 
 #gameCanvas.blur {
   filter: blur(5px);
-  pointer-events: none; /* optional: prevent clicks */
+  pointer-events: none;
+  /* optional: prevent clicks */
 }
 
-.memory-matrix, .memory-option div {
+.memory-matrix,
+.memory-option div {
   display: grid;
   justify-content: center;
   align-items: center;
@@ -401,6 +716,7 @@ body {
   from {
     text-shadow: 0 0 5px rgba(33, 150, 243, 0.3);
   }
+
   to {
     text-shadow: 0 0 10px rgba(33, 150, 243, 0.5), 0 0 15px rgba(233, 30, 99, 0.3);
   }
@@ -412,25 +728,25 @@ body {
     width: 90%;
     padding: 20px;
   }
-  
+
   .card-container {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .card {
     width: 100%;
     max-width: 350px;
   }
-  
+
   .select-card-container h1 {
     font-size: 1.8rem;
   }
-  
+
   .card-title h1 {
     font-size: 1rem;
   }
-  
+
   .card-attribute p {
     font-size: 0.7rem;
   }
@@ -442,15 +758,15 @@ body {
     width: 95%;
     padding: 15px;
   }
-  
+
   .select-card-container h1 {
     font-size: 1.5rem;
   }
-  
+
   .card {
     padding: 15px;
   }
-  
+
   .timer-text {
     font-size: 0.8rem;
   }
@@ -567,13 +883,15 @@ body {
   background: linear-gradient(145deg, #fff8f6, #ffeae6);
 }
 
-.question-option.correct, .memory-option.correct {
+.question-option.correct,
+.memory-option.correct {
   background: linear-gradient(145deg, #e8f5e8, #c8e6c9);
   border-color: #4CAF50;
   color: #2e7d32;
 }
 
-.question-option.incorrect, .memory-option.incorrect {
+.question-option.incorrect,
+.memory-option.incorrect {
   background: linear-gradient(145deg, #ffebee, #ffcdd2);
   border-color: #f44336;
   color: #c62828;
@@ -586,17 +904,25 @@ body {
 
 /* Waiting Period Styles */
 #waitingPeriodMessage {
-    font-family: "Balatro", cursive;
-    background: rgba(0, 0, 0, 0.9) !important;
-    border: 2px solid #2196F3;
-    box-shadow: 0 0 20px rgba(33, 150, 243, 0.5);
-    animation: pulse 2s infinite;
+  font-family: "Balatro", cursive;
+  background: rgba(0, 0, 0, 0.9) !important;
+  border: 2px solid #2196F3;
+  box-shadow: 0 0 20px rgba(33, 150, 243, 0.5);
+  animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-    0% { border-color: #2196F3; }
-    50% { border-color: #E91E63; }
-    100% { border-color: #2196F3; }
+  0% {
+    border-color: #2196F3;
+  }
+
+  50% {
+    border-color: #E91E63;
+  }
+
+  100% {
+    border-color: #2196F3;
+  }
 }
 
 /* Animation for question appearance */
@@ -605,6 +931,7 @@ body {
     opacity: 0;
     transform: translate(-50%, -40%);
   }
+
   to {
     opacity: 1;
     transform: translate(-50%, -50%);
@@ -621,11 +948,11 @@ body {
     width: 90%;
     padding: 20px;
   }
-  
+
   .question-options {
     grid-template-columns: 1fr;
   }
-  
+
   .question-description {
     font-size: 1rem;
     padding: 15px;
@@ -637,16 +964,16 @@ body {
     width: 95%;
     padding: 15px;
   }
-  
+
   .question-container h1 {
     font-size: 1.5rem;
   }
-  
+
   .question-description {
     font-size: 0.9rem;
     padding: 12px;
   }
-  
+
   .question-option {
     padding: 12px 15px;
     font-size: 0.8rem;

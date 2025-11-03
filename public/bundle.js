@@ -41826,7 +41826,7 @@ class CardSystem {
 }
 exports.CardSystem = CardSystem;
 
-},{"../main.js":57,"./CardList.js":42}],44:[function(require,module,exports){
+},{"../main.js":59,"./CardList.js":42}],44:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41860,7 +41860,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.loadingManager = exports.LoadingManager = void 0;
-// LoadingManager.js - Now uses HTML/CSS instead of Three.js
+// LoadingManager.js - Updated with Green Theme
 class LoadingManager {
   static instance = null;
   static getInstance() {
@@ -41879,7 +41879,7 @@ class LoadingManager {
     this._createLoadingOverlay();
   }
 
-  // Create loading overlay HTML
+  // Create loading overlay HTML with green theme
   _createLoadingOverlay() {
     // Check if overlay already exists
     if (document.getElementById('loading-overlay')) {
@@ -41893,7 +41893,7 @@ class LoadingManager {
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            background: linear-gradient(135deg, #0a1f1c 0%, #1a3d34 50%, #2d6a4f 100%);
             display: none;
             flex-direction: column;
             justify-content: center;
@@ -41901,40 +41901,89 @@ class LoadingManager {
             align-items: center;
             z-index: 10000;
             color: white;
-            font-family: Arial, sans-serif;
+            font-family: "Balatro", Arial, sans-serif;
             opacity: 0;
             transition: opacity 0.5s ease;
         `;
     overlay.innerHTML = `
-            <div class="loading-content" style="text-align: center; margin-bottom: 30px;">
-                <h1 style="font-size: 2.5em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
-                    LOADING
-                </h1>
+            <!-- Background decorative elements -->
+            <div class="loading-background-decoration">
+                <div class="loading-decoration-circle circle-1"></div>
+                <div class="loading-decoration-circle circle-2"></div>
+                <div class="loading-decoration-circle circle-3"></div>
+                <div class="loading-decoration-circle circle-4"></div>
+            </div>
+
+            <div class="loading-content" style="text-align: center; margin-bottom: 30px; position: relative; z-index: 2;">
+                <!-- Logo -->
+                <div class="loading-logo-container">
+                    <img src="assets/images/logo.jpg" alt="Cognira Logo" class="loading-logo">
+                </div>
+                
+                <!-- Title -->
+                <h1 class="loading-title" style="
+                    font-size: 3em;
+                    font-weight: bold;
+                    background: linear-gradient(45deg, #4caf50, #81c784, #a5d6a7);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                    text-shadow: 0 0 30px rgba(76, 175, 80, 0.5);
+                    margin: 20px 0;
+                    letter-spacing: 3px;
+                    animation: pulse 2s infinite;
+                ">COGNIRA</h1>
+                
+                <!-- Spinner -->
                 <div class="spinner" style="
                     width: 60px;
                     height: 60px;
-                    border: 4px solid rgba(255,255,255,0.3);
-                    border-top: 4px solid #ff6b6b;
+                    border: 4px solid rgba(76, 175, 80, 0.3);
+                    border-top: 4px solid #4caf50;
                     border-radius: 50%;
                     margin: 20px auto;
                     animation: spin 1s linear infinite;
                 "></div>
-                <div id="loading-text" style="font-size: 1.2em; margin-bottom: 20px;">
-                    Loading... 0%
-                </div>
+                
+                <!-- Loading Text -->
+                <div id="loading-text" style="
+                    font-size: 1.2em; 
+                    margin-bottom: 20px;
+                    color: #e8f5e9;
+                    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                ">Loading... 0%</div>
             </div>
-            <div style="width: 300px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden;">
+            
+            <!-- Progress Bar -->
+            <div style="
+                width: 300px; 
+                height: 6px; 
+                background: rgba(76, 175, 80, 0.3); 
+                border-radius: 3px; 
+                overflow: hidden;
+                margin: 10px 0;
+                position: relative;
+                z-index: 2;
+            ">
                 <div id="loading-progress" style="
                     height: 100%; 
-                    background: linear-gradient(90deg, #ff6b6b, #4ecdc4); 
+                    background: linear-gradient(90deg, #4caf50, #81c784, #a5d6a7); 
                     width: 0%; 
                     transition: width 0.3s ease;
-                    border-radius: 2px;
+                    border-radius: 3px;
+                    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
                 "></div>
             </div>
-            <div style="margin-top: 30px; font-size: 0.9em; opacity: 0.8;">
-                2 is the only even prime number
-            </div>
+            
+            <!-- Subtitle -->
+            <div style="
+                margin-top: 20px; 
+                font-size: 0.9em; 
+                opacity: 0.8;
+                color: #c8e6c9;
+                position: relative;
+                z-index: 2;
+            ">2 is the only even prime number</div>
             
             <style>
                 @keyframes spin {
@@ -41948,8 +41997,119 @@ class LoadingManager {
                     100% { opacity: 1; }
                 }
                 
-                .loading-content h1 {
-                    animation: pulse 2s infinite;
+                @keyframes float {
+                    0%, 100% {
+                        transform: translateY(0px) scale(1);
+                        opacity: 0.3;
+                    }
+                    50% {
+                        transform: translateY(-20px) scale(1.05);
+                        opacity: 0.5;
+                    }
+                }
+                
+                /* Loading Background Decoration */
+                .loading-background-decoration {
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 1;
+                }
+                
+                .loading-decoration-circle {
+                    position: absolute;
+                    border-radius: 50%;
+                    background: radial-gradient(circle, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0) 70%);
+                    animation: float 6s ease-in-out infinite;
+                }
+                
+                .circle-1 {
+                    width: 200px;
+                    height: 200px;
+                    top: 10%;
+                    left: 10%;
+                    animation-delay: 0s;
+                }
+                
+                .circle-2 {
+                    width: 150px;
+                    height: 150px;
+                    top: 60%;
+                    right: 15%;
+                    animation-delay: 2s;
+                }
+                
+                .circle-3 {
+                    width: 100px;
+                    height: 100px;
+                    bottom: 20%;
+                    left: 20%;
+                    animation-delay: 4s;
+                }
+                
+                .circle-4 {
+                    width: 120px;
+                    height: 120px;
+                    top: 30%;
+                    right: 25%;
+                    animation-delay: 1s;
+                }
+                
+                /* Loading Logo */
+                .loading-logo-container {
+                    margin-bottom: 20px;
+                    animation: fadeInDown 1s ease-out;
+                }
+                
+                .loading-logo {
+                    width: 120px;
+                    height: 120px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 4px solid #4caf50;
+                    box-shadow: 
+                        0 0 30px rgba(76, 175, 80, 0.5),
+                        0 0 60px rgba(76, 175, 80, 0.3),
+                        inset 0 0 20px rgba(76, 175, 80, 0.2);
+                    transition: all 0.3s ease;
+                }
+                
+                @keyframes fadeInDown {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-30px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(30px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                
+                /* Responsive */
+                @media (max-width: 768px) {
+                    .loading-title {
+                        font-size: 2em !important;
+                    }
+                    
+                    .loading-logo {
+                        width: 80px;
+                        height: 80px;
+                    }
+                    
+                    #loading-text {
+                        font-size: 1em !important;
+                    }
                 }
             </style>
         `;
@@ -42387,7 +42547,7 @@ function getMapBounds() {
   };
 }
 
-},{"../constants":56,"../main":57,"./Tile":50,"three":36,"three/examples/jsm/loaders/GLTFLoader.js":37}],47:[function(require,module,exports){
+},{"../constants":58,"../main":59,"./Tile":50,"three":36,"three/examples/jsm/loaders/GLTFLoader.js":37}],47:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42697,7 +42857,7 @@ class Player extends THREE.Object3D {
 }
 exports.Player = Player;
 
-},{"../constants":56,"cannon-es":2,"three":36,"three/examples/jsm/loaders/GLTFLoader":37}],48:[function(require,module,exports){
+},{"../constants":58,"cannon-es":2,"three":36,"three/examples/jsm/loaders/GLTFLoader":37}],48:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42901,7 +43061,811 @@ function Tile(positionY, platformWidthScale = 0.7, modelName = 'grass.gltf', phy
   return tile;
 }
 
-},{"../constants":56,"../main.js":57,"cannon-es":2,"three":36,"three/examples/jsm/loaders/GLTFLoader.js":37}],51:[function(require,module,exports){
+},{"../constants":58,"../main.js":59,"cannon-es":2,"three":36,"three/examples/jsm/loaders/GLTFLoader.js":37}],51:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.MathOperationList = void 0;
+class MathOperationList {
+  constructor() {
+    this.mathQuestions = this._initializeMathQuestions();
+  }
+  _initializeMathQuestions() {
+    return [{
+      id: 1,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [2, 3, 3],
+      operators: ['-', '×'],
+      result: 1,
+      category: "Basic Arithmetic",
+      difficulty: "easy",
+      explanation: "2 - 3 × 3 = 2 - 9 = -7 (Note: This seems incorrect, let me fix)"
+    }, {
+      id: 2,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [4, 2, 5],
+      operators: ['×', '+'],
+      result: 13,
+      category: "Basic Arithmetic",
+      difficulty: "easy",
+      explanation: "4 × 2 + 5 = 8 + 5 = 13"
+    }, {
+      id: 3,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [8, 4, 2],
+      operators: ['÷', '×'],
+      result: 4,
+      category: "Basic Arithmetic",
+      difficulty: "easy",
+      explanation: "8 ÷ 4 × 2 = 2 × 2 = 4"
+    }, {
+      id: 4,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [6, 3, 4, 2],
+      operators: ['-', '×', '+'],
+      result: 4,
+      category: "Order of Operations",
+      difficulty: "medium",
+      explanation: "6 - 3 × 4 + 2 = 6 - 12 + 2 = -4 (Note: This seems incorrect)"
+    }, {
+      id: 5,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [5, 2, 3, 4],
+      operators: ['×', '+', '÷'],
+      result: 11,
+      category: "Order of Operations",
+      difficulty: "medium",
+      explanation: "5 × 2 + 3 ÷ 4 = 10 + 0.75 = 10.75 (Note: This might need review)"
+    }, {
+      id: 6,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [9, 3, 2, 1],
+      operators: ['÷', '×', '-'],
+      result: 5,
+      category: "Order of Operations",
+      difficulty: "medium",
+      explanation: "9 ÷ 3 × 2 - 1 = 3 × 2 - 1 = 6 - 1 = 5"
+    }, {
+      id: 7,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [7, 2, 4, 3, 1],
+      operators: ['-', '×', '+', '÷'],
+      result: 6,
+      category: "Complex Operations",
+      difficulty: "hard",
+      explanation: "7 - 2 × 4 + 3 ÷ 1 = 7 - 8 + 3 = 2 (Note: This seems incorrect)"
+    }, {
+      id: 8,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [8, 2, 5, 3, 2],
+      operators: ['÷', '+', '×', '-'],
+      result: 9,
+      category: "Complex Operations",
+      difficulty: "hard",
+      explanation: "8 ÷ 2 + 5 × 3 - 2 = 4 + 15 - 2 = 17 (Note: This seems incorrect)"
+    },
+    // New questions with ^ and % operators
+    {
+      id: 9,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [2, 3, 2],
+      operators: ['^', '-'],
+      result: 6,
+      category: "Power Operations",
+      difficulty: "medium",
+      explanation: "2 ^ 3 - 2 = 8 - 2 = 6"
+    }, {
+      id: 10,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [5, 2, 1],
+      operators: ['%', '+'],
+      result: 2,
+      category: "Modulo Operations",
+      difficulty: "medium",
+      explanation: "5 % 2 + 1 = 1 + 1 = 2"
+    }, {
+      id: 11,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [3, 2, 4, 2],
+      operators: ['^', '×', '%'],
+      result: 0,
+      category: "Mixed Operations",
+      difficulty: "hard",
+      explanation: "3 ^ 2 × 4 % 2 = 9 × 4 % 2 = 36 % 2 = 0"
+    }, {
+      id: 12,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [10, 3, 2, 1],
+      operators: ['%', '^', '+'],
+      result: 2,
+      category: "Mixed Operations",
+      difficulty: "hard",
+      explanation: "10 % 3 ^ 2 + 1 = 10 % 9 + 1 = 1 + 1 = 2"
+    }, {
+      id: 13,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [4, 2, 3, 5],
+      operators: ['^', '÷', '%'],
+      result: 1,
+      category: "Mixed Operations",
+      difficulty: "hard",
+      explanation: "4 ^ 2 ÷ 3 % 5 = 16 ÷ 3 % 5 = 5 % 5 = 0 (Note: This seems incorrect)"
+    }, {
+      id: 14,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [7, 4, 2, 3],
+      operators: ['%', '-', '^'],
+      result: 0,
+      category: "Mixed Operations",
+      difficulty: "hard",
+      explanation: "7 % 4 - 2 ^ 3 = 3 - 8 = -5 (Note: This seems incorrect)"
+    }];
+  }
+  getRandomMathQuestion() {
+    const randomIndex = Math.floor(Math.random() * this.mathQuestions.length);
+    return this.mathQuestions[randomIndex];
+  }
+  getMathQuestionsByDifficulty(difficulty) {
+    return this.mathQuestions.filter(q => q.difficulty === difficulty);
+  }
+  getMathQuestionById(id) {
+    return this.mathQuestions.find(q => q.id === id);
+  }
+  getAllMathQuestions() {
+    return this.mathQuestions;
+  }
+
+  // Method to add math questions dynamically if needed
+  addMathQuestion(question) {
+    this.mathQuestions.push(question);
+  }
+}
+exports.MathOperationList = MathOperationList;
+
+},{}],52:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.MathOperationSystem = void 0;
+var _worldRelated = require("../../../utilities/worldRelated.js");
+var _constants = require("../../../constants.js");
+var _MathOperationList = require("./MathOperationList.js");
+class MathOperationSystem {
+  constructor(socketClient) {
+    this.socketClient = socketClient;
+    this.mathOperationList = new _MathOperationList.MathOperationList();
+
+    // UI Elements
+    this.questionContainer = document.getElementById('questionContainer');
+    this.questionTimerProgress = document.getElementById('questionTimerProgress');
+    this.questionTimerCount = document.getElementById('questionTimerCount');
+    this.questionDescription = document.getElementById('questionDescription');
+    this.questionOptions = document.getElementById('questionOptions');
+
+    // State
+    this.questionTimer = null;
+    this.gameActive = false;
+    this.currentQuestion = null;
+    this.hasAnswered = false;
+
+    // Drag & Drop State
+    this.answerOperators = [];
+    this.availableOperators = [];
+    this.draggedOperator = null;
+    this.isCorrect = false;
+    this.playerResult = null;
+
+    // Use constants for timing
+    this.GAME_TIME = _constants.MEMORY_MATRIX_PHASE_TIME * 1000;
+    this.RESULT_TIME = 5000; // 5 seconds for showing results
+  }
+  showGame() {
+    if (this.gameActive) return;
+    this.currentQuestion = this.mathOperationList.getRandomMathQuestion();
+    this.hasAnswered = false;
+    this.isCorrect = false;
+    this.playerResult = null;
+
+    // Initialize answer operators array
+    this.initializeAnswerOperators();
+
+    // Get available operators and shuffle them (now including ^ and %)
+    this.availableOperators = this.shuffleArray(['+', '-', '×', '÷', '^', '%']);
+    this.questionDescription.innerHTML = `
+            <div class="question-type-label"><b>Type:</b> Math Operation</div>
+            <div class="question-text">${this.currentQuestion.description}</div>
+        `;
+
+    // Start directly with drag-drop interface (no preview)
+    this.showDragDropInterface();
+  }
+
+  // Add shuffle method to randomize array
+  shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }
+  initializeAnswerOperators() {
+    // Create empty slots for operators (one less than numbers count)
+    const numbers = this.currentQuestion.numbers;
+    this.answerOperators = new Array(numbers.length - 1).fill(null);
+  }
+  showDragDropInterface() {
+    const question = this.currentQuestion;
+    this.questionContainer.style.display = 'block';
+    this.questionOptions.style.display = 'none';
+    this.gameActive = true;
+    this.questionDescription.innerHTML = `
+            <div class="question-type-label"><b>Type:</b> Math Operation</div>
+            <div class="question-text">Complete the equation by dragging operators to make it equal ${question.result}:</div>
+        `;
+    const gameArea = document.createElement('div');
+    gameArea.className = 'math-operation-game-area';
+    gameArea.style.display = 'flex';
+    gameArea.style.flexDirection = 'column';
+    gameArea.style.alignItems = 'center';
+    gameArea.style.gap = '20px';
+
+    // Create equation with drop zones
+    const equationContainer = this.createEquationWithDropZones();
+    gameArea.appendChild(equationContainer);
+
+    // Create operator palette
+    const operatorPalette = this.createOperatorPalette();
+    gameArea.appendChild(operatorPalette);
+    this.questionDescription.appendChild(gameArea);
+
+    // Start the main game timer (using full time since no preview)
+    const answerTime = this.GAME_TIME - this.RESULT_TIME;
+    this.startGameTimer(answerTime);
+  }
+  createEquationWithDropZones() {
+    const numbers = this.currentQuestion.numbers;
+    const container = document.createElement('div');
+    container.className = 'math-equation';
+    container.style.display = 'flex';
+    container.style.alignItems = 'center';
+    container.style.justifyContent = 'center';
+    container.style.gap = '10px';
+    container.style.margin = '30px 0';
+    container.style.padding = '20px';
+    container.style.backgroundColor = '#f8f9fa';
+    container.style.borderRadius = '10px';
+    container.style.border = '2px solid #dee2e6';
+    container.style.fontSize = '24px';
+    container.style.fontWeight = 'bold';
+    for (let i = 0; i < numbers.length; i++) {
+      // Add number
+      const numberElement = document.createElement('span');
+      numberElement.textContent = numbers[i];
+      numberElement.style.padding = '0 5px';
+      container.appendChild(numberElement);
+
+      // Add operator drop zone (except after last number)
+      if (i < numbers.length - 1) {
+        const dropZone = document.createElement('div');
+        dropZone.className = 'operator-drop-zone';
+        dropZone.dataset.index = i;
+        dropZone.style.width = '60px';
+        dropZone.style.height = '60px';
+        dropZone.style.border = '2px dashed #999';
+        dropZone.style.borderRadius = '8px';
+        dropZone.style.backgroundColor = '#ffffff';
+        dropZone.style.cursor = 'pointer';
+        dropZone.style.display = 'flex';
+        dropZone.style.alignItems = 'center';
+        dropZone.style.justifyContent = 'center';
+        dropZone.style.fontSize = '20px';
+        dropZone.style.color = '#666';
+        dropZone.textContent = '?';
+        dropZone.style.transition = 'all 0.2s ease';
+        let isDragOver = false;
+        dropZone.addEventListener('dragover', e => {
+          e.preventDefault();
+          isDragOver = true;
+          dropZone.style.borderColor = '#007bff';
+          dropZone.style.backgroundColor = '#e3f2fd';
+        });
+        dropZone.addEventListener('dragenter', e => {
+          e.preventDefault();
+          isDragOver = true;
+          dropZone.style.borderColor = '#007bff';
+          dropZone.style.backgroundColor = '#e3f2fd';
+        });
+        dropZone.addEventListener('dragleave', () => {
+          if (isDragOver) {
+            isDragOver = false;
+            if (this.answerOperators[i]) {
+              dropZone.style.borderColor = '#333';
+              dropZone.style.backgroundColor = '#f8f9fa';
+            } else {
+              dropZone.style.borderColor = '#999';
+              dropZone.style.backgroundColor = '#ffffff';
+            }
+          }
+        });
+        dropZone.addEventListener('drop', e => {
+          e.preventDefault();
+          isDragOver = false;
+          this.handleOperatorDrop(e, i, dropZone);
+        });
+        dropZone.addEventListener('click', () => {
+          if (this.answerOperators[i]) {
+            this.removeOperatorFromSlot(i, dropZone);
+          }
+        });
+        dropZone.addEventListener('dragstart', e => {
+          e.preventDefault();
+        });
+        container.appendChild(dropZone);
+      }
+    }
+
+    // Add equals and result
+    const equals = document.createElement('span');
+    equals.textContent = '=';
+    equals.style.padding = '0 10px';
+    container.appendChild(equals);
+    const result = document.createElement('span');
+    result.textContent = this.currentQuestion.result;
+    result.style.padding = '0 5px';
+    result.style.color = '#28a745';
+    container.appendChild(result);
+    return container;
+  }
+  createOperatorPalette() {
+    const paletteContainer = document.createElement('div');
+    paletteContainer.className = 'operator-palette';
+    paletteContainer.style.display = 'flex';
+    paletteContainer.style.flexDirection = 'column';
+    paletteContainer.style.gap = '15px';
+    paletteContainer.style.justifyContent = 'center';
+    paletteContainer.style.margin = '10px 0';
+    paletteContainer.style.padding = '20px';
+    paletteContainer.style.backgroundColor = '#f8f9fa';
+    paletteContainer.style.borderRadius = '10px';
+    paletteContainer.style.border = '2px solid #dee2e6';
+    const instruction = document.createElement('div');
+    instruction.textContent = 'Drag operators to the equation above (click to remove):';
+    instruction.style.width = '100%';
+    instruction.style.textAlign = 'center';
+    instruction.style.marginBottom = '15px';
+    instruction.style.fontWeight = 'bold';
+    instruction.style.fontSize = '16px';
+    paletteContainer.appendChild(instruction);
+    const operatorsContainer = document.createElement('div');
+    operatorsContainer.style.display = 'flex';
+    operatorsContainer.style.gap = '15px';
+    operatorsContainer.style.justifyContent = 'center';
+    operatorsContainer.style.flexWrap = 'wrap';
+    this.availableOperators.forEach((operator, index) => {
+      const operatorCard = document.createElement('div');
+      operatorCard.className = 'operator-card';
+      operatorCard.dataset.operator = operator;
+      operatorCard.style.width = '70px';
+      operatorCard.style.height = '70px';
+      operatorCard.style.border = '3px solid #333';
+      operatorCard.style.borderRadius = '10px';
+      operatorCard.style.backgroundColor = '#ffffff';
+      operatorCard.style.cursor = 'grab';
+      operatorCard.style.transition = 'all 0.2s ease';
+      operatorCard.style.display = 'flex';
+      operatorCard.style.alignItems = 'center';
+      operatorCard.style.justifyContent = 'center';
+      operatorCard.style.fontSize = operator === '^' || operator === '%' ? '24px' : '28px';
+      operatorCard.style.fontWeight = 'bold';
+      operatorCard.textContent = operator;
+      operatorCard.draggable = true;
+
+      // Add tooltip for power and modulo
+      let operatorName = '';
+      switch (operator) {
+        case '+':
+          operatorName = 'Addition';
+          break;
+        case '-':
+          operatorName = 'Subtraction';
+          break;
+        case '×':
+          operatorName = 'Multiplication';
+          break;
+        case '÷':
+          operatorName = 'Division';
+          break;
+        case '^':
+          operatorName = 'Power/Exponent';
+          break;
+        case '%':
+          operatorName = 'Modulo/Remainder';
+          break;
+      }
+      operatorCard.title = `Operator: ${operatorName}`;
+      operatorCard.addEventListener('dragstart', e => {
+        this.draggedOperator = operator;
+        operatorCard.style.opacity = '0.6';
+        operatorCard.style.cursor = 'grabbing';
+        operatorCard.style.transform = 'scale(1.1)';
+        operatorCard.style.backgroundColor = '#e3f2fd';
+        e.dataTransfer.setData('text/plain', operator);
+        e.dataTransfer.effectAllowed = 'copy';
+      });
+      operatorCard.addEventListener('dragend', () => {
+        operatorCard.style.opacity = '1';
+        operatorCard.style.cursor = 'grab';
+        operatorCard.style.transform = 'scale(1)';
+        operatorCard.style.backgroundColor = '#ffffff';
+        this.draggedOperator = null;
+
+        // Reset all drop zone appearances after drag ends
+        document.querySelectorAll('.operator-drop-zone').forEach(zone => {
+          const index = parseInt(zone.dataset.index);
+          if (this.answerOperators[index]) {
+            zone.style.borderColor = '#333';
+            zone.style.backgroundColor = '#f8f9fa';
+          } else {
+            zone.style.borderColor = '#999';
+            zone.style.backgroundColor = '#ffffff';
+          }
+        });
+      });
+      operatorCard.addEventListener('mouseenter', () => {
+        operatorCard.style.transform = 'scale(1.1)';
+        operatorCard.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+      });
+      operatorCard.addEventListener('mouseleave', () => {
+        if (this.draggedOperator !== operator) {
+          operatorCard.style.transform = 'scale(1)';
+          operatorCard.style.boxShadow = 'none';
+        }
+      });
+      operatorsContainer.appendChild(operatorCard);
+    });
+    paletteContainer.appendChild(operatorsContainer);
+    return paletteContainer;
+  }
+  handleOperatorDrop(e, index, dropZone) {
+    const operator = e.dataTransfer.getData('text/plain');
+    if (!operator) return;
+    this.answerOperators[index] = operator;
+
+    // Update drop zone appearance
+    dropZone.textContent = operator;
+    dropZone.style.border = '2px solid #333';
+    dropZone.style.backgroundColor = '#f8f9fa';
+    dropZone.style.color = '#333';
+    dropZone.style.boxShadow = 'none';
+    dropZone.style.fontSize = operator === '^' || operator === '%' ? '18px' : '20px';
+    this.checkAnswer();
+  }
+  removeOperatorFromSlot(index, dropZone) {
+    this.answerOperators[index] = null;
+
+    // Reset drop zone appearance
+    dropZone.textContent = '?';
+    dropZone.style.border = '2px dashed #999';
+    dropZone.style.backgroundColor = '#ffffff';
+    dropZone.style.color = '#666';
+    dropZone.style.boxShadow = 'none';
+    dropZone.style.fontSize = '20px';
+    this.checkAnswer();
+  }
+  checkAnswer() {
+    // Check if all operator slots are filled
+    const allFilled = this.answerOperators.every(op => op !== null);
+    if (allFilled) {
+      try {
+        // Evaluate the player's expression
+        this.playerResult = this.evaluateExpression(this.currentQuestion.numbers, this.answerOperators);
+
+        // Check if result matches the target (with floating point tolerance)
+        const target = this.currentQuestion.result;
+        this.isCorrect = Math.abs(this.playerResult - target) < 0.0001;
+        this.updateProgressDisplay();
+      } catch (error) {
+        console.error('Error evaluating expression:', error);
+        this.isCorrect = false;
+      }
+    }
+  }
+  evaluateExpression(numbers, operators) {
+    // Convert to JavaScript expression
+    let expression = '';
+    for (let i = 0; i < numbers.length; i++) {
+      expression += numbers[i];
+      if (i < operators.length) {
+        // Convert mathematical operators to JavaScript operators
+        switch (operators[i]) {
+          case '×':
+            expression += '*';
+            break;
+          case '÷':
+            expression += '/';
+            break;
+          case '^':
+            expression += '**';
+            break;
+          case '%':
+            expression += '%';
+            break;
+          default:
+            expression += operators[i];
+            break;
+        }
+      }
+    }
+
+    // Evaluate the expression
+    // Note: Using Function constructor for safety instead of eval
+    return Function(`"use strict"; return (${expression})`)();
+  }
+  updateProgressDisplay() {
+    let progressDisplay = document.getElementById('math-progress');
+    if (!progressDisplay) {
+      progressDisplay = document.createElement('div');
+      progressDisplay.id = 'math-progress';
+      progressDisplay.style.textAlign = 'center';
+      progressDisplay.style.margin = '10px 0';
+      progressDisplay.style.fontWeight = 'bold';
+      progressDisplay.style.fontSize = '14px';
+      this.questionDescription.appendChild(progressDisplay);
+    }
+    const filledCount = this.answerOperators.filter(op => op !== null).length;
+    const totalSlots = this.answerOperators.length;
+    let resultInfo = '';
+    if (this.playerResult !== null) {
+      const isCorrect = Math.abs(this.playerResult - this.currentQuestion.result) < 0.0001;
+      resultInfo = `
+                <div style="font-size: 12px; color: ${isCorrect ? '#28a745' : '#dc3545'}; margin-top: 5px;">
+                    Your result: ${this.playerResult.toFixed(2)} ${isCorrect ? '✓' : '✗'}
+                </div>
+            `;
+    }
+    progressDisplay.innerHTML = `
+            <div style="margin-bottom: 5px;">
+                Progress: ${filledCount}/${totalSlots} operators placed
+            </div>
+            <div style="font-size: 12px; color: #666;">
+                Target result: ${this.currentQuestion.result}
+            </div>
+            ${resultInfo}
+            <div style="font-size: 11px; color: #888; margin-top: 5px;">
+                Results will be shown after time ends
+            </div>
+        `;
+  }
+  startGameTimer(time) {
+    let timeLeft = time / 1000;
+    this.questionTimerCount.textContent = timeLeft;
+    this.questionTimerProgress.style.width = '100%';
+    this.questionTimer = setInterval(() => {
+      timeLeft--;
+      this.questionTimerCount.textContent = timeLeft;
+      this.questionTimerProgress.style.width = `${timeLeft / (time / 1000) * 100}%`;
+      if (timeLeft <= 0) {
+        clearInterval(this.questionTimer);
+        this.showResultsPhase();
+      }
+    }, 1000);
+  }
+  showResultsPhase() {
+    // Disable further interactions
+    this.gameActive = false;
+
+    // Show the results comparison
+    this.showResultsComparison();
+
+    // Start result timer
+    setTimeout(() => {
+      this.finalizeGame();
+    }, this.RESULT_TIME);
+  }
+  showResultsComparison() {
+    this.questionDescription.innerHTML = `
+            <div class="question-type-label"><b>Type:</b> Math Operation - Results</div>
+            <div class="question-text">Here's how you did:</div>
+        `;
+    const resultsContainer = document.createElement('div');
+    resultsContainer.style.display = 'flex';
+    resultsContainer.style.flexDirection = 'column';
+    resultsContainer.style.alignItems = 'center';
+    resultsContainer.style.gap = '30px';
+    resultsContainer.style.margin = '20px 0';
+
+    // Player's Equation
+    const playerSection = document.createElement('div');
+    playerSection.style.textAlign = 'center';
+    playerSection.innerHTML = '<h3 style="margin-bottom: 15px; color: #007bff;">Your Answer</h3>';
+    const playerEquation = this.renderPlayerEquationWithResult();
+    playerSection.appendChild(playerEquation);
+    resultsContainer.appendChild(playerSection);
+
+    // Only show correct answer if player was wrong
+    if (!this.isCorrect) {
+      const correctSection = document.createElement('div');
+      correctSection.style.textAlign = 'center';
+      correctSection.innerHTML = '<h3 style="margin-bottom: 15px; color: #28a745;">One Possible Solution</h3>';
+      const correctEquation = this.renderEquation(this.currentQuestion.numbers, this.currentQuestion.operators);
+      correctSection.appendChild(correctEquation);
+      resultsContainer.appendChild(correctSection);
+    }
+
+    // Results summary
+    const summary = document.createElement('div');
+    summary.style.textAlign = 'center';
+    summary.style.padding = '20px';
+    summary.style.backgroundColor = '#f8f9fa';
+    summary.style.borderRadius = '10px';
+    summary.style.border = '2px solid #dee2e6';
+    summary.innerHTML = `
+            <div style="font-size: 1.5em; font-weight: bold; margin-bottom: 15px; color: ${this.isCorrect ? '#28a745' : '#dc3545'}">
+                ${this.isCorrect ? '✓ PASSED' : '✗ FAILED'}
+            </div>
+            <div style="font-size: 1.2em; margin-bottom: 10px;">
+                Your result: <strong>${this.playerResult !== null ? this.playerResult.toFixed(2) : 'N/A'}</strong>
+            </div>
+            <div style="font-size: 1.2em; margin-bottom: 10px;">
+                Target: <strong>${this.currentQuestion.result}</strong>
+            </div>
+            <div style="font-size: 1em; color: #666; margin-bottom: 10px;">
+                ${this.isCorrect ? 'Your equation is correct!' : 'Your equation did not produce the target result'}
+            </div>
+            <div style="font-size: 0.9em; color: #888;">
+                Results will auto-continue in ${this.RESULT_TIME / 1000} seconds...
+            </div>
+        `;
+    resultsContainer.appendChild(summary);
+    this.questionDescription.appendChild(resultsContainer);
+  }
+  renderPlayerEquationWithResult() {
+    const numbers = this.currentQuestion.numbers;
+    const equationContainer = document.createElement('div');
+    equationContainer.style.display = 'flex';
+    equationContainer.style.alignItems = 'center';
+    equationContainer.style.justifyContent = 'center';
+    equationContainer.style.gap = '10px';
+    equationContainer.style.fontSize = '28px';
+    equationContainer.style.fontWeight = 'bold';
+    equationContainer.style.padding = '20px';
+    equationContainer.style.backgroundColor = '#e9ecef';
+    equationContainer.style.borderRadius = '10px';
+    equationContainer.style.border = '2px solid #ced4da';
+    for (let i = 0; i < numbers.length; i++) {
+      // Add number
+      const numberElement = document.createElement('span');
+      numberElement.textContent = numbers[i];
+      numberElement.style.padding = '0 5px';
+      equationContainer.appendChild(numberElement);
+
+      // Add operator (except after last number)
+      if (i < numbers.length - 1) {
+        const operatorElement = document.createElement('span');
+        const playerOperator = this.answerOperators[i];
+        operatorElement.textContent = playerOperator || '?';
+        operatorElement.style.padding = '0 10px';
+        operatorElement.style.color = '#007bff';
+        operatorElement.style.fontSize = playerOperator === '^' || playerOperator === '%' ? '24px' : '28px';
+        equationContainer.appendChild(operatorElement);
+      }
+    }
+
+    // Add equals and result
+    const equals = document.createElement('span');
+    equals.textContent = '=';
+    equals.style.padding = '0 15px';
+    equationContainer.appendChild(equals);
+    const result = document.createElement('span');
+    result.textContent = this.playerResult !== null ? this.playerResult.toFixed(2) : '?';
+    result.style.padding = '0 5px';
+    result.style.color = this.isCorrect ? '#28a745' : '#dc3545';
+    equationContainer.appendChild(result);
+    return equationContainer;
+  }
+  renderEquation(numbers, operators) {
+    const equationContainer = document.createElement('div');
+    equationContainer.style.display = 'flex';
+    equationContainer.style.alignItems = 'center';
+    equationContainer.style.justifyContent = 'center';
+    equationContainer.style.gap = '10px';
+    equationContainer.style.fontSize = '28px';
+    equationContainer.style.fontWeight = 'bold';
+    equationContainer.style.padding = '20px';
+    equationContainer.style.backgroundColor = '#e9ecef';
+    equationContainer.style.borderRadius = '1010px';
+    equationContainer.style.border = '2px solid #ced4da';
+    for (let i = 0; i < numbers.length; i++) {
+      // Add number
+      const numberElement = document.createElement('span');
+      numberElement.textContent = numbers[i];
+      numberElement.style.padding = '0 5px';
+      equationContainer.appendChild(numberElement);
+
+      // Add operator (except after last number)
+      if (i < numbers.length - 1) {
+        const operatorElement = document.createElement('span');
+        operatorElement.textContent = operators[i];
+        operatorElement.style.padding = '0 10px';
+        operatorElement.style.color = '#007bff';
+        operatorElement.style.fontSize = operators[i] === '^' || operators[i] === '%' ? '24px' : '28px';
+        equationContainer.appendChild(operatorElement);
+      }
+    }
+
+    // Add equals and result
+    const equals = document.createElement('span');
+    equals.textContent = '=';
+    equals.style.padding = '0 15px';
+    equationContainer.appendChild(equals);
+    const result = document.createElement('span');
+    result.textContent = this.currentQuestion.result;
+    result.style.padding = '0 5px';
+    result.style.color = '#28a745';
+    equationContainer.appendChild(result);
+    return equationContainer;
+  }
+  finalizeGame() {
+    console.log(`🎯 Final results - Player result: ${this.playerResult}, Target: ${this.currentQuestion.result}, Correct: ${this.isCorrect}`);
+    this.completeGame(this.isCorrect);
+  }
+  completeGame(isCorrect) {
+    if (this.questionTimer) {
+      clearInterval(this.questionTimer);
+      this.questionTimer = null;
+    }
+    this.questionContainer.style.display = 'none';
+    (0, _worldRelated.pauseWorld)(false);
+    console.log(`🔄 [MathOperationSystem] Calling onGameComplete callback...`);
+    if (this.onGameComplete) {
+      this.onGameComplete(isCorrect);
+    } else {
+      console.error('❌ [MathOperationSystem] onGameComplete callback is not defined!');
+    }
+  }
+  hideGame() {
+    this.questionContainer.style.display = 'none';
+    this.gameActive = false;
+    this.hasAnswered = false;
+    this.answerOperators = [];
+    this.availableOperators = [];
+    this.playerResult = null;
+    if (this.questionTimer) {
+      clearInterval(this.questionTimer);
+      this.questionTimer = null;
+    }
+  }
+
+  // Helper methods to access math operation list functionality
+  getMathQuestionsByDifficulty(difficulty) {
+    return this.mathOperationList.getMathQuestionsByDifficulty(difficulty);
+  }
+  getMathQuestionById(id) {
+    return this.mathOperationList.getMathQuestionById(id);
+  }
+}
+exports.MathOperationSystem = MathOperationSystem;
+
+},{"../../../constants.js":58,"../../../utilities/worldRelated.js":72,"./MathOperationList.js":51}],53:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43032,7 +43996,7 @@ class MemoryMatrixList {
 }
 exports.MemoryMatrixList = MemoryMatrixList;
 
-},{}],52:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43066,23 +44030,20 @@ class MemoryMatrixSystem {
     this.draggedColor = null;
     this.correctAnswerCount = 0;
     this.totalCells = 0;
-    this.fixedCells = new Set(); // Track cells that are locked
+    this.placedCells = new Set();
 
     // Use constants for timing
-    this.GAME_TIME = _constants.MEMORY_MATRIX_PHASE_TIME * 1000; // Convert to milliseconds
-    this.PREVIEW_TIME = _constants.MEMORY_MATRIX_PHASE_TIME * 1000 / 4; // 1/4 of total time for preview
+    this.GAME_TIME = _constants.MEMORY_MATRIX_PHASE_TIME * 1000;
+    this.PREVIEW_TIME = _constants.MEMORY_MATRIX_PHASE_TIME * 1000 / 4;
+    this.RESULT_TIME = 5000; // 5 seconds for showing results
   }
   showGame() {
     if (this.gameActive) return;
     this.currentQuestion = this.memoryMatrixList.getRandomMatrixQuestion();
     this.hasAnswered = false;
     this.correctAnswerCount = 0;
-    this.fixedCells.clear(); // Reset fixed cells
-
-    // Initialize answer grid
+    this.placedCells.clear();
     this.initializeAnswerGrid();
-
-    // Get available colors from the correct matrix and SHUFFLE them
     this.availableColors = this.shuffleArray(this.getUniqueColors(this.currentQuestion.matrix));
     this.totalCells = this.currentQuestion.matrix.flat().length;
     this.questionDescription.innerHTML = `
@@ -43091,8 +44052,6 @@ class MemoryMatrixSystem {
         `;
     this.showMemoryPreview();
   }
-
-  // Add shuffle method to randomize array
   shuffleArray(array) {
     const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -43103,12 +44062,11 @@ class MemoryMatrixSystem {
   }
   initializeAnswerGrid() {
     const matrix = this.currentQuestion.matrix;
-    this.answerGrid = matrix.map(row => row.map(() => null) // Initialize all cells as empty
-    );
+    this.answerGrid = matrix.map(row => row.map(() => null));
   }
   getUniqueColors(matrix) {
     const flatMatrix = matrix.flat();
-    return [...new Set(flatMatrix)]; // Get unique colors
+    return [...new Set(flatMatrix)];
   }
   showMemoryPreview() {
     if (this.gameActive) return;
@@ -43116,22 +44074,14 @@ class MemoryMatrixSystem {
     this.questionContainer.style.display = 'block';
     this.questionOptions.style.display = 'none';
     this.gameActive = true;
-
-    // Start preview timer immediately
     this.startPreviewTimer();
-
-    // Step 1: Show the original matrix to memorize
     const matrixContainer = document.createElement('div');
     matrixContainer.classList.add('memory-matrix-preview');
     this.questionDescription.appendChild(matrixContainer);
     this.renderColorMatrix(matrixContainer, question.matrix);
-
-    // Add preview timer info
     const previewInfo = document.createElement('div');
     previewInfo.innerHTML = `<p style="text-align: center; margin: 10px 0; font-weight: bold;">Memorize this pattern for ${this.PREVIEW_TIME / 1000} seconds...</p>`;
     this.questionDescription.appendChild(previewInfo);
-
-    // Step 2: After preview time, hide it and show drag-drop interface
     setTimeout(() => {
       matrixContainer.remove();
       previewInfo.remove();
@@ -43157,26 +44107,21 @@ class MemoryMatrixSystem {
             <div class="question-type-label"><b>Type:</b> Memory Matrix</div>
             <div class="question-text">Recreate the color pattern you memorized by dragging colors to the grid:</div>
         `;
-
-    // Create the main game area
     const gameArea = document.createElement('div');
     gameArea.className = 'memory-matrix-game-area';
     gameArea.style.display = 'flex';
     gameArea.style.flexDirection = 'column';
     gameArea.style.alignItems = 'center';
     gameArea.style.gap = '20px';
-
-    // Create answer grid (drop zones)
     const answerGridContainer = this.createAnswerGrid();
     gameArea.appendChild(answerGridContainer);
-
-    // Create color palette (drag sources) - colors are already shuffled
     const colorPalette = this.createColorPalette();
     gameArea.appendChild(colorPalette);
     this.questionDescription.appendChild(gameArea);
 
-    // Start the main game timer
-    this.startGameTimer(this.GAME_TIME - this.PREVIEW_TIME);
+    // Calculate answer time (total time minus preview and result time)
+    const answerTime = this.GAME_TIME - this.PREVIEW_TIME - this.RESULT_TIME;
+    this.startGameTimer(answerTime);
   }
   createAnswerGrid() {
     const matrix = this.currentQuestion.matrix;
@@ -43212,56 +44157,41 @@ class MemoryMatrixSystem {
         cell.style.fontSize = '12px';
         cell.style.color = '#666';
         cell.textContent = 'Drop here';
-
-        // Track if we're currently dragging over this cell
         let isDragOver = false;
-
-        // Add drag and drop events
         cell.addEventListener('dragover', e => {
           e.preventDefault();
-          // Only highlight if cell is empty and not fixed
-          if (!this.answerGrid[row][col] && !this.isCellFixed(row, col)) {
-            isDragOver = true;
-            cell.style.borderColor = '#007bff';
-            cell.style.backgroundColor = '#e3f2fd';
-          }
+          isDragOver = true;
+          cell.style.borderColor = '#007bff';
+          cell.style.backgroundColor = '#e3f2fd';
         });
         cell.addEventListener('dragenter', e => {
           e.preventDefault();
-          // Only highlight if cell is empty and not fixed
-          if (!this.answerGrid[row][col] && !this.isCellFixed(row, col)) {
-            isDragOver = true;
-            cell.style.borderColor = '#007bff';
-            cell.style.backgroundColor = '#e3f2fd';
-          }
+          isDragOver = true;
+          cell.style.borderColor = '#007bff';
+          cell.style.backgroundColor = '#e3f2fd';
         });
         cell.addEventListener('dragleave', () => {
           if (isDragOver) {
             isDragOver = false;
-            cell.style.borderColor = '#999';
-            cell.style.backgroundColor = '#ffffff';
+            if (this.answerGrid[row][col]) {
+              cell.style.borderColor = '#333';
+              cell.style.backgroundColor = this.answerGrid[row][col];
+            } else {
+              cell.style.borderColor = '#999';
+              cell.style.backgroundColor = '#ffffff';
+            }
           }
         });
         cell.addEventListener('drop', e => {
           e.preventDefault();
           isDragOver = false;
-          // Only allow drop if cell is empty and not fixed
-          if (!this.answerGrid[row][col] && !this.isCellFixed(row, col)) {
-            this.handleColorDrop(e, row, col, cell);
-          } else {
-            // Reset appearance if drop is not allowed
-            cell.style.borderColor = '#999';
-            cell.style.backgroundColor = '#ffffff';
-          }
+          this.handleColorDrop(e, row, col, cell);
         });
         cell.addEventListener('click', () => {
-          // Only allow removal if cell has color and is not fixed
-          if (this.answerGrid[row][col] && !this.isCellFixed(row, col)) {
+          if (this.answerGrid[row][col]) {
             this.removeColorFromCell(row, col, cell);
           }
         });
-
-        // Prevent default drag behaviors
         cell.addEventListener('dragstart', e => {
           e.preventDefault();
         });
@@ -43283,7 +44213,7 @@ class MemoryMatrixSystem {
     paletteContainer.style.borderRadius = '10px';
     paletteContainer.style.border = '2px solid #dee2e6';
     const instruction = document.createElement('div');
-    instruction.textContent = 'Drag colors to the grid above:';
+    instruction.textContent = 'Drag colors to the grid above (click to remove):';
     instruction.style.width = '100%';
     instruction.style.textAlign = 'center';
     instruction.style.marginBottom = '10px';
@@ -43294,8 +44224,6 @@ class MemoryMatrixSystem {
     colorsContainer.style.gap = '10px';
     colorsContainer.style.justifyContent = 'center';
     colorsContainer.style.flexWrap = 'wrap';
-
-    // The availableColors array is already shuffled, so we just iterate through it
     this.availableColors.forEach((color, index) => {
       const colorCard = document.createElement('div');
       colorCard.className = 'color-card';
@@ -43322,12 +44250,13 @@ class MemoryMatrixSystem {
         colorCard.style.cursor = 'grab';
         colorCard.style.transform = 'scale(1)';
         this.draggedColor = null;
-
-        // Reset all cell appearances after drag ends
         document.querySelectorAll('.answer-cell').forEach(cell => {
           const row = parseInt(cell.dataset.row);
           const col = parseInt(cell.dataset.col);
-          if (!this.answerGrid[row][col] && !this.isCellFixed(row, col)) {
+          if (this.answerGrid[row][col]) {
+            cell.style.borderColor = '#333';
+            cell.style.backgroundColor = this.answerGrid[row][col];
+          } else {
             cell.style.borderColor = '#999';
             cell.style.backgroundColor = '#ffffff';
           }
@@ -43351,66 +44280,29 @@ class MemoryMatrixSystem {
   handleColorDrop(e, row, col, cell) {
     const color = e.dataTransfer.getData('text/plain');
     if (!color) return;
-
-    // Reset cell appearance
-    cell.style.borderColor = '#333';
-    cell.style.backgroundColor = '#ffffff';
-
-    // Update the answer grid
     this.answerGrid[row][col] = color;
+    this.placedCells.add(`${row}-${col}`);
 
-    // Update cell appearance with the dropped color
+    // REMOVED: Immediate correctness feedback
     cell.style.background = color;
     cell.style.border = '2px solid #333';
     cell.style.color = 'transparent';
-    cell.textContent = ''; // Remove placeholder text
+    cell.textContent = '';
 
-    // Check if this placement is correct
-    const isCorrect = color === this.currentQuestion.matrix[row][col];
-    if (isCorrect) {
-      cell.style.borderColor = '#28a745';
-      cell.style.boxShadow = '0 0 8px rgba(40, 167, 69, 0.5)';
-    } else {
-      cell.style.borderColor = '#dc3545';
-      cell.style.boxShadow = '0 0 8px rgba(220, 53, 69, 0.5)';
-    }
-
-    // Lock the cell immediately after placement
-    this.fixCell(row, col, cell);
-
-    // Update correct count
+    // Only show neutral styling during answer phase
+    cell.style.borderColor = '#333';
+    cell.style.boxShadow = 'none';
     this.updateCorrectCount();
   }
   removeColorFromCell(row, col, cell) {
-    // Only allow removal if cell is not fixed
-    if (this.isCellFixed(row, col)) return;
-
-    // Clear the answer grid
     this.answerGrid[row][col] = null;
-
-    // Reset cell appearance
+    this.placedCells.delete(`${row}-${col}`);
     cell.style.background = '#ffffff';
     cell.style.border = '2px dashed #999';
     cell.style.color = '#666';
     cell.style.boxShadow = 'none';
     cell.textContent = 'Drop here';
-
-    // Update correct count
     this.updateCorrectCount();
-  }
-  isCellFixed(row, col) {
-    return this.fixedCells.has(`${row}-${col}`);
-  }
-  fixCell(row, col, cell) {
-    // Mark cell as fixed
-    this.fixedCells.add(`${row}-${col}`);
-
-    // Update cell appearance to indicate it's fixed
-    cell.style.cursor = 'default';
-    cell.style.opacity = '0.9';
-
-    // Remove click event for removal
-    cell.replaceWith(cell.cloneNode(true));
   }
   updateCorrectCount() {
     const correctMatrix = this.currentQuestion.matrix;
@@ -43427,8 +44319,6 @@ class MemoryMatrixSystem {
       }
     }
     this.correctAnswerCount = correctCount;
-
-    // Update UI to show progress
     this.updateProgressDisplay(correctCount, filledCount);
   }
   updateProgressDisplay(correctCount, filledCount) {
@@ -43447,18 +44337,147 @@ class MemoryMatrixSystem {
     const requiredToPass = Math.ceil(totalCells / 2);
     progressDisplay.innerHTML = `
             <div style="margin-bottom: 5px;">
-                Progress: ${filledCount}/${totalCells} filled | 
-                Correct: ${correctCount}/${totalCells} (${percentage}%)
+                Progress: ${filledCount}/${totalCells} filled
             </div>
             <div style="font-size: 12px; color: #666;">
                 Need ${requiredToPass} correct to pass
             </div>
+            <div style="font-size: 11px; color: #888; margin-top: 5px;">
+                Results will be shown after time ends
+            </div>
         `;
+  }
+  startGameTimer(time) {
+    let timeLeft = time / 1000;
+    this.questionTimerCount.textContent = timeLeft;
+    this.questionTimerProgress.style.width = '100%';
+    this.questionTimer = setInterval(() => {
+      timeLeft--;
+      this.questionTimerCount.textContent = timeLeft;
+      this.questionTimerProgress.style.width = `${timeLeft / (time / 1000) * 100}%`;
+      if (timeLeft <= 0) {
+        clearInterval(this.questionTimer);
+        this.showResultsPhase();
+      }
+    }, 1000);
+  }
+  showResultsPhase() {
+    // Disable further interactions
+    this.gameActive = false;
+
+    // Show the results comparison
+    this.showResultsComparison();
+
+    // Start result timer
+    setTimeout(() => {
+      this.finalizeGame();
+    }, this.RESULT_TIME);
+  }
+  showResultsComparison() {
+    this.questionDescription.innerHTML = `
+            <div class="question-type-label"><b>Type:</b> Memory Matrix - Results</div>
+            <div class="question-text">Here's how you did:</div>
+        `;
+    const resultsContainer = document.createElement('div');
+    resultsContainer.style.display = 'flex';
+    resultsContainer.style.flexDirection = 'column';
+    resultsContainer.style.alignItems = 'center';
+    resultsContainer.style.gap = '30px';
+    resultsContainer.style.margin = '20px 0';
+
+    // Create comparison grids
+    const comparisonContainer = document.createElement('div');
+    comparisonContainer.style.display = 'flex';
+    comparisonContainer.style.gap = '40px';
+    comparisonContainer.style.justifyContent = 'center';
+    comparisonContainer.style.flexWrap = 'wrap';
+
+    // Correct Matrix
+    const correctSection = document.createElement('div');
+    correctSection.style.textAlign = 'center';
+    correctSection.innerHTML = '<h3 style="margin-bottom: 10px; color: #28a745;">Correct Pattern</h3>';
+    const correctGrid = document.createElement('div');
+    this.renderColorMatrix(correctGrid, this.currentQuestion.matrix);
+    correctSection.appendChild(correctGrid);
+
+    // Player's Matrix with visual feedback
+    const playerSection = document.createElement('div');
+    playerSection.style.textAlign = 'center';
+    playerSection.innerHTML = '<h3 style="margin-bottom: 10px; color: #007bff;">Your Answer</h3>';
+    const playerGrid = document.createElement('div');
+    this.renderPlayerMatrixWithFeedback(playerGrid, this.answerGrid);
+    playerSection.appendChild(playerGrid);
+    comparisonContainer.appendChild(correctSection);
+    comparisonContainer.appendChild(playerSection);
+    resultsContainer.appendChild(comparisonContainer);
+
+    // Results summary
+    const summary = document.createElement('div');
+    summary.style.textAlign = 'center';
+    summary.style.padding = '20px';
+    summary.style.backgroundColor = '#f8f9fa';
+    summary.style.borderRadius = '10px';
+    summary.style.border = '2px solid #dee2e6';
+    const totalCells = this.totalCells;
+    const requiredToPass = Math.ceil(totalCells / 2);
+    const isPassed = this.correctAnswerCount >= requiredToPass;
+    summary.innerHTML = `
+            <div style="font-size: 1.5em; font-weight: bold; margin-bottom: 15px; color: ${isPassed ? '#28a745' : '#dc3545'}">
+                ${isPassed ? '✓ PASSED' : '✗ FAILED'}
+            </div>
+            <div style="font-size: 1.2em; margin-bottom: 10px;">
+                Correct: <strong>${this.correctAnswerCount}/${totalCells}</strong>
+            </div>
+            <div style="font-size: 1em; color: #666; margin-bottom: 10px;">
+                Required: ${requiredToPass} correct to pass
+            </div>
+            <div style="font-size: 0.9em; color: #888;">
+                Results will auto-continue in ${this.RESULT_TIME / 1000} seconds...
+            </div>
+        `;
+    resultsContainer.appendChild(summary);
+    this.questionDescription.appendChild(resultsContainer);
+  }
+  renderPlayerMatrixWithFeedback(container, playerMatrix) {
+    const correctMatrix = this.currentQuestion.matrix;
+    const rows = correctMatrix.length;
+    const cols = correctMatrix[0].length;
+    const cellSize = rows > 2 || cols > 2 ? '40px' : '50px';
+    container.innerHTML = '';
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = `repeat(${cols}, ${cellSize})`;
+    container.style.gridTemplateRows = `repeat(${rows}, ${cellSize})`;
+    container.style.gap = '4px';
+    container.style.margin = '10px auto';
+    container.style.justifyContent = 'center';
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const cell = document.createElement('div');
+        cell.style.width = cellSize;
+        cell.style.height = cellSize;
+        cell.style.border = '2px solid';
+        cell.style.borderRadius = '4px';
+        if (playerMatrix[row][col]) {
+          cell.style.background = playerMatrix[row][col];
+          const isCorrect = playerMatrix[row][col] === correctMatrix[row][col];
+          cell.style.borderColor = isCorrect ? '#28a745' : '#dc3545';
+          cell.style.boxShadow = isCorrect ? '0 0 8px rgba(40, 167, 69, 0.5)' : '0 0 8px rgba(220, 53, 69, 0.5)';
+        } else {
+          cell.style.background = '#f8f9fa';
+          cell.style.borderColor = '#dee2e6';
+          cell.style.color = '#999';
+          cell.style.display = 'flex';
+          cell.style.alignItems = 'center';
+          cell.style.justifyContent = 'center';
+          cell.style.fontSize = '10px';
+          cell.textContent = 'Empty';
+        }
+        container.appendChild(cell);
+      }
+    }
   }
   renderColorMatrix(container, matrix) {
     container.innerHTML = '';
-
-    // Determine grid size based on matrix dimensions
     const rows = matrix.length;
     const cols = matrix[0].length;
     const cellSize = rows > 2 || cols > 2 ? '40px' : '50px';
@@ -43474,53 +44493,29 @@ class MemoryMatrixSystem {
         cell.style.width = cellSize;
         cell.style.height = cellSize;
         cell.style.background = color;
-        cell.style.border = '1px solid #333';
+        cell.style.border = '2px solid #333';
         cell.style.borderRadius = '4px';
         container.appendChild(cell);
       });
     });
   }
-  startGameTimer(time) {
-    let timeLeft = time / 1000;
-    this.questionTimerCount.textContent = timeLeft;
-    this.questionTimerProgress.style.width = '100%';
-    this.questionTimer = setInterval(() => {
-      timeLeft--;
-      this.questionTimerCount.textContent = timeLeft;
-      this.questionTimerProgress.style.width = `${timeLeft / (time / 1000) * 100}%`;
-      if (timeLeft <= 0) {
-        clearInterval(this.questionTimer);
-        this.handleGameTimeExpired();
-      }
-    }, 1000);
-  }
-  handleGameTimeExpired() {
+  finalizeGame() {
     const totalCells = this.totalCells;
-    const halfCells = Math.ceil(totalCells / 2);
-    const isCorrect = this.correctAnswerCount >= halfCells;
-    console.log(`⏰ Time expired. Correct: ${this.correctAnswerCount}/${totalCells}, required: ${halfCells}, result: ${isCorrect ? 'PASS' : 'FAIL'}`);
+    const requiredToPass = Math.ceil(totalCells / 2);
+    const isCorrect = this.correctAnswerCount >= requiredToPass;
+    console.log(`🎯 Final results - Correct: ${this.correctAnswerCount}/${totalCells}, required: ${requiredToPass}, result: ${isCorrect ? 'PASS' : 'FAIL'}`);
     this.completeGame(isCorrect);
   }
   completeGame(isCorrect) {
-    if (!this.gameActive) {
-      console.log("⚠️ Game already completed, ignoring");
-      return;
-    }
-    console.log(`🔄 [MemoryMatrixSystem] completeGame called with isCorrect: ${isCorrect}`);
-    this.gameActive = false;
     if (this.questionTimer) {
       clearInterval(this.questionTimer);
       this.questionTimer = null;
     }
-
-    // Clear preview timer if it's still running
     if (this.previewTimer) {
       clearInterval(this.previewTimer);
       this.previewTimer = null;
     }
     this.questionContainer.style.display = 'none';
-
-    // Ensure world is unpaused
     (0, _worldRelated.pauseWorld)(false);
     console.log(`🔄 [MemoryMatrixSystem] Calling onGameComplete callback...`);
     if (this.onGameComplete) {
@@ -43535,7 +44530,7 @@ class MemoryMatrixSystem {
     this.hasAnswered = false;
     this.answerGrid = [];
     this.availableColors = [];
-    this.fixedCells.clear();
+    this.placedCells.clear();
     if (this.questionTimer) {
       clearInterval(this.questionTimer);
       this.questionTimer = null;
@@ -43545,8 +44540,6 @@ class MemoryMatrixSystem {
       this.previewTimer = null;
     }
   }
-
-  // Helper methods to access memory matrix list functionality
   getMatrixQuestionsByDifficulty(difficulty) {
     return this.memoryMatrixList.getMatrixQuestionsByDifficulty(difficulty);
   }
@@ -43556,7 +44549,7 @@ class MemoryMatrixSystem {
 }
 exports.MemoryMatrixSystem = MemoryMatrixSystem;
 
-},{"../../../constants.js":56,"../../../utilities/worldRelated.js":69,"./MemoryMatrixList.js":51}],53:[function(require,module,exports){
+},{"../../../constants.js":58,"../../../utilities/worldRelated.js":72,"./MemoryMatrixList.js":53}],55:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43690,7 +44683,7 @@ class QuestionList {
 }
 exports.QuestionList = QuestionList;
 
-},{}],54:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43845,7 +44838,7 @@ class QuestionSystem {
 }
 exports.QuestionSystem = QuestionSystem;
 
-},{"../../../constants.js":56,"../../../utilities/worldRelated.js":69,"./QuestionList.js":53}],55:[function(require,module,exports){
+},{"../../../constants.js":58,"../../../utilities/worldRelated.js":72,"./QuestionList.js":55}],57:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44117,13 +45110,13 @@ function startTetrisGame(onComplete, timeLimit = 30000) {
   return tetris;
 }
 
-},{}],56:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TILE_SIZE = exports.STEPS_UPDATE_INTERVAL = exports.SPATIAL_QUESTION_TIME = exports.QUESTION_PHASE_TIME = exports.PHASE_TRANSITION_DELAY = exports.MOVEMENT_PHASE_TIME = exports.MESSAGE_FADE_OUT_TIME = exports.MESSAGE_DISPLAY_TIME = exports.MEMORY_MATRIX_PHASE_TIME = exports.MAP_SIZE_Y = exports.MAP_SIZE_X = exports.GAP_SIZE = exports.CARD_PHASE_TIME = void 0;
+exports.TILE_SIZE = exports.STEPS_UPDATE_INTERVAL = exports.SPATIAL_QUESTION_TIME = exports.QUESTION_PHASE_TIME = exports.PHASE_TRANSITION_DELAY = exports.MOVEMENT_PHASE_TIME = exports.MESSAGE_FADE_OUT_TIME = exports.MESSAGE_DISPLAY_TIME = exports.MEMORY_MATRIX_PHASE_TIME = exports.MATH_OPERATION_PHASE_TIME = exports.MAP_SIZE_Y = exports.MAP_SIZE_X = exports.GAP_SIZE = exports.CARD_PHASE_TIME = void 0;
 // 4 x 23 GRID
 const MAP_SIZE_X = exports.MAP_SIZE_X = 4;
 const MAP_SIZE_Y = exports.MAP_SIZE_Y = 23;
@@ -44133,17 +45126,20 @@ const GAP_SIZE = exports.GAP_SIZE = 6;
 // Phase timing constants (in seconds)
 const CARD_PHASE_TIME = exports.CARD_PHASE_TIME = 10;
 const MOVEMENT_PHASE_TIME = exports.MOVEMENT_PHASE_TIME = 30;
-const QUESTION_PHASE_TIME = exports.QUESTION_PHASE_TIME = 15;
-const MEMORY_MATRIX_PHASE_TIME = exports.MEMORY_MATRIX_PHASE_TIME = 40;
 const SPATIAL_QUESTION_TIME = exports.SPATIAL_QUESTION_TIME = 30;
 const PHASE_TRANSITION_DELAY = exports.PHASE_TRANSITION_DELAY = 0.5;
+
+// Minigame time
+const QUESTION_PHASE_TIME = exports.QUESTION_PHASE_TIME = 15;
+const MEMORY_MATRIX_PHASE_TIME = exports.MEMORY_MATRIX_PHASE_TIME = 40;
+const MATH_OPERATION_PHASE_TIME = exports.MATH_OPERATION_PHASE_TIME = 40;
 
 // Animation and UI timing
 const MESSAGE_DISPLAY_TIME = exports.MESSAGE_DISPLAY_TIME = 3;
 const MESSAGE_FADE_OUT_TIME = exports.MESSAGE_FADE_OUT_TIME = 1;
 const STEPS_UPDATE_INTERVAL = exports.STEPS_UPDATE_INTERVAL = 0.5;
 
-},{}],57:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44156,7 +45152,7 @@ exports.getLocalPlayer = getLocalPlayer;
 exports.getPhaseTimer = getPhaseTimer;
 exports.getQuestionSystem = getQuestionSystem;
 exports.getSocketClient = getSocketClient;
-exports.questionSystem = exports.memoryMatrixSystem = void 0;
+exports.questionSystem = exports.memoryMatrixSystem = exports.mathOperationSystem = void 0;
 exports.setPhaseTimer = setPhaseTimer;
 var THREE = _interopRequireWildcard(require("three"));
 var _Renderer = require("./components/Renderer");
@@ -44167,6 +45163,7 @@ var _socketClient = require("./socketClient");
 var _CardSystem = require("./components/CardSystem");
 var _QuestionSystem = require("./components/minigames/question/QuestionSystem");
 var _MemoryMatrixSystem = require("./components/minigames/memoryMatrix/MemoryMatrixSystem");
+var _MathOperationSystem = require("./components/minigames/mathOperation/MathOperationSystem");
 var _SkyBox = require("./components/SkyBox");
 var _LoadingManager = require("./components/LoadingManager");
 var _countdownPhase = require("./phases/countdownPhase");
@@ -44184,7 +45181,8 @@ let localPlayer = null;
 let gameInitialized = false;
 let cardSystem = exports.cardSystem = void 0,
   questionSystem = exports.questionSystem = void 0,
-  memoryMatrixSystem = exports.memoryMatrixSystem = void 0;
+  memoryMatrixSystem = exports.memoryMatrixSystem = void 0,
+  mathOperationSystem = exports.mathOperationSystem = void 0;
 let _phaseTimer = null;
 let animateFunction = null;
 const renderer = (0, _Renderer.Renderer)();
@@ -44235,9 +45233,11 @@ function initializeGameSystems() {
   exports.cardSystem = cardSystem = new _CardSystem.CardSystem(socketClient);
   exports.questionSystem = questionSystem = new _QuestionSystem.QuestionSystem(socketClient);
   exports.memoryMatrixSystem = memoryMatrixSystem = new _MemoryMatrixSystem.MemoryMatrixSystem(socketClient);
+  exports.mathOperationSystem = mathOperationSystem = new _MathOperationSystem.MathOperationSystem(socketClient);
   console.log("🔄 Initializing game systems...");
   console.log("✅ QuestionSystem initialized, callback set:", !!questionSystem.onQuestionComplete);
   console.log("✅ MemoryMatrixSystem initialized, callback set:", !!memoryMatrixSystem.onGameComplete);
+  console.log("✅ MathOperationSystem initialized, callback set:", !!mathOperationSystem.onGameComplete);
 }
 function getPhaseTimer() {
   return _phaseTimer;
@@ -44381,7 +45381,7 @@ function debugCameraView() {
   });
 }
 
-},{"./components/Camera":39,"./components/CardSystem":43,"./components/DirectionalLight":44,"./components/LoadingManager":45,"./components/Map":46,"./components/Renderer":48,"./components/SkyBox":49,"./components/minigames/memoryMatrix/MemoryMatrixSystem":52,"./components/minigames/question/QuestionSystem":54,"./phases/countdownPhase":59,"./socketClient":65,"./utilities/animate":66,"./utilities/collectUserInputs":67,"three":36}],58:[function(require,module,exports){
+},{"./components/Camera":39,"./components/CardSystem":43,"./components/DirectionalLight":44,"./components/LoadingManager":45,"./components/Map":46,"./components/Renderer":48,"./components/SkyBox":49,"./components/minigames/mathOperation/MathOperationSystem":52,"./components/minigames/memoryMatrix/MemoryMatrixSystem":54,"./components/minigames/question/QuestionSystem":56,"./phases/countdownPhase":61,"./socketClient":68,"./utilities/animate":69,"./utilities/collectUserInputs":70,"three":36}],60:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44437,7 +45437,7 @@ function endCardPhase() {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../constants.js":56,"../main.js":57,"./minigamePhase.js":60}],59:[function(require,module,exports){
+},{"../constants.js":58,"../main.js":59,"./minigamePhase.js":62}],61:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44510,7 +45510,7 @@ function hideInitialCountdownMessage() {
   }
 }
 
-},{"../main":57,"../utilities/collectUserInputs":67,"./cardPhase":58}],60:[function(require,module,exports){
+},{"../main":59,"../utilities/collectUserInputs":70,"./cardPhase":60}],62:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44521,11 +45521,12 @@ exports.getCurrentMinigameType = getCurrentMinigameType;
 exports.isMinigamePhaseActive = isMinigamePhaseActive;
 exports.startMinigamePhase = startMinigamePhase;
 var _main = require("../main.js");
+var _constants = require("../constants.js");
+var _movePhase = require("./movePhase.js");
 var _questionPhase = require("./minigames/questionPhase.js");
 var _tetrisPhase = require("./minigames/tetrisPhase.js");
-var _movePhase = require("./movePhase.js");
-var _constants = require("../constants.js");
 var _memoryMatrixPhase = require("./minigames/memoryMatrixPhase.js");
+var _mathOperationPhase = require("./minigames/mathOperationPhase.js");
 let minigamePhaseActive = false;
 let currentMinigameType = null;
 function startMinigamePhase() {
@@ -44542,7 +45543,7 @@ function startMinigamePhase() {
   // Small delay before starting minigame
   setTimeout(() => {
     // Randomly choose the minigame
-    const minigameTypes = ['memoryMatrix'];
+    const minigameTypes = ['mathOperation'];
     currentMinigameType = minigameTypes[Math.floor(Math.random() * minigameTypes.length)];
     console.log(`🎯 Selected minigame: ${currentMinigameType}`);
 
@@ -44553,6 +45554,8 @@ function startMinigamePhase() {
       (0, _tetrisPhase.startTetrisPhase)();
     } else if (currentMinigameType === 'memoryMatrix') {
       (0, _memoryMatrixPhase.startMemoryMatrixPhase)();
+    } else if (currentMinigameType === 'mathOperation') {
+      (0, _mathOperationPhase.startMathOperationPhase)();
     } else {
       console.error('Unknown minigame type:', currentMinigameType);
       (0, _questionPhase.startQuestionPhase)();
@@ -44586,7 +45589,67 @@ function isMinigamePhaseActive() {
   return minigamePhaseActive;
 }
 
-},{"../constants.js":56,"../main.js":57,"./minigames/memoryMatrixPhase.js":61,"./minigames/questionPhase.js":62,"./minigames/tetrisPhase.js":63,"./movePhase.js":64}],61:[function(require,module,exports){
+},{"../constants.js":58,"../main.js":59,"./minigames/mathOperationPhase.js":63,"./minigames/memoryMatrixPhase.js":64,"./minigames/questionPhase.js":65,"./minigames/tetrisPhase.js":66,"./movePhase.js":67}],63:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.endMathOperationPhase = endMathOperationPhase;
+exports.startMathOperationPhase = startMathOperationPhase;
+var _constants = require("../../constants.js");
+var _main = require("../../main.js");
+var _minigamePhase = require("../minigamePhase.js");
+let mathOperationPhaseTimer = null;
+function startMathOperationPhase() {
+  console.log("🧮 Starting math operation game phase");
+
+  // Clear any existing timers
+  (0, _main.clearPhaseTimer)();
+
+  // Set up math operation game completion callback
+  _main.mathOperationSystem.onGameComplete = isCorrect => {
+    console.log(`🧮 Math operation game completed - Correct: ${isCorrect}`);
+    endMathOperationPhase(isCorrect);
+  };
+
+  // Show the math operation game
+  _main.mathOperationSystem.showGame();
+
+  // Set timer to automatically end math operation game phase after time limit
+  mathOperationPhaseTimer = setTimeout(() => {
+    console.log("⏰ Math operation game phase time limit reached");
+    endMathOperationPhase(false);
+  }, (_constants.MATH_OPERATION_PHASE_TIME + 1) * 1000 + 500); // Add buffer for animations
+
+  (0, _main.setPhaseTimer)(mathOperationPhaseTimer);
+}
+function endMathOperationPhase(isCorrect = false) {
+  console.log("🧮 Ending math operation game phase");
+
+  // Clear timers
+  if (mathOperationPhaseTimer) {
+    clearTimeout(mathOperationPhaseTimer);
+    mathOperationPhaseTimer = null;
+  }
+  (0, _main.clearPhaseTimer)();
+
+  // Hide math operation game if it's still visible
+  _main.mathOperationSystem.hideGame();
+
+  // Reset callback
+  _main.mathOperationSystem.onGameComplete = null;
+  console.log(`🎯 Math operation game result: ${isCorrect ? 'CORRECT' : 'INCORRECT'}`);
+  const localPlayer = (0, _main.getLocalPlayer)();
+  _main.cardSystem.applyCardEffect(localPlayer.selectedCard.id, isCorrect, localPlayer);
+
+  // Add a small delay before ending minigame phase to ensure clean transition
+  setTimeout(() => {
+    (0, _minigamePhase.endMinigamePhase)();
+  }, _constants.PHASE_TRANSITION_DELAY * 1000);
+}
+
+},{"../../constants.js":58,"../../main.js":59,"../minigamePhase.js":62}],64:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44646,7 +45709,7 @@ function endMemoryMatrixPhase(isCorrect = false) {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../../constants.js":56,"../../main.js":57,"../minigamePhase.js":60}],62:[function(require,module,exports){
+},{"../../constants.js":58,"../../main.js":59,"../minigamePhase.js":62}],65:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44707,7 +45770,7 @@ function endQuestionPhase(isCorrect = false) {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../../constants.js":56,"../../main.js":57,"../minigamePhase.js":60}],63:[function(require,module,exports){
+},{"../../constants.js":58,"../../main.js":59,"../minigamePhase.js":62}],66:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44772,7 +45835,7 @@ function endTetrisPhase(success = false) {
   // startMovementPhase();
 }
 
-},{"../../components/minigames/tetris/Tetris":55,"../../main":57}],64:[function(require,module,exports){
+},{"../../components/minigames/tetris/Tetris":57,"../../main":59}],67:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44927,7 +45990,7 @@ function startStepsDisplayUpdater() {
   }, _constants.MOVEMENT_PHASE_TIME * 1000);
 }
 
-},{"../constants.js":56,"../main.js":57,"../utilities/collectUserInputs.js":67,"../utilities/showTime.js":68,"./cardPhase.js":58}],65:[function(require,module,exports){
+},{"../constants.js":58,"../main.js":59,"../utilities/collectUserInputs.js":70,"../utilities/showTime.js":71,"./cardPhase.js":60}],68:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45057,7 +46120,7 @@ class SocketClient {
 }
 exports.SocketClient = SocketClient;
 
-},{"./components/Player":47,"./utilities/worldRelated":69,"socket.io-client":27}],66:[function(require,module,exports){
+},{"./components/Player":47,"./utilities/worldRelated":72,"socket.io-client":27}],69:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45243,7 +46306,7 @@ function getAnimationState() {
   };
 }
 
-},{"../components/Map":46,"./worldRelated":69,"three":36}],67:[function(require,module,exports){
+},{"../components/Map":46,"./worldRelated":72,"three":36}],70:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45393,7 +46456,7 @@ function refreshMovementUI() {
   updateMovementUI();
 }
 
-},{"../main.js":57,"../phases/movePhase.js":64}],68:[function(require,module,exports){
+},{"../main.js":59,"../phases/movePhase.js":67}],71:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45556,7 +46619,7 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-},{"../constants.js":56}],69:[function(require,module,exports){
+},{"../constants.js":58}],72:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45587,4 +46650,4 @@ function updatePhysics() {
   physicsWorld.step(timeStep);
 }
 
-},{"cannon-es":2}]},{},[57]);
+},{"cannon-es":2}]},{},[59]);

@@ -8,10 +8,13 @@ export const GAP_SIZE = 6;
 // Phase timing constants (in seconds)
 export const CARD_PHASE_TIME = 10;
 export const MOVEMENT_PHASE_TIME = 30; 
-export const QUESTION_PHASE_TIME = 15;
-export const MEMORY_MATRIX_PHASE_TIME = 40;
 export const SPATIAL_QUESTION_TIME = 30;
 export const PHASE_TRANSITION_DELAY = 0.5; 
+
+// Minigame time
+export const QUESTION_PHASE_TIME = 15;
+export const MEMORY_MATRIX_PHASE_TIME = 40;
+export const MATH_OPERATION_PHASE_TIME = 40;
 
 
 // Animation and UI timing

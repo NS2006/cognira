@@ -7,6 +7,7 @@ import { SocketClient } from "./socketClient";
 import { CardSystem } from "./components/CardSystem";
 import { QuestionSystem } from "./components/minigames/question/QuestionSystem";
 import { MemoryMatrixSystem } from "./components/minigames/memoryMatrix/MemoryMatrixSystem";
+import { MathOperationSystem } from "./components/minigames/mathOperation/MathOperationSystem";
 import { SkyBox } from "./components/SkyBox";
 import { loadingManager } from "./components/LoadingManager"; 
 import { startInitialCountdown } from "./phases/countdownPhase";
@@ -23,7 +24,7 @@ const playerCountSpan = document.getElementById("playerCount");
 var scene, socketClient, ambientLight, dirLight, dirLightTarget, camera;
 let localPlayer = null;
 let gameInitialized = false;
-export let cardSystem, questionSystem, memoryMatrixSystem;
+export let cardSystem, questionSystem, memoryMatrixSystem, mathOperationSystem;
 let _phaseTimer = null;
 let animateFunction = null;
 
@@ -92,10 +93,12 @@ function initializeGameSystems() {
   cardSystem = new CardSystem(socketClient);
   questionSystem = new QuestionSystem(socketClient);
   memoryMatrixSystem = new MemoryMatrixSystem(socketClient);
+  mathOperationSystem = new MathOperationSystem(socketClient);
 
   console.log("🔄 Initializing game systems...");
   console.log("✅ QuestionSystem initialized, callback set:", !!questionSystem.onQuestionComplete);
   console.log("✅ MemoryMatrixSystem initialized, callback set:", !!memoryMatrixSystem.onGameComplete);
+  console.log("✅ MathOperationSystem initialized, callback set:", !!mathOperationSystem.onGameComplete);
 }
 export function getPhaseTimer() {
   return _phaseTimer;

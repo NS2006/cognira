@@ -26,11 +26,12 @@ export class MemoryMatrixSystem {
         this.draggedColor = null;
         this.correctAnswerCount = 0;
         this.totalCells = 0;
-        this.fixedCells = new Set(); // Track cells that are locked
+        this.placedCells = new Set();
 
         // Use constants for timing
-        this.GAME_TIME = MEMORY_MATRIX_PHASE_TIME * 1000; // Convert to milliseconds
-        this.PREVIEW_TIME = (MEMORY_MATRIX_PHASE_TIME * 1000) / 4; // 1/4 of total time for preview
+        this.GAME_TIME = MEMORY_MATRIX_PHASE_TIME * 1000;
+        this.PREVIEW_TIME = (MEMORY_MATRIX_PHASE_TIME * 1000) / 4;
+        this.RESULT_TIME = 5000; // 5 seconds for showing results
     }
 
     showGame() {
@@ -39,12 +40,9 @@ export class MemoryMatrixSystem {
         this.currentQuestion = this.memoryMatrixList.getRandomMatrixQuestion();
         this.hasAnswered = false;
         this.correctAnswerCount = 0;
-        this.fixedCells.clear(); // Reset fixed cells
+        this.placedCells.clear();
         
-        // Initialize answer grid
         this.initializeAnswerGrid();
-        
-        // Get available colors from the correct matrix and SHUFFLE them
         this.availableColors = this.shuffleArray(this.getUniqueColors(this.currentQuestion.matrix));
         this.totalCells = this.currentQuestion.matrix.flat().length;
 
@@ -56,7 +54,6 @@ export class MemoryMatrixSystem {
         this.showMemoryPreview();
     }
 
-    // Add shuffle method to randomize array
     shuffleArray(array) {
         const shuffled = [...array];
         for (let i = shuffled.length - 1; i > 0; i--) {
@@ -69,13 +66,13 @@ export class MemoryMatrixSystem {
     initializeAnswerGrid() {
         const matrix = this.currentQuestion.matrix;
         this.answerGrid = matrix.map(row => 
-            row.map(() => null) // Initialize all cells as empty
+            row.map(() => null)
         );
     }
 
     getUniqueColors(matrix) {
         const flatMatrix = matrix.flat();
-        return [...new Set(flatMatrix)]; // Get unique colors
+        return [...new Set(flatMatrix)];
     }
 
     showMemoryPreview() {
@@ -86,22 +83,18 @@ export class MemoryMatrixSystem {
         this.questionOptions.style.display = 'none';
         this.gameActive = true;
 
-        // Start preview timer immediately
         this.startPreviewTimer();
 
-        // Step 1: Show the original matrix to memorize
         const matrixContainer = document.createElement('div');
         matrixContainer.classList.add('memory-matrix-preview');
         this.questionDescription.appendChild(matrixContainer);
 
         this.renderColorMatrix(matrixContainer, question.matrix);
 
-        // Add preview timer info
         const previewInfo = document.createElement('div');
         previewInfo.innerHTML = `<p style="text-align: center; margin: 10px 0; font-weight: bold;">Memorize this pattern for ${this.PREVIEW_TIME / 1000} seconds...</p>`;
         this.questionDescription.appendChild(previewInfo);
 
-        // Step 2: After preview time, hide it and show drag-drop interface
         setTimeout(() => {
             matrixContainer.remove();
             previewInfo.remove();
@@ -133,7 +126,6 @@ export class MemoryMatrixSystem {
             <div class="question-text">Recreate the color pattern you memorized by dragging colors to the grid:</div>
         `;
 
-        // Create the main game area
         const gameArea = document.createElement('div');
         gameArea.className = 'memory-matrix-game-area';
         gameArea.style.display = 'flex';
@@ -141,18 +133,17 @@ export class MemoryMatrixSystem {
         gameArea.style.alignItems = 'center';
         gameArea.style.gap = '20px';
 
-        // Create answer grid (drop zones)
         const answerGridContainer = this.createAnswerGrid();
         gameArea.appendChild(answerGridContainer);
 
-        // Create color palette (drag sources) - colors are already shuffled
         const colorPalette = this.createColorPalette();
         gameArea.appendChild(colorPalette);
 
         this.questionDescription.appendChild(gameArea);
 
-        // Start the main game timer
-        this.startGameTimer(this.GAME_TIME - this.PREVIEW_TIME);
+        // Calculate answer time (total time minus preview and result time)
+        const answerTime = this.GAME_TIME - this.PREVIEW_TIME - this.RESULT_TIME;
+        this.startGameTimer(answerTime);
     }
 
     createAnswerGrid() {
@@ -192,59 +183,47 @@ export class MemoryMatrixSystem {
                 cell.style.color = '#666';
                 cell.textContent = 'Drop here';
 
-                // Track if we're currently dragging over this cell
                 let isDragOver = false;
 
-                // Add drag and drop events
                 cell.addEventListener('dragover', (e) => {
                     e.preventDefault();
-                    // Only highlight if cell is empty and not fixed
-                    if (!this.answerGrid[row][col] && !this.isCellFixed(row, col)) {
-                        isDragOver = true;
-                        cell.style.borderColor = '#007bff';
-                        cell.style.backgroundColor = '#e3f2fd';
-                    }
+                    isDragOver = true;
+                    cell.style.borderColor = '#007bff';
+                    cell.style.backgroundColor = '#e3f2fd';
                 });
 
                 cell.addEventListener('dragenter', (e) => {
                     e.preventDefault();
-                    // Only highlight if cell is empty and not fixed
-                    if (!this.answerGrid[row][col] && !this.isCellFixed(row, col)) {
-                        isDragOver = true;
-                        cell.style.borderColor = '#007bff';
-                        cell.style.backgroundColor = '#e3f2fd';
-                    }
+                    isDragOver = true;
+                    cell.style.borderColor = '#007bff';
+                    cell.style.backgroundColor = '#e3f2fd';
                 });
 
                 cell.addEventListener('dragleave', () => {
                     if (isDragOver) {
                         isDragOver = false;
-                        cell.style.borderColor = '#999';
-                        cell.style.backgroundColor = '#ffffff';
+                        if (this.answerGrid[row][col]) {
+                            cell.style.borderColor = '#333';
+                            cell.style.backgroundColor = this.answerGrid[row][col];
+                        } else {
+                            cell.style.borderColor = '#999';
+                            cell.style.backgroundColor = '#ffffff';
+                        }
                     }
                 });
 
                 cell.addEventListener('drop', (e) => {
                     e.preventDefault();
                     isDragOver = false;
-                    // Only allow drop if cell is empty and not fixed
-                    if (!this.answerGrid[row][col] && !this.isCellFixed(row, col)) {
-                        this.handleColorDrop(e, row, col, cell);
-                    } else {
-                        // Reset appearance if drop is not allowed
-                        cell.style.borderColor = '#999';
-                        cell.style.backgroundColor = '#ffffff';
-                    }
+                    this.handleColorDrop(e, row, col, cell);
                 });
 
                 cell.addEventListener('click', () => {
-                    // Only allow removal if cell has color and is not fixed
-                    if (this.answerGrid[row][col] && !this.isCellFixed(row, col)) {
+                    if (this.answerGrid[row][col]) {
                         this.removeColorFromCell(row, col, cell);
                     }
                 });
 
-                // Prevent default drag behaviors
                 cell.addEventListener('dragstart', (e) => {
                     e.preventDefault();
                 });
@@ -270,7 +249,7 @@ export class MemoryMatrixSystem {
         paletteContainer.style.border = '2px solid #dee2e6';
 
         const instruction = document.createElement('div');
-        instruction.textContent = 'Drag colors to the grid above:';
+        instruction.textContent = 'Drag colors to the grid above (click to remove):';
         instruction.style.width = '100%';
         instruction.style.textAlign = 'center';
         instruction.style.marginBottom = '10px';
@@ -283,7 +262,6 @@ export class MemoryMatrixSystem {
         colorsContainer.style.justifyContent = 'center';
         colorsContainer.style.flexWrap = 'wrap';
 
-        // The availableColors array is already shuffled, so we just iterate through it
         this.availableColors.forEach((color, index) => {
             const colorCard = document.createElement('div');
             colorCard.className = 'color-card';
@@ -313,11 +291,13 @@ export class MemoryMatrixSystem {
                 colorCard.style.transform = 'scale(1)';
                 this.draggedColor = null;
                 
-                // Reset all cell appearances after drag ends
                 document.querySelectorAll('.answer-cell').forEach(cell => {
                     const row = parseInt(cell.dataset.row);
                     const col = parseInt(cell.dataset.col);
-                    if (!this.answerGrid[row][col] && !this.isCellFixed(row, col)) {
+                    if (this.answerGrid[row][col]) {
+                        cell.style.borderColor = '#333';
+                        cell.style.backgroundColor = this.answerGrid[row][col];
+                    } else {
                         cell.style.borderColor = '#999';
                         cell.style.backgroundColor = '#ffffff';
                     }
@@ -348,68 +328,33 @@ export class MemoryMatrixSystem {
         
         if (!color) return;
         
-        // Reset cell appearance
-        cell.style.borderColor = '#333';
-        cell.style.backgroundColor = '#ffffff';
-        
-        // Update the answer grid
         this.answerGrid[row][col] = color;
+        this.placedCells.add(`${row}-${col}`);
         
-        // Update cell appearance with the dropped color
+        // REMOVED: Immediate correctness feedback
         cell.style.background = color;
         cell.style.border = '2px solid #333';
         cell.style.color = 'transparent';
-        cell.textContent = ''; // Remove placeholder text
+        cell.textContent = '';
         
-        // Check if this placement is correct
-        const isCorrect = color === this.currentQuestion.matrix[row][col];
-        if (isCorrect) {
-            cell.style.borderColor = '#28a745';
-            cell.style.boxShadow = '0 0 8px rgba(40, 167, 69, 0.5)';
-        } else {
-            cell.style.borderColor = '#dc3545';
-            cell.style.boxShadow = '0 0 8px rgba(220, 53, 69, 0.5)';
-        }
+        // Only show neutral styling during answer phase
+        cell.style.borderColor = '#333';
+        cell.style.boxShadow = 'none';
 
-        // Lock the cell immediately after placement
-        this.fixCell(row, col, cell);
-
-        // Update correct count
         this.updateCorrectCount();
     }
 
     removeColorFromCell(row, col, cell) {
-        // Only allow removal if cell is not fixed
-        if (this.isCellFixed(row, col)) return;
-        
-        // Clear the answer grid
         this.answerGrid[row][col] = null;
+        this.placedCells.delete(`${row}-${col}`);
         
-        // Reset cell appearance
         cell.style.background = '#ffffff';
         cell.style.border = '2px dashed #999';
         cell.style.color = '#666';
         cell.style.boxShadow = 'none';
         cell.textContent = 'Drop here';
         
-        // Update correct count
         this.updateCorrectCount();
-    }
-
-    isCellFixed(row, col) {
-        return this.fixedCells.has(`${row}-${col}`);
-    }
-
-    fixCell(row, col, cell) {
-        // Mark cell as fixed
-        this.fixedCells.add(`${row}-${col}`);
-        
-        // Update cell appearance to indicate it's fixed
-        cell.style.cursor = 'default';
-        cell.style.opacity = '0.9';
-        
-        // Remove click event for removal
-        cell.replaceWith(cell.cloneNode(true));
     }
 
     updateCorrectCount() {
@@ -429,8 +374,6 @@ export class MemoryMatrixSystem {
         }
 
         this.correctAnswerCount = correctCount;
-        
-        // Update UI to show progress
         this.updateProgressDisplay(correctCount, filledCount);
     }
 
@@ -452,19 +395,166 @@ export class MemoryMatrixSystem {
         
         progressDisplay.innerHTML = `
             <div style="margin-bottom: 5px;">
-                Progress: ${filledCount}/${totalCells} filled | 
-                Correct: ${correctCount}/${totalCells} (${percentage}%)
+                Progress: ${filledCount}/${totalCells} filled
             </div>
             <div style="font-size: 12px; color: #666;">
                 Need ${requiredToPass} correct to pass
             </div>
+            <div style="font-size: 11px; color: #888; margin-top: 5px;">
+                Results will be shown after time ends
+            </div>
         `;
+    }
+
+    startGameTimer(time) {
+        let timeLeft = time / 1000;
+        this.questionTimerCount.textContent = timeLeft;
+        this.questionTimerProgress.style.width = '100%';
+
+        this.questionTimer = setInterval(() => {
+            timeLeft--;
+            this.questionTimerCount.textContent = timeLeft;
+            this.questionTimerProgress.style.width = `${(timeLeft / (time / 1000)) * 100}%`;
+
+            if (timeLeft <= 0) {
+                clearInterval(this.questionTimer);
+                this.showResultsPhase();
+            }
+        }, 1000);
+    }
+
+    showResultsPhase() {
+        // Disable further interactions
+        this.gameActive = false;
+        
+        // Show the results comparison
+        this.showResultsComparison();
+        
+        // Start result timer
+        setTimeout(() => {
+            this.finalizeGame();
+        }, this.RESULT_TIME);
+    }
+
+    showResultsComparison() {
+        this.questionDescription.innerHTML = `
+            <div class="question-type-label"><b>Type:</b> Memory Matrix - Results</div>
+            <div class="question-text">Here's how you did:</div>
+        `;
+
+        const resultsContainer = document.createElement('div');
+        resultsContainer.style.display = 'flex';
+        resultsContainer.style.flexDirection = 'column';
+        resultsContainer.style.alignItems = 'center';
+        resultsContainer.style.gap = '30px';
+        resultsContainer.style.margin = '20px 0';
+
+        // Create comparison grids
+        const comparisonContainer = document.createElement('div');
+        comparisonContainer.style.display = 'flex';
+        comparisonContainer.style.gap = '40px';
+        comparisonContainer.style.justifyContent = 'center';
+        comparisonContainer.style.flexWrap = 'wrap';
+
+        // Correct Matrix
+        const correctSection = document.createElement('div');
+        correctSection.style.textAlign = 'center';
+        correctSection.innerHTML = '<h3 style="margin-bottom: 10px; color: #28a745;">Correct Pattern</h3>';
+        const correctGrid = document.createElement('div');
+        this.renderColorMatrix(correctGrid, this.currentQuestion.matrix);
+        correctSection.appendChild(correctGrid);
+
+        // Player's Matrix with visual feedback
+        const playerSection = document.createElement('div');
+        playerSection.style.textAlign = 'center';
+        playerSection.innerHTML = '<h3 style="margin-bottom: 10px; color: #007bff;">Your Answer</h3>';
+        const playerGrid = document.createElement('div');
+        this.renderPlayerMatrixWithFeedback(playerGrid, this.answerGrid);
+        playerSection.appendChild(playerGrid);
+
+        comparisonContainer.appendChild(correctSection);
+        comparisonContainer.appendChild(playerSection);
+        resultsContainer.appendChild(comparisonContainer);
+
+        // Results summary
+        const summary = document.createElement('div');
+        summary.style.textAlign = 'center';
+        summary.style.padding = '20px';
+        summary.style.backgroundColor = '#f8f9fa';
+        summary.style.borderRadius = '10px';
+        summary.style.border = '2px solid #dee2e6';
+
+        const totalCells = this.totalCells;
+        const requiredToPass = Math.ceil(totalCells / 2);
+        const isPassed = this.correctAnswerCount >= requiredToPass;
+
+        summary.innerHTML = `
+            <div style="font-size: 1.5em; font-weight: bold; margin-bottom: 15px; color: ${isPassed ? '#28a745' : '#dc3545'}">
+                ${isPassed ? '✓ PASSED' : '✗ FAILED'}
+            </div>
+            <div style="font-size: 1.2em; margin-bottom: 10px;">
+                Correct: <strong>${this.correctAnswerCount}/${totalCells}</strong>
+            </div>
+            <div style="font-size: 1em; color: #666; margin-bottom: 10px;">
+                Required: ${requiredToPass} correct to pass
+            </div>
+            <div style="font-size: 0.9em; color: #888;">
+                Results will auto-continue in ${this.RESULT_TIME / 1000} seconds...
+            </div>
+        `;
+
+        resultsContainer.appendChild(summary);
+        this.questionDescription.appendChild(resultsContainer);
+    }
+
+    renderPlayerMatrixWithFeedback(container, playerMatrix) {
+        const correctMatrix = this.currentQuestion.matrix;
+        const rows = correctMatrix.length;
+        const cols = correctMatrix[0].length;
+        const cellSize = rows > 2 || cols > 2 ? '40px' : '50px';
+
+        container.innerHTML = '';
+        container.style.display = 'grid';
+        container.style.gridTemplateColumns = `repeat(${cols}, ${cellSize})`;
+        container.style.gridTemplateRows = `repeat(${rows}, ${cellSize})`;
+        container.style.gap = '4px';
+        container.style.margin = '10px auto';
+        container.style.justifyContent = 'center';
+
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+                const cell = document.createElement('div');
+                cell.style.width = cellSize;
+                cell.style.height = cellSize;
+                cell.style.border = '2px solid';
+                cell.style.borderRadius = '4px';
+                
+                if (playerMatrix[row][col]) {
+                    cell.style.background = playerMatrix[row][col];
+                    const isCorrect = playerMatrix[row][col] === correctMatrix[row][col];
+                    cell.style.borderColor = isCorrect ? '#28a745' : '#dc3545';
+                    cell.style.boxShadow = isCorrect ? 
+                        '0 0 8px rgba(40, 167, 69, 0.5)' : 
+                        '0 0 8px rgba(220, 53, 69, 0.5)';
+                } else {
+                    cell.style.background = '#f8f9fa';
+                    cell.style.borderColor = '#dee2e6';
+                    cell.style.color = '#999';
+                    cell.style.display = 'flex';
+                    cell.style.alignItems = 'center';
+                    cell.style.justifyContent = 'center';
+                    cell.style.fontSize = '10px';
+                    cell.textContent = 'Empty';
+                }
+
+                container.appendChild(cell);
+            }
+        }
     }
 
     renderColorMatrix(container, matrix) {
         container.innerHTML = '';
         
-        // Determine grid size based on matrix dimensions
         const rows = matrix.length;
         const cols = matrix[0].length;
         const cellSize = rows > 2 || cols > 2 ? '40px' : '50px';
@@ -482,63 +572,34 @@ export class MemoryMatrixSystem {
                 cell.style.width = cellSize;
                 cell.style.height = cellSize;
                 cell.style.background = color;
-                cell.style.border = '1px solid #333';
+                cell.style.border = '2px solid #333';
                 cell.style.borderRadius = '4px';
                 container.appendChild(cell);
             });
         });
     }
 
-    startGameTimer(time) {
-        let timeLeft = time / 1000;
-        this.questionTimerCount.textContent = timeLeft;
-        this.questionTimerProgress.style.width = '100%';
-
-        this.questionTimer = setInterval(() => {
-            timeLeft--;
-            this.questionTimerCount.textContent = timeLeft;
-            this.questionTimerProgress.style.width = `${(timeLeft / (time / 1000)) * 100}%`;
-
-            if (timeLeft <= 0) {
-                clearInterval(this.questionTimer);
-                this.handleGameTimeExpired();
-            }
-        }, 1000);
-    }
-
-    handleGameTimeExpired() {
+    finalizeGame() {
         const totalCells = this.totalCells;
-        const halfCells = Math.ceil(totalCells / 2);
-        const isCorrect = this.correctAnswerCount >= halfCells;
+        const requiredToPass = Math.ceil(totalCells / 2);
+        const isCorrect = this.correctAnswerCount >= requiredToPass;
 
-        console.log(`⏰ Time expired. Correct: ${this.correctAnswerCount}/${totalCells}, required: ${halfCells}, result: ${isCorrect ? 'PASS' : 'FAIL'}`);
+        console.log(`🎯 Final results - Correct: ${this.correctAnswerCount}/${totalCells}, required: ${requiredToPass}, result: ${isCorrect ? 'PASS' : 'FAIL'}`);
         this.completeGame(isCorrect);
     }
 
     completeGame(isCorrect) {
-        if (!this.gameActive) {
-            console.log("⚠️ Game already completed, ignoring");
-            return;
-        }
-        
-        console.log(`🔄 [MemoryMatrixSystem] completeGame called with isCorrect: ${isCorrect}`);
-        
-        this.gameActive = false;
-
         if (this.questionTimer) {
             clearInterval(this.questionTimer);
             this.questionTimer = null;
         }
 
-        // Clear preview timer if it's still running
         if (this.previewTimer) {
             clearInterval(this.previewTimer);
             this.previewTimer = null;
         }
 
         this.questionContainer.style.display = 'none';
-
-        // Ensure world is unpaused
         pauseWorld(false);
 
         console.log(`🔄 [MemoryMatrixSystem] Calling onGameComplete callback...`);
@@ -556,7 +617,7 @@ export class MemoryMatrixSystem {
         this.hasAnswered = false;
         this.answerGrid = [];
         this.availableColors = [];
-        this.fixedCells.clear();
+        this.placedCells.clear();
 
         if (this.questionTimer) {
             clearInterval(this.questionTimer);
@@ -569,7 +630,6 @@ export class MemoryMatrixSystem {
         }
     }
 
-    // Helper methods to access memory matrix list functionality
     getMatrixQuestionsByDifficulty(difficulty) {
         return this.memoryMatrixList.getMatrixQuestionsByDifficulty(difficulty);
     }

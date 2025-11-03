@@ -12,11 +12,43 @@
 
 <body>
   <div class="main-menu-container" id="mainMenu">
-    <h1>Cognira</h1>
-    <button id="joinGameButton">Join Game</button>
-    <div id="waitingMessage" style="display: none; margin-top: 20px;">
+    <!-- Logo Section -->
+    <div class="logo-container">
+      <img src="assets/images/logo.jpg" alt="Cognira Logo" class="logo-image">
+    </div>
+
+    <!-- Title with decorative elements -->
+    <div class="title-section">
+      <div class="title-decoration top-decoration"></div>
+      <h1 class="game-title">Cognira</h1>
+      <div class="title-decoration bottom-decoration"></div>
+    </div>
+
+    <!-- Join Button with hover effects -->
+    <div class="button-container">
+      <button id="joinGameButton" class="join-button">
+        <span class="button-text">Join Game</span>
+        <span class="button-glow"></span>
+      </button>
+    </div>
+
+    <!-- Waiting Message with animation -->
+    <div id="waitingMessage" class="waiting-message">
+      <div class="loading-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
       <p>Waiting for players... <span id="playerCount">(0/4)</span></p>
     </div>
+  </div>
+
+  <!-- Background decorative elements -->
+  <div class="background-decoration">
+    <div class="decoration-circle circle-1"></div>
+    <div class="decoration-circle circle-2"></div>
+    <div class="decoration-circle circle-3"></div>
+    <div class="decoration-circle circle-4"></div>
   </div>
 
   <!-- Card Container - Will be populated dynamically -->
@@ -34,30 +66,30 @@
   </div>
 
   <!-- Question Container -->
-<div class="question-container" id="questionContainer" style="display: none;">
-  <h1>Question</h1>
-  <div class="question-timer-container">
-    <div class="question-timer-bar">
-      <div class="question-timer-progress" id="questionTimerProgress"></div>
+  <div class="question-container" id="questionContainer" style="display: none;">
+    <h1>Question</h1>
+    <div class="question-timer-container">
+      <div class="question-timer-bar">
+        <div class="question-timer-progress" id="questionTimerProgress"></div>
+      </div>
+      <div class="question-timer-text">Time left: <span id="questionTimerCount">15</span>s</div>
     </div>
-    <div class="question-timer-text">Time left: <span id="questionTimerCount">15</span>s</div>
+    <div class="question-content">
+      <div class="question-description" id="questionDescription">
+        <!-- Question text will be inserted here -->
+      </div>
+      <div class="question-image-container" id="questionImageContainer" style="display: none;">
+        <img id="questionImage" src="" alt="Question image">
+      </div>
+      <div class="question-options" id="questionOptions">
+        <!-- Answer buttons will be dynamically inserted here -->
+      </div>
+    </div>
   </div>
-  <div class="question-content">
-    <div class="question-description" id="questionDescription">
-      <!-- Question text will be inserted here -->
-    </div>
-    <div class="question-image-container" id="questionImageContainer" style="display: none;">
-      <img id="questionImage" src="" alt="Question image">
-    </div>
-    <div class="question-options" id="questionOptions">
-      <!-- Answer buttons will be dynamically inserted here -->
-    </div>
-  </div>
-</div>
 
-<!-- Spatial Minigame Container -->
-<div id="spatialMinigame">
-</div>
+  <!-- Spatial Minigame Container -->
+  <div id="spatialMinigame">
+  </div>
 
   <canvas class="game" id="gameCanvas"></canvas>
   <div id="controls">
