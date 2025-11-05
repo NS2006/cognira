@@ -44,6 +44,9 @@ joinGameButton.addEventListener("click", (e) => {
 });
 
 function updatePlayerCount(count, players) {
+  if(gameInitialized){
+    return;
+  }
 
   if (!lobby) {
       lobby = new Lobby(socketClient);

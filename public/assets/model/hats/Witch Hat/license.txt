@@ -1,0 +1,11 @@
+Model Information:
+* title:	Low Poly: Witch's Hat
+* source:	https://sketchfab.com/3d-models/low-poly-witchs-hat-d63d984e26614f008fd4d8721506a54d
+* author:	ClintonAbbott.Art (https://sketchfab.com/clintonabbott.art)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Low Poly: Witch's Hat" (https://sketchfab.com/3d-models/low-poly-witchs-hat-d63d984e26614f008fd4d8721506a54d) by ClintonAbbott.Art (https://sketchfab.com/clintonabbott.art) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

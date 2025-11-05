@@ -43,8 +43,8 @@ export class MathOperationSystem {
         // Initialize answer operators array
         this.initializeAnswerOperators();
         
-        // Get available operators and shuffle them (now including ^ and %)
-        this.availableOperators = this.shuffleArray(['+', '-', '×', '÷', '^', '%']);
+        // Get available operators and shuffle them (removed %)
+        this.availableOperators = this.shuffleArray(['+', '-', '×', '÷', '^']);
         
         this.questionDescription.innerHTML = `
             <div class="question-type-label"><b>Type:</b> Math Operation</div>
@@ -253,12 +253,12 @@ export class MathOperationSystem {
             operatorCard.style.display = 'flex';
             operatorCard.style.alignItems = 'center';
             operatorCard.style.justifyContent = 'center';
-            operatorCard.style.fontSize = operator === '^' || operator === '%' ? '24px' : '28px';
+            operatorCard.style.fontSize = operator === '^' ? '24px' : '28px';
             operatorCard.style.fontWeight = 'bold';
             operatorCard.textContent = operator;
             operatorCard.draggable = true;
             
-            // Add tooltip for power and modulo
+            // Add tooltip for power
             let operatorName = '';
             switch(operator) {
                 case '+': operatorName = 'Addition'; break;
@@ -266,7 +266,6 @@ export class MathOperationSystem {
                 case '×': operatorName = 'Multiplication'; break;
                 case '÷': operatorName = 'Division'; break;
                 case '^': operatorName = 'Power/Exponent'; break;
-                case '%': operatorName = 'Modulo/Remainder'; break;
             }
             operatorCard.title = `Operator: ${operatorName}`;
 
@@ -332,9 +331,7 @@ export class MathOperationSystem {
         dropZone.style.backgroundColor = '#f8f9fa';
         dropZone.style.color = '#333';
         dropZone.style.boxShadow = 'none';
-        dropZone.style.fontSize = operator === '^' || operator === '%' ? '18px' : '20px';
-
-        this.checkAnswer();
+        dropZone.style.fontSize = operator === '^' ? '18px' : '20px';
     }
 
     removeOperatorFromSlot(index, dropZone) {
@@ -347,8 +344,6 @@ export class MathOperationSystem {
         dropZone.style.color = '#666';
         dropZone.style.boxShadow = 'none';
         dropZone.style.fontSize = '20px';
-        
-        this.checkAnswer();
     }
 
     checkAnswer() {
@@ -366,8 +361,6 @@ export class MathOperationSystem {
                 // Check if result matches the target (with floating point tolerance)
                 const target = this.currentQuestion.result;
                 this.isCorrect = Math.abs(this.playerResult - target) < 0.0001;
-                
-                this.updateProgressDisplay();
             } catch (error) {
                 console.error('Error evaluating expression:', error);
                 this.isCorrect = false;
@@ -387,7 +380,6 @@ export class MathOperationSystem {
                     case '×': expression += '*'; break;
                     case '÷': expression += '/'; break;
                     case '^': expression += '**'; break;
-                    case '%': expression += '%'; break;
                     default: expression += operators[i]; break;
                 }
             }
@@ -396,45 +388,6 @@ export class MathOperationSystem {
         // Evaluate the expression
         // Note: Using Function constructor for safety instead of eval
         return Function(`"use strict"; return (${expression})`)();
-    }
-
-    updateProgressDisplay() {
-        let progressDisplay = document.getElementById('math-progress');
-        if (!progressDisplay) {
-            progressDisplay = document.createElement('div');
-            progressDisplay.id = 'math-progress';
-            progressDisplay.style.textAlign = 'center';
-            progressDisplay.style.margin = '10px 0';
-            progressDisplay.style.fontWeight = 'bold';
-            progressDisplay.style.fontSize = '14px';
-            this.questionDescription.appendChild(progressDisplay);
-        }
-
-        const filledCount = this.answerOperators.filter(op => op !== null).length;
-        const totalSlots = this.answerOperators.length;
-        
-        let resultInfo = '';
-        if (this.playerResult !== null) {
-            const isCorrect = Math.abs(this.playerResult - this.currentQuestion.result) < 0.0001;
-            resultInfo = `
-                <div style="font-size: 12px; color: ${isCorrect ? '#28a745' : '#dc3545'}; margin-top: 5px;">
-                    Your result: ${this.playerResult.toFixed(2)} ${isCorrect ? '✓' : '✗'}
-                </div>
-            `;
-        }
-        
-        progressDisplay.innerHTML = `
-            <div style="margin-bottom: 5px;">
-                Progress: ${filledCount}/${totalSlots} operators placed
-            </div>
-            <div style="font-size: 12px; color: #666;">
-                Target result: ${this.currentQuestion.result}
-            </div>
-            ${resultInfo}
-            <div style="font-size: 11px; color: #888; margin-top: 5px;">
-                Results will be shown after time ends
-            </div>
-        `;
     }
 
     startGameTimer(time) {
@@ -449,6 +402,8 @@ export class MathOperationSystem {
 
             if (timeLeft <= 0) {
                 clearInterval(this.questionTimer);
+                // Check answer only when time ends
+                this.checkAnswer();
                 this.showResultsPhase();
             }
         }, 1000);
@@ -557,7 +512,7 @@ export class MathOperationSystem {
                 operatorElement.textContent = playerOperator || '?';
                 operatorElement.style.padding = '0 10px';
                 operatorElement.style.color = '#007bff';
-                operatorElement.style.fontSize = playerOperator === '^' || playerOperator === '%' ? '24px' : '28px';
+                operatorElement.style.fontSize = playerOperator === '^' ? '24px' : '28px';
                 equationContainer.appendChild(operatorElement);
             }
         }
@@ -587,7 +542,7 @@ export class MathOperationSystem {
         equationContainer.style.fontWeight = 'bold';
         equationContainer.style.padding = '20px';
         equationContainer.style.backgroundColor = '#e9ecef';
-        equationContainer.style.borderRadius = '1010px';
+        equationContainer.style.borderRadius = '10px';
         equationContainer.style.border = '2px solid #ced4da';
 
         for (let i = 0; i < numbers.length; i++) {
@@ -603,7 +558,7 @@ export class MathOperationSystem {
                 operatorElement.textContent = operators[i];
                 operatorElement.style.padding = '0 10px';
                 operatorElement.style.color = '#007bff';
-                operatorElement.style.fontSize = operators[i] === '^' || operators[i] === '%' ? '24px' : '28px';
+                operatorElement.style.fontSize = operators[i] === '^' ? '24px' : '28px';
                 equationContainer.appendChild(operatorElement);
             }
         }

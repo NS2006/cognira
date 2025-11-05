@@ -77,15 +77,14 @@ function animatePlayer(localPlayer, socketClient) {
     localPlayer.animatePlayer();
 
     // Send position updates to server if position changed
-    console.log("738i12uykehbj")
 
     const currentPos = localPlayer.position;
     const lastPos = animationState.lastSentPosition;
-    
+
     if (currentPos.x !== lastPos.x ||
         currentPos.y !== lastPos.y ||
         currentPos.z !== lastPos.z) {
-            console.log("129378123uijk")
+
             sendPositionUpdate(localPlayer, socketClient);
     }
 }
@@ -95,15 +94,10 @@ function sendPositionUpdate(localPlayer, socketClient) {
 
     const currentPos = localPlayer.position;
     const lastPos = animationState.lastSentPosition;
-    console.log("Local Player: ", localPlayer);
-    console.log(currentPos);
-    console.log(lastPos);
 
     if (currentPos.x !== lastPos.x ||
         currentPos.y !== lastPos.y ||
         currentPos.z !== lastPos.z) {
-
-            console.log("][;.'p[lpl;kasdpj")
 
         socketClient.update(
             {

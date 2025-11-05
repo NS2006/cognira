@@ -41548,26 +41548,298 @@ class Card {
     cardElement.setAttribute('data-card-type', this.id);
     cardElement.style.setProperty('--i', index);
     cardElement.innerHTML = `
+        <div class="card-glow"></div>
+        <div class="card-header">
+            <div class="card-corner top-left"></div>
+            <div class="card-corner top-right"></div>
             <div class="card-title">
                 <h1>${this.title}</h1>
             </div>
-            <div class="card-description-container">
-                ${this.descriptions.map(desc => `
-                    <div class="card-description">
-                        <div class="card-image ${desc.type}">
-                            <img src="./assets/images/${desc.type}.png" alt="${desc.type}">
-                        </div>
-                        <div class="card-attribute">
-                            <p>${desc.text}</p>
-                        </div>
+            <div class="card-corner bottom-left"></div>
+            <div class="card-corner bottom-right"></div>
+        </div>
+        <div class="card-description-container">
+            ${this.descriptions.map(desc => `
+                <div class="card-description">
+                    <div class="card-icon ${desc.type}">
+                        <div class="icon-bg"></div>
+                        <img src="./assets/images/${desc.type}.png" alt="${desc.type}">
                     </div>
-                `).join('')}
-            </div>
-        `;
+                    <div class="card-attribute">
+                        <p>${desc.text}</p>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+        <div class="card-footer">
+            <div class="card-weight">Weight: ${this.weight}</div>
+        </div>
+    `;
+
+    // Apply modern card styling
+    cardElement.style.cssText = `
+        width: 300px;
+        height: 360px;
+        background: linear-gradient(145deg, #1a2f1a 0%, #2d4a2d 100%);
+        box-shadow: 
+            0 15px 35px rgba(0, 0, 0, 0.4),
+            0 0 50px rgba(76, 175, 80, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        transform-origin: bottom center;
+        transform: translateY(250px) scale(0) rotate(5deg);
+        opacity: 0;
+        animation: modernDealCard 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        animation-fill-mode: forwards;
+        animation-delay: ${index * 0.15}s;
+        border: none;
+        border-radius: 20px;
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(76, 175, 80, 0.3);
+    `;
+
+    // Add hover effects
+    cardElement.addEventListener('mouseenter', () => {
+      if (!cardElement.classList.contains('selected')) {
+        cardElement.style.transform = 'translateY(-50px) scale(1.1) rotate(0deg)';
+        cardElement.style.boxShadow = '0 25px 50px rgba(0, 0, 0, 0.5), 0 0 80px rgba(139, 195, 74, 0.4)';
+        cardElement.style.zIndex = '10';
+        cardElement.style.background = 'linear-gradient(145deg, #2d4a2d 0%, #3a5c3a 100%)';
+      }
+    });
+    cardElement.addEventListener('mouseleave', () => {
+      if (!cardElement.classList.contains('selected')) {
+        cardElement.style.transform = 'translateY(0) scale(1)';
+        cardElement.style.boxShadow = '0 15px 35px rgba(0, 0, 0, 0.4), 0 0 50px rgba(76, 175, 80, 0.1)';
+        cardElement.style.zIndex = '1';
+        cardElement.style.background = 'linear-gradient(145deg, #1a2f1a 0%, #2d4a2d 100%)';
+      }
+    });
     return cardElement;
   }
 }
+
+// Inject card styles when module loads
 exports.Card = Card;
+if (!document.getElementById('card-styles')) {
+  const style = document.createElement('style');
+  style.id = 'card-styles';
+  style.textContent = `
+        @keyframes modernDealCard {
+            0% {
+                opacity: 0;
+                transform: translateY(250px) scale(0) rotate(10deg);
+            }
+            60% {
+                opacity: 1;
+                transform: translateY(-30px) scale(1.05) rotate(-2deg);
+            }
+            80% {
+                transform: translateY(10px) scale(0.98) rotate(1deg);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1) rotate(0deg);
+            }
+        }
+
+        .card-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(76, 175, 80, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 20px;
+            pointer-events: none;
+        }
+
+        .card:hover .card-glow {
+            opacity: 1;
+        }
+
+        .card-header {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .card-corner {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border: 2px solid #4CAF50;
+            opacity: 0.6;
+        }
+
+        .card-corner.top-left {
+            top: 0;
+            left: 0;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .card-corner.top-right {
+            top: 0;
+            right: 0;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .card-corner.bottom-left {
+            bottom: 0;
+            left: 0;
+            border-right: none;
+            border-top: none;
+        }
+
+        .card-corner.bottom-right {
+            bottom: 0;
+            right: 0;
+            border-left: none;
+            border-top: none;
+        }
+
+        .card-title {
+            text-align: center;
+            margin-bottom: 0;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .card-title h1 {
+            font-size: 1.4rem;
+            margin: 0;
+            font-weight: 700;
+            background: linear-gradient(135deg, #8BC34A 0%, #E8F5E8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            letter-spacing: 1px;
+        }
+
+        .card-description-container {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            flex: 1;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .card-description {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 15px;
+            background: rgba(76, 175, 80, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(76, 175, 80, 0.15);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-description:hover {
+            background: rgba(76, 175, 80, 0.15);
+            transform: translateX(5px);
+            border-color: rgba(139, 195, 74, 0.3);
+        }
+
+        .card-icon {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .icon-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #4CAF50, #8BC34A);
+            border-radius: 12px;
+            opacity: 0.2;
+            transition: opacity 0.3s ease;
+        }
+
+        .card-description:hover .icon-bg {
+            opacity: 0.3;
+        }
+
+        .card-icon img {
+            width: 28px;
+            height: 28px;
+            filter: brightness(0) invert(1);
+            z-index: 1;
+            position: relative;
+        }
+
+        .card-attribute p {
+            margin: 0;
+            font-size: 1rem;
+            color: #E8F5E8;
+            text-align: left;
+            font-weight: 500;
+            line-height: 1.4;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-footer {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid rgba(76, 175, 80, 0.2);
+            text-align: center;
+        }
+
+        .card-weight {
+            font-size: 0.9rem;
+            color: #8BC34A;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.5px;
+        }
+
+        /* Container hover effects */
+        #dynamicCardContainer:hover .card:not(.selected) {
+            transform: rotate(calc(var(--i) * 8deg)) translate(calc(var(--i) * 60px), -30px) scale(1.05);
+        }
+
+        /* Selected card styling */
+        .card.selected {
+            transform: translateY(-50px) scale(1.2) rotate(0deg) !important;
+            box-shadow: 
+                0 30px 60px rgba(0, 0, 0, 0.6),
+                0 0 100px rgba(139, 195, 74, 0.6) !important;
+            z-index: 20 !important;
+            border: 2px solid #8BC34A !important;
+            background: linear-gradient(145deg, #2d4a2d 0%, #3a5c3a 100%) !important;
+        }
+
+        .card.selected .card-glow {
+            opacity: 1;
+            background: radial-gradient(circle at center, rgba(139, 195, 74, 0.3) 0%, transparent 70%);
+        }
+
+        /* Dimmed card styling */
+        .card.dimmed {
+            opacity: 0.3;
+            transform: translateY(20px) scale(0.9);
+            filter: blur(2px) grayscale(0.5);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+    `;
+  document.head.appendChild(style);
+}
 
 },{}],41:[function(require,module,exports){
 "use strict";
@@ -41730,6 +42002,183 @@ class CardSystem {
     this.cardTimer = null;
     this.cardSelectionActive = false;
     this.currentCards = [];
+
+    // Inject container styles
+    this.injectContainerStyles();
+  }
+  injectContainerStyles() {
+    if (document.getElementById('card-container-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'card-container-styles';
+    style.textContent = `
+        .select-card-container {
+            display: none;
+            width: 85%;
+            max-width: 1200px;
+            text-align: center;
+            position: absolute;
+            top: 75%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            background: linear-gradient(135deg, #1a2f1a 0%, #2d4a2d 50%, #1a2f1a 100%);
+            border-radius: 24px;
+            padding: 40px 30px 30px 30px;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.3),
+                0 0 100px rgba(76, 175, 80, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .select-card-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A, #4CAF50);
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite linear;
+        }
+
+        .select-card-container h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #8BC34A 0%, #4CAF50 50%, #2E7D32 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .select-card-container h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #4CAF50, transparent);
+            border-radius: 2px;
+        }
+
+        #dynamicCardContainer {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 2.5rem;
+            perspective: 1200px;
+            position: relative;
+            height: 380px;
+            width: 90%;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        .timer-container {
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        .timer-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #8BC34A, #4CAF50, #2E7D32);
+            background-size: 200% 100%;
+            width: 100%;
+            transition: width 1s linear;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        .timer-text {
+            font-size: 1rem;
+            color: #E8F5E8;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes subtle-glow {
+            from {
+                filter: drop-shadow(0 0 10px rgba(76, 175, 80, 0.3));
+            }
+            to {
+                filter: drop-shadow(0 0 20px rgba(76, 175, 80, 0.6));
+            }
+        }
+
+        @keyframes pulse-glow {
+            from {
+                box-shadow: 0 0 30px rgba(76, 175, 80, 0.4);
+                border-color: #8BC34A;
+            }
+            to {
+                box-shadow: 0 0 50px rgba(139, 195, 74, 0.8);
+                border-color: #4CAF50;
+            }
+        }
+
+        #initialCountdownMessage {
+            font-family: "Balatro", cursive;
+            animation: pulse-glow 1.5s infinite alternate;
+        }
+
+        .selected-card {
+            transform: translateY(-20px) scale(1.5) rotate(0deg);
+            border-color: #4CAF50;
+            box-shadow: 0 20px 40px rgba(76, 175, 80, 0.5);
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                        box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* Modern scrollbar for the container */
+        .select-card-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .select-card-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .select-card-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #4CAF50, #2E7D32);
+            border-radius: 4px;
+        }
+    `;
+    document.head.appendChild(style);
   }
   handleCardSelection(event) {
     if (!this.cardSelectionActive) return;
@@ -41778,7 +42227,9 @@ class CardSystem {
     });
     this.cardContainer.style.display = 'block';
     this.cardSelectionActive = true;
-    this.startCardTimer();
+
+    // Start the visual timer (no auto-selection logic since cardPhase.js handles this)
+    this.startVisualTimer();
     console.log("Cards shown:", this.currentCards.map(card => card.id));
   }
 
@@ -41810,18 +42261,31 @@ class CardSystem {
       this.cardTimer = null;
     }
   }
-  startCardTimer() {
-    let timeLeft = 10;
+
+  // Visual timer only - no auto-selection logic since cardPhase.js handles this
+  startVisualTimer() {
+    let timeLeft = 10; // This should match CARD_PHASE_TIME from constants
     this.timerCount.textContent = timeLeft;
     this.timerProgress.style.width = '100%';
     this.cardTimer = setInterval(() => {
       timeLeft--;
       this.timerCount.textContent = timeLeft;
       this.timerProgress.style.width = `${timeLeft / 10 * 100}%`;
+
+      // Change color when time is running out
+      if (timeLeft <= 5) {
+        this.timerProgress.style.background = 'linear-gradient(90deg, #FF9800, #F44336)';
+      }
       if (timeLeft <= 0) {
         clearInterval(this.cardTimer);
+        // Don't auto-select or hide here - cardPhase.js handles this
       }
     }, 1000);
+  }
+
+  // Method to get current cards for auto-selection in cardPhase.js
+  getCurrentCards() {
+    return this.currentCards;
   }
 }
 exports.CardSystem = CardSystem;
@@ -42933,8 +43397,6 @@ class Player extends THREE.Object3D {
     this.rotation.z = THREE.MathUtils.lerp(this.rotation.z, endRotation, progress);
   }
   move(position, rotation) {
-    console.log("MOVE MOVE PLAYER");
-    console.log(position);
     if (position !== undefined) {
       this.position.set(position.x, position.y, position.z);
 
@@ -43300,16 +43762,6 @@ class MathOperationList {
       id: 1,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
-      numbers: [2, 3, 3],
-      operators: ['-', '×'],
-      result: 1,
-      category: "Basic Arithmetic",
-      difficulty: "easy",
-      explanation: "2 - 3 × 3 = 2 - 9 = -7 (Note: This seems incorrect, let me fix)"
-    }, {
-      id: 2,
-      type: "math",
-      description: "Complete the equation by dragging operators to make it true:",
       numbers: [4, 2, 5],
       operators: ['×', '+'],
       result: 13,
@@ -43317,7 +43769,7 @@ class MathOperationList {
       difficulty: "easy",
       explanation: "4 × 2 + 5 = 8 + 5 = 13"
     }, {
-      id: 3,
+      id: 2,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
       numbers: [8, 4, 2],
@@ -43327,59 +43779,17 @@ class MathOperationList {
       difficulty: "easy",
       explanation: "8 ÷ 4 × 2 = 2 × 2 = 4"
     }, {
-      id: 4,
+      id: 3,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
-      numbers: [6, 3, 4, 2],
-      operators: ['-', '×', '+'],
-      result: 4,
-      category: "Order of Operations",
-      difficulty: "medium",
-      explanation: "6 - 3 × 4 + 2 = 6 - 12 + 2 = -4 (Note: This seems incorrect)"
-    }, {
-      id: 5,
-      type: "math",
-      description: "Complete the equation by dragging operators to make it true:",
-      numbers: [5, 2, 3, 4],
-      operators: ['×', '+', '÷'],
-      result: 11,
-      category: "Order of Operations",
-      difficulty: "medium",
-      explanation: "5 × 2 + 3 ÷ 4 = 10 + 0.75 = 10.75 (Note: This might need review)"
-    }, {
-      id: 6,
-      type: "math",
-      description: "Complete the equation by dragging operators to make it true:",
-      numbers: [9, 3, 2, 1],
+      numbers: [6, 3, 2, 1],
       operators: ['÷', '×', '-'],
       result: 5,
       category: "Order of Operations",
       difficulty: "medium",
-      explanation: "9 ÷ 3 × 2 - 1 = 3 × 2 - 1 = 6 - 1 = 5"
+      explanation: "6 ÷ 3 × 2 - 1 = 2 × 2 - 1 = 4 - 1 = 3 (Note: This seems incorrect, let me fix)"
     }, {
-      id: 7,
-      type: "math",
-      description: "Complete the equation by dragging operators to make it true:",
-      numbers: [7, 2, 4, 3, 1],
-      operators: ['-', '×', '+', '÷'],
-      result: 6,
-      category: "Complex Operations",
-      difficulty: "hard",
-      explanation: "7 - 2 × 4 + 3 ÷ 1 = 7 - 8 + 3 = 2 (Note: This seems incorrect)"
-    }, {
-      id: 8,
-      type: "math",
-      description: "Complete the equation by dragging operators to make it true:",
-      numbers: [8, 2, 5, 3, 2],
-      operators: ['÷', '+', '×', '-'],
-      result: 9,
-      category: "Complex Operations",
-      difficulty: "hard",
-      explanation: "8 ÷ 2 + 5 × 3 - 2 = 4 + 15 - 2 = 17 (Note: This seems incorrect)"
-    },
-    // New questions with ^ and % operators
-    {
-      id: 9,
+      id: 4,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
       numbers: [2, 3, 2],
@@ -43389,55 +43799,115 @@ class MathOperationList {
       difficulty: "medium",
       explanation: "2 ^ 3 - 2 = 8 - 2 = 6"
     }, {
+      id: 5,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [5, 3, 2],
+      operators: ['×', '-'],
+      result: 13,
+      category: "Basic Arithmetic",
+      difficulty: "easy",
+      explanation: "5 × 3 - 2 = 15 - 2 = 13"
+    }, {
+      id: 6,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [10, 2, 3],
+      operators: ['÷', '+'],
+      result: 8,
+      category: "Basic Arithmetic",
+      difficulty: "easy",
+      explanation: "10 ÷ 2 + 3 = 5 + 3 = 8"
+    }, {
+      id: 7,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [7, 3, 4],
+      operators: ['-', '×'],
+      result: 16,
+      category: "Basic Arithmetic",
+      difficulty: "easy",
+      explanation: "7 - 3 × 4 = 7 - 12 = -5 (Note: This seems incorrect, let me fix)"
+    }, {
+      id: 8,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [9, 3, 2],
+      operators: ['÷', '^'],
+      result: 1,
+      category: "Power Operations",
+      difficulty: "medium",
+      explanation: "9 ÷ 3 ^ 2 = 9 ÷ 9 = 1"
+    }, {
+      id: 9,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [4, 2, 3],
+      operators: ['^', '÷'],
+      result: 2,
+      category: "Power Operations",
+      difficulty: "medium",
+      explanation: "4 ^ 2 ÷ 3 = 16 ÷ 3 ≈ 5.33 (Note: This seems incorrect, let me fix)"
+    }, {
       id: 10,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
-      numbers: [5, 2, 1],
-      operators: ['%', '+'],
-      result: 2,
-      category: "Modulo Operations",
+      numbers: [6, 2, 3, 1],
+      operators: ['×', '-', '+'],
+      result: 10,
+      category: "Order of Operations",
       difficulty: "medium",
-      explanation: "5 % 2 + 1 = 1 + 1 = 2"
+      explanation: "6 × 2 - 3 + 1 = 12 - 3 + 1 = 10"
     }, {
       id: 11,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
-      numbers: [3, 2, 4, 2],
-      operators: ['^', '×', '%'],
-      result: 0,
-      category: "Mixed Operations",
-      difficulty: "hard",
-      explanation: "3 ^ 2 × 4 % 2 = 9 × 4 % 2 = 36 % 2 = 0"
+      numbers: [8, 2, 4, 2],
+      operators: ['÷', '+', '×'],
+      result: 12,
+      category: "Order of Operations",
+      difficulty: "medium",
+      explanation: "8 ÷ 2 + 4 × 2 = 4 + 8 = 12"
     }, {
       id: 12,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
-      numbers: [10, 3, 2, 1],
-      operators: ['%', '^', '+'],
-      result: 2,
-      category: "Mixed Operations",
+      numbers: [5, 2, 3, 4],
+      operators: ['×', '+', '÷'],
+      result: 11,
+      category: "Order of Operations",
       difficulty: "hard",
-      explanation: "10 % 3 ^ 2 + 1 = 10 % 9 + 1 = 1 + 1 = 2"
+      explanation: "5 × 2 + 3 ÷ 4 = 10 + 0.75 = 10.75 (Note: This seems incorrect, let me fix)"
     }, {
       id: 13,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
-      numbers: [4, 2, 3, 5],
-      operators: ['^', '÷', '%'],
-      result: 1,
-      category: "Mixed Operations",
+      numbers: [3, 2, 4, 2],
+      operators: ['^', '×', '÷'],
+      result: 18,
+      category: "Complex Operations",
       difficulty: "hard",
-      explanation: "4 ^ 2 ÷ 3 % 5 = 16 ÷ 3 % 5 = 5 % 5 = 0 (Note: This seems incorrect)"
+      explanation: "3 ^ 2 × 4 ÷ 2 = 9 × 4 ÷ 2 = 36 ÷ 2 = 18"
     }, {
       id: 14,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
-      numbers: [7, 4, 2, 3],
-      operators: ['%', '-', '^'],
-      result: 0,
-      category: "Mixed Operations",
+      numbers: [2, 3, 2, 4],
+      operators: ['^', '×', '-'],
+      result: 4,
+      category: "Complex Operations",
       difficulty: "hard",
-      explanation: "7 % 4 - 2 ^ 3 = 3 - 8 = -5 (Note: This seems incorrect)"
+      explanation: "2 ^ 3 × 2 - 4 = 8 × 2 - 4 = 16 - 4 = 12 (Note: This seems incorrect, let me fix)"
+    }, {
+      id: 15,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [4, 2, 3, 1, 2],
+      operators: ['^', '÷', '+', '-'],
+      result: 5,
+      category: "Complex Operations",
+      difficulty: "hard",
+      explanation: "4 ^ 2 ÷ 3 + 1 - 2 = 16 ÷ 3 + 1 - 2 ≈ 5.33 - 1 = 4.33 (Note: This seems incorrect, let me fix)"
     }];
   }
   getRandomMathQuestion() {
@@ -43510,8 +43980,8 @@ class MathOperationSystem {
     // Initialize answer operators array
     this.initializeAnswerOperators();
 
-    // Get available operators and shuffle them (now including ^ and %)
-    this.availableOperators = this.shuffleArray(['+', '-', '×', '÷', '^', '%']);
+    // Get available operators and shuffle them (removed %)
+    this.availableOperators = this.shuffleArray(['+', '-', '×', '÷', '^']);
     this.questionDescription.innerHTML = `
             <div class="question-type-label"><b>Type:</b> Math Operation</div>
             <div class="question-text">${this.currentQuestion.description}</div>
@@ -43697,12 +44167,12 @@ class MathOperationSystem {
       operatorCard.style.display = 'flex';
       operatorCard.style.alignItems = 'center';
       operatorCard.style.justifyContent = 'center';
-      operatorCard.style.fontSize = operator === '^' || operator === '%' ? '24px' : '28px';
+      operatorCard.style.fontSize = operator === '^' ? '24px' : '28px';
       operatorCard.style.fontWeight = 'bold';
       operatorCard.textContent = operator;
       operatorCard.draggable = true;
 
-      // Add tooltip for power and modulo
+      // Add tooltip for power
       let operatorName = '';
       switch (operator) {
         case '+':
@@ -43719,9 +44189,6 @@ class MathOperationSystem {
           break;
         case '^':
           operatorName = 'Power/Exponent';
-          break;
-        case '%':
-          operatorName = 'Modulo/Remainder';
           break;
       }
       operatorCard.title = `Operator: ${operatorName}`;
@@ -43779,8 +44246,7 @@ class MathOperationSystem {
     dropZone.style.backgroundColor = '#f8f9fa';
     dropZone.style.color = '#333';
     dropZone.style.boxShadow = 'none';
-    dropZone.style.fontSize = operator === '^' || operator === '%' ? '18px' : '20px';
-    this.checkAnswer();
+    dropZone.style.fontSize = operator === '^' ? '18px' : '20px';
   }
   removeOperatorFromSlot(index, dropZone) {
     this.answerOperators[index] = null;
@@ -43792,7 +44258,6 @@ class MathOperationSystem {
     dropZone.style.color = '#666';
     dropZone.style.boxShadow = 'none';
     dropZone.style.fontSize = '20px';
-    this.checkAnswer();
   }
   checkAnswer() {
     // Check if all operator slots are filled
@@ -43805,7 +44270,6 @@ class MathOperationSystem {
         // Check if result matches the target (with floating point tolerance)
         const target = this.currentQuestion.result;
         this.isCorrect = Math.abs(this.playerResult - target) < 0.0001;
-        this.updateProgressDisplay();
       } catch (error) {
         console.error('Error evaluating expression:', error);
         this.isCorrect = false;
@@ -43829,9 +44293,6 @@ class MathOperationSystem {
           case '^':
             expression += '**';
             break;
-          case '%':
-            expression += '%';
-            break;
           default:
             expression += operators[i];
             break;
@@ -43843,41 +44304,6 @@ class MathOperationSystem {
     // Note: Using Function constructor for safety instead of eval
     return Function(`"use strict"; return (${expression})`)();
   }
-  updateProgressDisplay() {
-    let progressDisplay = document.getElementById('math-progress');
-    if (!progressDisplay) {
-      progressDisplay = document.createElement('div');
-      progressDisplay.id = 'math-progress';
-      progressDisplay.style.textAlign = 'center';
-      progressDisplay.style.margin = '10px 0';
-      progressDisplay.style.fontWeight = 'bold';
-      progressDisplay.style.fontSize = '14px';
-      this.questionDescription.appendChild(progressDisplay);
-    }
-    const filledCount = this.answerOperators.filter(op => op !== null).length;
-    const totalSlots = this.answerOperators.length;
-    let resultInfo = '';
-    if (this.playerResult !== null) {
-      const isCorrect = Math.abs(this.playerResult - this.currentQuestion.result) < 0.0001;
-      resultInfo = `
-                <div style="font-size: 12px; color: ${isCorrect ? '#28a745' : '#dc3545'}; margin-top: 5px;">
-                    Your result: ${this.playerResult.toFixed(2)} ${isCorrect ? '✓' : '✗'}
-                </div>
-            `;
-    }
-    progressDisplay.innerHTML = `
-            <div style="margin-bottom: 5px;">
-                Progress: ${filledCount}/${totalSlots} operators placed
-            </div>
-            <div style="font-size: 12px; color: #666;">
-                Target result: ${this.currentQuestion.result}
-            </div>
-            ${resultInfo}
-            <div style="font-size: 11px; color: #888; margin-top: 5px;">
-                Results will be shown after time ends
-            </div>
-        `;
-  }
   startGameTimer(time) {
     let timeLeft = time / 1000;
     this.questionTimerCount.textContent = timeLeft;
@@ -43888,6 +44314,8 @@ class MathOperationSystem {
       this.questionTimerProgress.style.width = `${timeLeft / (time / 1000) * 100}%`;
       if (timeLeft <= 0) {
         clearInterval(this.questionTimer);
+        // Check answer only when time ends
+        this.checkAnswer();
         this.showResultsPhase();
       }
     }, 1000);
@@ -43988,7 +44416,7 @@ class MathOperationSystem {
         operatorElement.textContent = playerOperator || '?';
         operatorElement.style.padding = '0 10px';
         operatorElement.style.color = '#007bff';
-        operatorElement.style.fontSize = playerOperator === '^' || playerOperator === '%' ? '24px' : '28px';
+        operatorElement.style.fontSize = playerOperator === '^' ? '24px' : '28px';
         equationContainer.appendChild(operatorElement);
       }
     }
@@ -44015,7 +44443,7 @@ class MathOperationSystem {
     equationContainer.style.fontWeight = 'bold';
     equationContainer.style.padding = '20px';
     equationContainer.style.backgroundColor = '#e9ecef';
-    equationContainer.style.borderRadius = '1010px';
+    equationContainer.style.borderRadius = '10px';
     equationContainer.style.border = '2px solid #ced4da';
     for (let i = 0; i < numbers.length; i++) {
       // Add number
@@ -44030,7 +44458,7 @@ class MathOperationSystem {
         operatorElement.textContent = operators[i];
         operatorElement.style.padding = '0 10px';
         operatorElement.style.color = '#007bff';
-        operatorElement.style.fontSize = operators[i] === '^' || operators[i] === '%' ? '24px' : '28px';
+        operatorElement.style.fontSize = operators[i] === '^' ? '24px' : '28px';
         equationContainer.appendChild(operatorElement);
       }
     }
@@ -45345,7 +45773,7 @@ const MAP_SIZE_X = exports.MAP_SIZE_X = 4;
 const MAP_SIZE_Y = exports.MAP_SIZE_Y = 23;
 const TILE_SIZE = exports.TILE_SIZE = 42;
 const GAP_SIZE = exports.GAP_SIZE = 6;
-const MAX_PLAYER = exports.MAX_PLAYER = 2;
+const MAX_PLAYER = exports.MAX_PLAYER = 1;
 
 // Phase timing constants (in seconds)
 const CARD_PHASE_TIME = exports.CARD_PHASE_TIME = 10;
@@ -45355,7 +45783,7 @@ const PHASE_TRANSITION_DELAY = exports.PHASE_TRANSITION_DELAY = 0.5;
 
 // Minigame time
 const QUESTION_PHASE_TIME = exports.QUESTION_PHASE_TIME = 15;
-const MEMORY_MATRIX_PHASE_TIME = exports.MEMORY_MATRIX_PHASE_TIME = 5;
+const MEMORY_MATRIX_PHASE_TIME = exports.MEMORY_MATRIX_PHASE_TIME = 40;
 const MATH_OPERATION_PHASE_TIME = exports.MATH_OPERATION_PHASE_TIME = 40;
 
 // Animation and UI timing
@@ -45421,6 +45849,9 @@ joinGameButton.addEventListener("click", e => {
   socketClient = new _socketClient.SocketClient(addPlayer, removePlayer, updatePlayerCount);
 });
 function updatePlayerCount(count, players) {
+  if (gameInitialized) {
+    return;
+  }
   if (!lobby) {
     lobby = new _lobby.Lobby(socketClient);
   }
@@ -46351,11 +46782,10 @@ function animatePlayer(localPlayer, socketClient) {
   localPlayer.animatePlayer();
 
   // Send position updates to server if position changed
-  console.log("738i12uykehbj");
+
   const currentPos = localPlayer.position;
   const lastPos = animationState.lastSentPosition;
   if (currentPos.x !== lastPos.x || currentPos.y !== lastPos.y || currentPos.z !== lastPos.z) {
-    console.log("129378123uijk");
     sendPositionUpdate(localPlayer, socketClient);
   }
 }
@@ -46363,11 +46793,7 @@ function sendPositionUpdate(localPlayer, socketClient) {
   if (!localPlayer || !socketClient) return;
   const currentPos = localPlayer.position;
   const lastPos = animationState.lastSentPosition;
-  console.log("Local Player: ", localPlayer);
-  console.log(currentPos);
-  console.log(lastPos);
   if (currentPos.x !== lastPos.x || currentPos.y !== lastPos.y || currentPos.z !== lastPos.z) {
-    console.log("][;.'p[lpl;kasdpj");
     socketClient.update({
       x: currentPos.x,
       y: currentPos.y,
