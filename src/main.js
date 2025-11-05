@@ -98,6 +98,10 @@ function initializeGameSystems() {
   console.log("✅ MathOperationSystem initialized, callback set:", !!mathOperationSystem.onGameComplete);
 }
 
+export function isGameInitialized(){
+  return gameInitialized;
+}
+
 export function getPhaseTimer() {
   return _phaseTimer;
 }

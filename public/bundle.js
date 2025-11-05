@@ -45773,7 +45773,7 @@ const MAP_SIZE_X = exports.MAP_SIZE_X = 4;
 const MAP_SIZE_Y = exports.MAP_SIZE_Y = 23;
 const TILE_SIZE = exports.TILE_SIZE = 42;
 const GAP_SIZE = exports.GAP_SIZE = 6;
-const MAX_PLAYER = exports.MAX_PLAYER = 1;
+const MAX_PLAYER = exports.MAX_PLAYER = 2;
 
 // Phase timing constants (in seconds)
 const CARD_PHASE_TIME = exports.CARD_PHASE_TIME = 10;
@@ -45803,6 +45803,7 @@ exports.clearPhaseTimer = clearPhaseTimer;
 exports.getLocalPlayer = getLocalPlayer;
 exports.getPhaseTimer = getPhaseTimer;
 exports.getSocketClient = getSocketClient;
+exports.isGameInitialized = isGameInitialized;
 exports.questionSystem = exports.memoryMatrixSystem = exports.mathOperationSystem = void 0;
 exports.setPhaseTimer = setPhaseTimer;
 var THREE = _interopRequireWildcard(require("three"));
@@ -45883,6 +45884,9 @@ function initializeGameSystems() {
   console.log("✅ QuestionSystem initialized, callback set:", !!questionSystem.onQuestionComplete);
   console.log("✅ MemoryMatrixSystem initialized, callback set:", !!memoryMatrixSystem.onGameComplete);
   console.log("✅ MathOperationSystem initialized, callback set:", !!mathOperationSystem.onGameComplete);
+}
+function isGameInitialized() {
+  return gameInitialized;
 }
 function getPhaseTimer() {
   return _phaseTimer;
@@ -46937,6 +46941,9 @@ const keyHeld = {
   right: false
 };
 function setupInputHandlers() {
+  if (!(0, _main.isGameInitialized)()) {
+    return;
+  }
   console.log("🎮 Setting up input handlers");
   const forwardBtn = document.getElementById("forward");
   const backwardBtn = document.getElementById("backward");
