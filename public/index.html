@@ -31,15 +31,35 @@
         <span class="button-glow"></span>
       </button>
     </div>
+  </div>
 
-    <!-- Waiting Message with animation -->
-    <div id="waitingMessage" class="waiting-message">
-      <div class="loading-dots">
-        <span></span>
-        <span></span>
-        <span></span>
+  <!-- Lobby Container -->
+  <div class="lobby-container" id="lobbyContainer" style="display: none;">
+    <div class="lobby-header">
+      <h1>Game Lobby</h1>
+      <div class="lobby-info">
+        <span id="lobbyPlayerCount">Players: 1/4</span>
       </div>
-      <p>Waiting for players... <span id="playerCount">(0/4)</span></p>
+    </div>
+
+    <div class="players-container">
+      <div class="players-list" id="playersList">
+        <!-- Player cards will be dynamically inserted here -->
+      </div>
+    </div>
+
+    <div class="lobby-controls">
+      <div class="username-section">
+        <label for="usernameInput">Your Username:</label>
+        <input type="text" id="usernameInput" maxlength="20" placeholder="Enter your username">
+        <button id="updateUsernameButton" class="update-btn">Update</button>
+      </div>
+    </div>
+
+    <!-- Countdown message when game is about to start -->
+    <div id="countdownMessage" class="countdown-message" style="display: none;">
+      <h2>Game Starting in <span id="countdownTimer">5</span> seconds!</h2>
+      <p>Get ready to play!</p>
     </div>
   </div>
 

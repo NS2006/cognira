@@ -13,20 +13,21 @@ import { loadingManager } from "./components/LoadingManager";
 import { startInitialCountdown } from "./phases/countdownPhase";
 import { createAnimationLoop, resetAnimationState } from "./utilities/animate";
 import "./utilities/collectUserInputs";
+import { Lobby } from "./components/lobby";
+import { MAX_PLAYER } from "./constants";
 
 const mainMenu = document.getElementById("mainMenu");
 const gameCanvas = document.getElementById("gameCanvas");
 const joinGameButton = document.getElementById("joinGameButton");
 const controlsButton = document.getElementById("controls");
-const waitingMessage = document.getElementById("waitingMessage");
-const playerCountSpan = document.getElementById("playerCount");
 
+export let cardSystem, questionSystem, memoryMatrixSystem, mathOperationSystem;
 var scene, socketClient, ambientLight, dirLight, dirLightTarget, camera;
 let localPlayer = null;
 let gameInitialized = false;
-export let cardSystem, questionSystem, memoryMatrixSystem, mathOperationSystem;
 let _phaseTimer = null;
 let animateFunction = null;
+let lobby;
 
 const renderer = Renderer();
 
@@ -37,27 +38,32 @@ joinGameButton.addEventListener("click", (e) => {
 
   // Hide join button and show waiting message
   joinGameButton.style.display = "none";
-  waitingMessage.style.display = "block";
 
   // Initialize socket connection
   socketClient = new SocketClient(addPlayer, removePlayer, updatePlayerCount);
 });
 
-function updatePlayerCount(count) {
-  // Update the player count display
-  playerCountSpan.textContent = `(${count}/4)`;
+function updatePlayerCount(count, players) {
 
-  // Check if we have enough players and game isn't initialized yet
-  if (count >= 1 && !gameInitialized) {
-    // Hide waiting message and show controls
+  if (!lobby) {
+      lobby = new Lobby(socketClient);
+    }
+  lobby.show(players);
+
+  if (count == MAX_PLAYER && !gameInitialized) {
+    lobby.hide();
+
+    gameInitialized = true;
+
+    // Hide main menu
     mainMenu.style.display = "none";
+    
     controlsButton.style.display = "flex";
     gameCanvas.style.display = "flex";
 
     loadingManager.startLoading(1000, () => {
       console.log('Loading complete!');
       
-      // Create animation loop
       animateFunction = createAnimationLoop(
         scene, 
         camera, 
@@ -70,21 +76,9 @@ function updatePlayerCount(count) {
       );
       
       renderer.setAnimationLoop(animateFunction);
-
-      // Initialize game systems after loading
       initializeGameSystems();
-
-      // Start the initial 5-second countdown before first card phase
       startInitialCountdown();
     });
-
-    window.onresize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    }
-
-    gameInitialized = true;
   }
 }
 
@@ -100,6 +94,7 @@ function initializeGameSystems() {
   console.log("✅ MemoryMatrixSystem initialized, callback set:", !!memoryMatrixSystem.onGameComplete);
   console.log("✅ MathOperationSystem initialized, callback set:", !!mathOperationSystem.onGameComplete);
 }
+
 export function getPhaseTimer() {
   return _phaseTimer;
 }
@@ -155,9 +150,9 @@ function initializeGame() {
 
 function addPlayer(player) {
   console.log("=== addPlayer CALLED ===");
-
   if (player.playerId === socketClient.id && !localPlayer) {
     localPlayer = player;
+    localPlayer.setAsLocalPlayer();
     console.log("✅ LOCAL PLAYER SET!:", player.playerId);
 
     // Set initial positions
@@ -198,10 +193,6 @@ export function getSocketClient() {
   return socketClient;
 }
 
-export function getQuestionSystem() {
-  return questionSystem;
-}
-
 // Clean up when game ends
 export function cleanupGame() {
   if (cardSystem) {
@@ -217,50 +208,6 @@ export function cleanupGame() {
   if (animateFunction) {
     renderer.setAnimationLoop(null);
   }
-}
 
-// Rest of your debug functions remain the same...
-function debugMode() {
-  debugScene();
-  debugCameraView();
-}
-
-function debugScene() {
-  // Debug the map and scene
-  console.log("🗺️ Map children count:", map.children.length);
-  console.log("🗺️ Map position:", map.position);
-  console.log("🗺️ Map world position:", new THREE.Vector3().setFromMatrixPosition(map.matrixWorld));
-
-  // Debug scene
-  console.log("🎭 Scene children:", scene.children.length);
-  scene.children.forEach((child, index) => {
-    console.log(`🎭 Child ${index}:`, child.constructor.name, "position:", child.position);
-  });
-}
-
-function debugCameraView() {
-  console.log("📷 Camera view debug:");
-  console.log("📷 - Position:", camera.position);
-  console.log("📷 - Type:", camera.constructor.name);
-
-  if (camera instanceof THREE.PerspectiveCamera) {
-    console.log("📷 - FOV:", camera.fov);
-    console.log("📷 - Aspect:", camera.aspect);
-
-    // Calculate visible area at Z=0
-    const distance = camera.position.z;
-    const fovRad = camera.fov * Math.PI / 180;
-    const visibleHeight = 2 * Math.tan(fovRad / 2) * distance;
-    const visibleWidth = visibleHeight * camera.aspect;
-
-    console.log("📷 - Visible area at Z=0:", {
-      width: visibleWidth,
-      height: visibleHeight
-    });
-  }
-
-  console.log("🗺️ Map bounds:", {
-    min: { x: 0, y: 0 },
-    max: { x: 126, y: 504 }
-  });
+  gameInitialized = false;
 }

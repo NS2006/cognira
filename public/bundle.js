@@ -41826,7 +41826,7 @@ class CardSystem {
 }
 exports.CardSystem = CardSystem;
 
-},{"../main.js":59,"./CardList.js":42}],44:[function(require,module,exports){
+},{"../main.js":60,"./CardList.js":42}],44:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42549,7 +42549,7 @@ function getMapBounds() {
   };
 }
 
-},{"../constants":58,"../main":59,"./Tile":50,"three":36,"three/examples/jsm/loaders/GLTFLoader.js":37}],47:[function(require,module,exports){
+},{"../constants":59,"../main":60,"./Tile":50,"three":36,"three/examples/jsm/loaders/GLTFLoader.js":37}],47:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42562,14 +42562,16 @@ var _constants = require("../constants");
 var CANNON = _interopRequireWildcard(require("cannon-es"));
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 class Player extends THREE.Object3D {
-  constructor(playerId, initX, physicsWorld) {
+  constructor(playerId, playerUsername, initX, physicsWorld) {
     super();
     initX %= 4;
     console.log("Player Constructor: " + playerId + " | " + initX);
     this.playerId = playerId;
+    this.playerUsername = playerUsername;
     this.physicsWorld = physicsWorld;
     this.radius = 5;
     this.movesQueue = [];
+    this.isLocalPlayer = false;
     this.gridPosition = {
       currentY: 0,
       currentX: 0
@@ -42585,10 +42587,25 @@ class Player extends THREE.Object3D {
     this.selectedCard = null;
     this._createPhysicsBody(initX);
     this._createPlayerModel();
+
+    // Create player indicator
+    this.playerIndicator = null;
     this.initialize(initX);
   }
   get id() {
     return this.playerId;
+  }
+  get username() {
+    return this.playerUsername;
+  }
+  setUsername(username) {
+    this.playerUsername = username;
+  }
+  setAsLocalPlayer() {
+    this.isLocalPlayer = true;
+    if (this.isLocalPlayer) {
+      this._createPlayerIndicator();
+    }
   }
   displaySelectedCardInformation() {
     if (this.selectedCard) {
@@ -42778,6 +42795,82 @@ class Player extends THREE.Object3D {
       });
     }
   }
+  _createPlayerIndicator() {
+    // Create a group for the indicator
+    this.playerIndicator = new THREE.Group();
+
+    // Create large text sprite with wider box
+    const canvas = this._createTextCanvas("YOU", "bold 60px Arial", "white", "rgba(0, 128, 0, 0.9)");
+    const texture = new THREE.CanvasTexture(canvas);
+    const textMaterial = new THREE.SpriteMaterial({
+      map: texture,
+      transparent: true,
+      depthTest: false // Ensure text always renders on top
+    });
+    const textSprite = new THREE.Sprite(textMaterial);
+    textSprite.scale.set(25, 10, 1); // Wider scale (40 instead of 30)
+    textSprite.position.set(0, 0, 15); // Positioned above the model
+
+    // Add both to indicator group
+    this.playerIndicator.add(textSprite);
+
+    // Position the entire indicator group high above the player
+    this.playerIndicator.position.set(0, 0, 40); // High above the model
+
+    // Add indicator to player
+    this.add(this.playerIndicator);
+    console.log("Large 'YOU' indicator with arrow created");
+
+    // Add subtle floating animation
+    this._startIndicatorAnimation();
+  }
+  _createTextCanvas(text, font, textColor, backgroundColor) {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+
+    // Set very large canvas size for high-quality text - make it wider
+    canvas.width = 350; // Wider canvas (was 2048)
+    canvas.height = 200;
+
+    // Fill background with rounded corners - wider rectangle
+    if (backgroundColor) {
+      context.fillStyle = backgroundColor;
+      context.beginPath();
+      context.roundRect(0, 0, canvas.width, canvas.height, 40); // Slightly larger corners
+      context.fill();
+    }
+
+    // Draw text with enhanced styling - slightly larger font
+    context.font = font;
+    context.fillStyle = textColor;
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+
+    // Add strong text shadow for maximum readability
+    context.shadowColor = 'rgba(0, 0, 0, 0.8)';
+    context.shadowBlur = 10;
+    context.shadowOffsetX = 4;
+    context.shadowOffsetY = 4;
+    context.fillText(text, canvas.width / 2, canvas.height / 2);
+    return canvas;
+  }
+  _startIndicatorAnimation() {
+    // Store original position for animation
+    this.indicatorOriginalY = this.playerIndicator.position.y;
+    this.animationTime = 0;
+  }
+  updateIndicatorAnimation(deltaTime) {
+    if (!this.playerIndicator || !this.isLocalPlayer) return;
+
+    // Very subtle floating animation - barely noticeable
+    this.animationTime += deltaTime;
+    const floatHeight = Math.sin(this.animationTime * 1.5) * 0.3; // Much smaller movement
+    this.playerIndicator.position.y = this.indicatorOriginalY + floatHeight;
+
+    // Remove scale pulsing to keep it simple and not distracting
+  }
+
+  // Update your animatePlayer method to also update indicator animation
   animatePlayer() {
     if (!this.movesQueue.length) return;
     if (!this.moveClock.running) {
@@ -42826,7 +42919,7 @@ class Player extends THREE.Object3D {
     this._update3DPosition(startX, startY, endX, endY, progress);
 
     // Animate jumping
-    const jumpHeight = Math.sin(progress * Math.PI) * 8;
+    // const jumpHeight = Math.sin(progress * Math.PI) * 8;
     // this.position.z = jumpHeight;
   }
   _setRotation(progress) {
@@ -42840,8 +42933,15 @@ class Player extends THREE.Object3D {
     this.rotation.z = THREE.MathUtils.lerp(this.rotation.z, endRotation, progress);
   }
   move(position, rotation) {
+    console.log("MOVE MOVE PLAYER");
+    console.log(position);
     if (position !== undefined) {
       this.position.set(position.x, position.y, position.z);
+
+      // ✅ Sync Cannon body center (if used)
+      if (this.body) {
+        this.body.position.set(this.position.x, this.position.y, this.position.z + this.radius);
+      }
     }
     if (rotation !== undefined) {
       this.rotation.set(rotation.x, rotation.y, rotation.z);
@@ -42851,6 +42951,17 @@ class Player extends THREE.Object3D {
     if (this.physicsWorld && this.body) {
       this.physicsWorld.removeBody(this.body);
     }
+
+    // Clean up indicator
+    if (this.playerIndicator) {
+      this.playerIndicator.traverse(child => {
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) child.material.dispose();
+      });
+      this.remove(this.playerIndicator);
+    }
+
+    // Clean up main model
     this.children.forEach(child => {
       if (child.geometry) child.geometry.dispose();
       if (child.material) child.material.dispose();
@@ -42859,7 +42970,7 @@ class Player extends THREE.Object3D {
 }
 exports.Player = Player;
 
-},{"../constants":58,"cannon-es":2,"three":36,"three/examples/jsm/loaders/GLTFLoader":37}],48:[function(require,module,exports){
+},{"../constants":59,"cannon-es":2,"three":36,"three/examples/jsm/loaders/GLTFLoader":37}],48:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43063,7 +43174,117 @@ function Tile(positionY, platformWidthScale = 0.7, modelName = 'grass.gltf', phy
   return tile;
 }
 
-},{"../constants":58,"../main.js":59,"cannon-es":2,"three":36,"three/examples/jsm/loaders/GLTFLoader.js":37}],51:[function(require,module,exports){
+},{"../constants":59,"../main.js":60,"cannon-es":2,"three":36,"three/examples/jsm/loaders/GLTFLoader.js":37}],51:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Lobby = void 0;
+var _main = require("../main");
+// Lobby.js
+class Lobby {
+  constructor(socketClient) {
+    this.socketClient = socketClient;
+    this.players = new Map();
+    this.localPlayer = null;
+    this.lobbyContainer = document.getElementById('lobbyContainer');
+    this.playersList = document.getElementById('playersList');
+    this.lobbyPlayerCount = document.getElementById('lobbyPlayerCount');
+    this.usernameInput = document.getElementById('usernameInput');
+    this.updateUsernameButton = document.getElementById('updateUsernameButton');
+    this.initializeEventListeners();
+  }
+  initializeEventListeners() {
+    this.updateUsernameButton.addEventListener('click', () => this.updateUsername());
+    this.usernameInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') this.updateUsername();
+    });
+  }
+  show(players = null) {
+    this.localPlayer = (0, _main.getLocalPlayer)();
+    this.lobbyContainer.style.display = 'block';
+    this.usernameInput.value = this.localPlayer.username;
+    if (players) {
+      this.updatePlayers(players);
+    }
+  }
+  hide() {
+    this.lobbyContainer.style.display = 'none';
+  }
+  updatePlayers(players) {
+    this.players.clear();
+
+    // Add all players from the provided list
+    players.forEach(playerData => {
+      this.players.set(playerData.id, {
+        id: playerData.id,
+        username: playerData.username
+      });
+    });
+    this.updatePlayersList();
+  }
+  updatePlayersList() {
+    this.playersList.innerHTML = '';
+    this.players.forEach((player, playerId) => {
+      const playerCard = this.createPlayerCard(player, playerId);
+      this.playersList.appendChild(playerCard);
+    });
+    const totalPlayers = this.players.size;
+    this.lobbyPlayerCount.textContent = `Players: ${totalPlayers}/4`;
+  }
+  createPlayerCard(player, playerId) {
+    const card = document.createElement('div');
+    card.className = `player-card ${playerId === this.localPlayer.id ? 'local-player' : ''}`;
+    card.innerHTML = `
+            <div class="player-avatar">
+                <div class="avatar-icon">🐔</div>
+            </div>
+            <div class="player-info">
+                <div class="player-name">${player.username || 'Player'}</div>
+                <div class="player-status">
+                    ${playerId === this.localPlayer.id ? 'You' : 'Connected'}
+                </div>
+            </div>
+        `;
+    return card;
+  }
+  updateUsername() {
+    const newUsername = this.usernameInput.value.trim();
+    if (newUsername && newUsername !== this.localPlayer.username) {
+      this.localPlayer.setUsername(newUsername);
+
+      // Update local display
+      if (this.players.has(this.localPlayer.id)) {
+        this.players.get(this.localPlayer.id).username = newUsername;
+        this.updatePlayersList();
+      }
+
+      // Send to server via socket
+      console.log("uawiuq1908291");
+      if (this.socketClient && this.socketClient.updateUsername) {
+        console.log("asdhjkasdl");
+        this.socketClient.updateUsername(newUsername);
+      }
+    }
+  }
+  setLocalPlayerId(playerId) {
+    this.localPlayerId = playerId;
+    if (this.players.has(playerId)) {
+      this.players.get(playerId).username = this.localUsername;
+      this.updatePlayersList();
+    }
+  }
+
+  // Cleanup method
+  destroy() {
+    this.hide();
+    this.players.clear();
+  }
+}
+exports.Lobby = Lobby;
+
+},{"../main":60}],52:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43240,7 +43461,7 @@ class MathOperationList {
 }
 exports.MathOperationList = MathOperationList;
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43867,7 +44088,7 @@ class MathOperationSystem {
 }
 exports.MathOperationSystem = MathOperationSystem;
 
-},{"../../../constants.js":58,"../../../utilities/worldRelated.js":72,"./MathOperationList.js":51}],53:[function(require,module,exports){
+},{"../../../constants.js":59,"../../../utilities/worldRelated.js":73,"./MathOperationList.js":52}],54:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43998,7 +44219,7 @@ class MemoryMatrixList {
 }
 exports.MemoryMatrixList = MemoryMatrixList;
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44551,7 +44772,7 @@ class MemoryMatrixSystem {
 }
 exports.MemoryMatrixSystem = MemoryMatrixSystem;
 
-},{"../../../constants.js":58,"../../../utilities/worldRelated.js":72,"./MemoryMatrixList.js":53}],55:[function(require,module,exports){
+},{"../../../constants.js":59,"../../../utilities/worldRelated.js":73,"./MemoryMatrixList.js":54}],56:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44685,7 +44906,7 @@ class QuestionList {
 }
 exports.QuestionList = QuestionList;
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44840,7 +45061,7 @@ class QuestionSystem {
 }
 exports.QuestionSystem = QuestionSystem;
 
-},{"../../../constants.js":58,"../../../utilities/worldRelated.js":72,"./QuestionList.js":55}],57:[function(require,module,exports){
+},{"../../../constants.js":59,"../../../utilities/worldRelated.js":73,"./QuestionList.js":56}],58:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45112,18 +45333,19 @@ function startTetrisGame(onComplete, timeLimit = 30000) {
   return tetris;
 }
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TILE_SIZE = exports.STEPS_UPDATE_INTERVAL = exports.SPATIAL_QUESTION_TIME = exports.QUESTION_PHASE_TIME = exports.PHASE_TRANSITION_DELAY = exports.MOVEMENT_PHASE_TIME = exports.MESSAGE_FADE_OUT_TIME = exports.MESSAGE_DISPLAY_TIME = exports.MEMORY_MATRIX_PHASE_TIME = exports.MATH_OPERATION_PHASE_TIME = exports.MAP_SIZE_Y = exports.MAP_SIZE_X = exports.GAP_SIZE = exports.CARD_PHASE_TIME = void 0;
+exports.TILE_SIZE = exports.STEPS_UPDATE_INTERVAL = exports.SPATIAL_QUESTION_TIME = exports.QUESTION_PHASE_TIME = exports.PHASE_TRANSITION_DELAY = exports.MOVEMENT_PHASE_TIME = exports.MESSAGE_FADE_OUT_TIME = exports.MESSAGE_DISPLAY_TIME = exports.MEMORY_MATRIX_PHASE_TIME = exports.MAX_PLAYER = exports.MATH_OPERATION_PHASE_TIME = exports.MAP_SIZE_Y = exports.MAP_SIZE_X = exports.GAP_SIZE = exports.CARD_PHASE_TIME = void 0;
 // 4 x 23 GRID
 const MAP_SIZE_X = exports.MAP_SIZE_X = 4;
 const MAP_SIZE_Y = exports.MAP_SIZE_Y = 23;
 const TILE_SIZE = exports.TILE_SIZE = 42;
 const GAP_SIZE = exports.GAP_SIZE = 6;
+const MAX_PLAYER = exports.MAX_PLAYER = 2;
 
 // Phase timing constants (in seconds)
 const CARD_PHASE_TIME = exports.CARD_PHASE_TIME = 10;
@@ -45133,7 +45355,7 @@ const PHASE_TRANSITION_DELAY = exports.PHASE_TRANSITION_DELAY = 0.5;
 
 // Minigame time
 const QUESTION_PHASE_TIME = exports.QUESTION_PHASE_TIME = 15;
-const MEMORY_MATRIX_PHASE_TIME = exports.MEMORY_MATRIX_PHASE_TIME = 40;
+const MEMORY_MATRIX_PHASE_TIME = exports.MEMORY_MATRIX_PHASE_TIME = 5;
 const MATH_OPERATION_PHASE_TIME = exports.MATH_OPERATION_PHASE_TIME = 40;
 
 // Animation and UI timing
@@ -45141,7 +45363,7 @@ const MESSAGE_DISPLAY_TIME = exports.MESSAGE_DISPLAY_TIME = 3;
 const MESSAGE_FADE_OUT_TIME = exports.MESSAGE_FADE_OUT_TIME = 1;
 const STEPS_UPDATE_INTERVAL = exports.STEPS_UPDATE_INTERVAL = 0.5;
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45152,7 +45374,6 @@ exports.cleanupGame = cleanupGame;
 exports.clearPhaseTimer = clearPhaseTimer;
 exports.getLocalPlayer = getLocalPlayer;
 exports.getPhaseTimer = getPhaseTimer;
-exports.getQuestionSystem = getQuestionSystem;
 exports.getSocketClient = getSocketClient;
 exports.questionSystem = exports.memoryMatrixSystem = exports.mathOperationSystem = void 0;
 exports.setPhaseTimer = setPhaseTimer;
@@ -45171,22 +45392,23 @@ var _LoadingManager = require("./components/LoadingManager");
 var _countdownPhase = require("./phases/countdownPhase");
 var _animate = require("./utilities/animate");
 require("./utilities/collectUserInputs");
+var _lobby = require("./components/lobby");
+var _constants = require("./constants");
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 const mainMenu = document.getElementById("mainMenu");
 const gameCanvas = document.getElementById("gameCanvas");
 const joinGameButton = document.getElementById("joinGameButton");
 const controlsButton = document.getElementById("controls");
-const waitingMessage = document.getElementById("waitingMessage");
-const playerCountSpan = document.getElementById("playerCount");
-var scene, socketClient, ambientLight, dirLight, dirLightTarget, camera;
-let localPlayer = null;
-let gameInitialized = false;
 let cardSystem = exports.cardSystem = void 0,
   questionSystem = exports.questionSystem = void 0,
   memoryMatrixSystem = exports.memoryMatrixSystem = void 0,
   mathOperationSystem = exports.mathOperationSystem = void 0;
+var scene, socketClient, ambientLight, dirLight, dirLightTarget, camera;
+let localPlayer = null;
+let gameInitialized = false;
 let _phaseTimer = null;
 let animateFunction = null;
+let lobby;
 const renderer = (0, _Renderer.Renderer)();
 initializeGame();
 joinGameButton.addEventListener("click", e => {
@@ -45194,40 +45416,30 @@ joinGameButton.addEventListener("click", e => {
 
   // Hide join button and show waiting message
   joinGameButton.style.display = "none";
-  waitingMessage.style.display = "block";
 
   // Initialize socket connection
   socketClient = new _socketClient.SocketClient(addPlayer, removePlayer, updatePlayerCount);
 });
-function updatePlayerCount(count) {
-  // Update the player count display
-  playerCountSpan.textContent = `(${count}/4)`;
+function updatePlayerCount(count, players) {
+  if (!lobby) {
+    lobby = new _lobby.Lobby(socketClient);
+  }
+  lobby.show(players);
+  if (count == _constants.MAX_PLAYER && !gameInitialized) {
+    lobby.hide();
+    gameInitialized = true;
 
-  // Check if we have enough players and game isn't initialized yet
-  if (count >= 1 && !gameInitialized) {
-    // Hide waiting message and show controls
+    // Hide main menu
     mainMenu.style.display = "none";
     controlsButton.style.display = "flex";
     gameCanvas.style.display = "flex";
     _LoadingManager.loadingManager.startLoading(1000, () => {
       console.log('Loading complete!');
-
-      // Create animation loop
       animateFunction = (0, _animate.createAnimationLoop)(scene, camera, dirLight, dirLightTarget, _Map.map, renderer, getLocalPlayer, getSocketClient);
       renderer.setAnimationLoop(animateFunction);
-
-      // Initialize game systems after loading
       initializeGameSystems();
-
-      // Start the initial 5-second countdown before first card phase
       (0, _countdownPhase.startInitialCountdown)();
     });
-    window.onresize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    };
-    gameInitialized = true;
   }
 }
 function initializeGameSystems() {
@@ -45280,6 +45492,7 @@ function addPlayer(player) {
   console.log("=== addPlayer CALLED ===");
   if (player.playerId === socketClient.id && !localPlayer) {
     localPlayer = player;
+    localPlayer.setAsLocalPlayer();
     console.log("✅ LOCAL PLAYER SET!:", player.playerId);
 
     // Set initial positions
@@ -45315,9 +45528,6 @@ function getLocalPlayer() {
 function getSocketClient() {
   return socketClient;
 }
-function getQuestionSystem() {
-  return questionSystem;
-}
 
 // Clean up when game ends
 function cleanupGame() {
@@ -45334,56 +45544,10 @@ function cleanupGame() {
   if (animateFunction) {
     renderer.setAnimationLoop(null);
   }
+  gameInitialized = false;
 }
 
-// Rest of your debug functions remain the same...
-function debugMode() {
-  debugScene();
-  debugCameraView();
-}
-function debugScene() {
-  // Debug the map and scene
-  console.log("🗺️ Map children count:", _Map.map.children.length);
-  console.log("🗺️ Map position:", _Map.map.position);
-  console.log("🗺️ Map world position:", new THREE.Vector3().setFromMatrixPosition(_Map.map.matrixWorld));
-
-  // Debug scene
-  console.log("🎭 Scene children:", scene.children.length);
-  scene.children.forEach((child, index) => {
-    console.log(`🎭 Child ${index}:`, child.constructor.name, "position:", child.position);
-  });
-}
-function debugCameraView() {
-  console.log("📷 Camera view debug:");
-  console.log("📷 - Position:", camera.position);
-  console.log("📷 - Type:", camera.constructor.name);
-  if (camera instanceof THREE.PerspectiveCamera) {
-    console.log("📷 - FOV:", camera.fov);
-    console.log("📷 - Aspect:", camera.aspect);
-
-    // Calculate visible area at Z=0
-    const distance = camera.position.z;
-    const fovRad = camera.fov * Math.PI / 180;
-    const visibleHeight = 2 * Math.tan(fovRad / 2) * distance;
-    const visibleWidth = visibleHeight * camera.aspect;
-    console.log("📷 - Visible area at Z=0:", {
-      width: visibleWidth,
-      height: visibleHeight
-    });
-  }
-  console.log("🗺️ Map bounds:", {
-    min: {
-      x: 0,
-      y: 0
-    },
-    max: {
-      x: 126,
-      y: 504
-    }
-  });
-}
-
-},{"./components/Camera":39,"./components/CardSystem":43,"./components/DirectionalLight":44,"./components/LoadingManager":45,"./components/Map":46,"./components/Renderer":48,"./components/SkyBox":49,"./components/minigames/mathOperation/MathOperationSystem":52,"./components/minigames/memoryMatrix/MemoryMatrixSystem":54,"./components/minigames/question/QuestionSystem":56,"./phases/countdownPhase":61,"./socketClient":68,"./utilities/animate":69,"./utilities/collectUserInputs":70,"three":36}],60:[function(require,module,exports){
+},{"./components/Camera":39,"./components/CardSystem":43,"./components/DirectionalLight":44,"./components/LoadingManager":45,"./components/Map":46,"./components/Renderer":48,"./components/SkyBox":49,"./components/lobby":51,"./components/minigames/mathOperation/MathOperationSystem":53,"./components/minigames/memoryMatrix/MemoryMatrixSystem":55,"./components/minigames/question/QuestionSystem":57,"./constants":59,"./phases/countdownPhase":62,"./socketClient":69,"./utilities/animate":70,"./utilities/collectUserInputs":71,"three":36}],61:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45439,7 +45603,7 @@ function endCardPhase() {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../constants.js":58,"../main.js":59,"./minigamePhase.js":62}],61:[function(require,module,exports){
+},{"../constants.js":59,"../main.js":60,"./minigamePhase.js":63}],62:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45512,7 +45676,7 @@ function hideInitialCountdownMessage() {
   }
 }
 
-},{"../main":59,"../utilities/collectUserInputs":70,"./cardPhase":60}],62:[function(require,module,exports){
+},{"../main":60,"../utilities/collectUserInputs":71,"./cardPhase":61}],63:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45591,7 +45755,7 @@ function isMinigamePhaseActive() {
   return minigamePhaseActive;
 }
 
-},{"../constants.js":58,"../main.js":59,"./minigames/mathOperationPhase.js":63,"./minigames/memoryMatrixPhase.js":64,"./minigames/questionPhase.js":65,"./minigames/tetrisPhase.js":66,"./movePhase.js":67}],63:[function(require,module,exports){
+},{"../constants.js":59,"../main.js":60,"./minigames/mathOperationPhase.js":64,"./minigames/memoryMatrixPhase.js":65,"./minigames/questionPhase.js":66,"./minigames/tetrisPhase.js":67,"./movePhase.js":68}],64:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45651,7 +45815,7 @@ function endMathOperationPhase(isCorrect = false) {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../../constants.js":58,"../../main.js":59,"../minigamePhase.js":62}],64:[function(require,module,exports){
+},{"../../constants.js":59,"../../main.js":60,"../minigamePhase.js":63}],65:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45711,7 +45875,7 @@ function endMemoryMatrixPhase(isCorrect = false) {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../../constants.js":58,"../../main.js":59,"../minigamePhase.js":62}],65:[function(require,module,exports){
+},{"../../constants.js":59,"../../main.js":60,"../minigamePhase.js":63}],66:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45772,7 +45936,7 @@ function endQuestionPhase(isCorrect = false) {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../../constants.js":58,"../../main.js":59,"../minigamePhase.js":62}],66:[function(require,module,exports){
+},{"../../constants.js":59,"../../main.js":60,"../minigamePhase.js":63}],67:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45837,7 +46001,7 @@ function endTetrisPhase(success = false) {
   // startMovementPhase();
 }
 
-},{"../../components/minigames/tetris/Tetris":57,"../../main":59}],67:[function(require,module,exports){
+},{"../../components/minigames/tetris/Tetris":58,"../../main":60}],68:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45992,7 +46156,7 @@ function startStepsDisplayUpdater() {
   }, _constants.MOVEMENT_PHASE_TIME * 1000);
 }
 
-},{"../constants.js":58,"../main.js":59,"../utilities/collectUserInputs.js":70,"../utilities/showTime.js":71,"./cardPhase.js":60}],68:[function(require,module,exports){
+},{"../constants.js":59,"../main.js":60,"../utilities/collectUserInputs.js":71,"../utilities/showTime.js":72,"./cardPhase.js":61}],69:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46002,6 +46166,8 @@ exports.SocketClient = void 0;
 var _socket = require("socket.io-client");
 var _Player = require("./components/Player");
 var _worldRelated = require("./utilities/worldRelated");
+// socketClient.js
+
 class SocketClient {
   constructor(addPlayer, removePlayer, updatePlayerCount) {
     this.addPlayer = addPlayer;
@@ -46010,9 +46176,6 @@ class SocketClient {
     this.players = new Map();
     this.io = (0, _socket.io)("http://localhost:3000");
     this.handleSocketEvents();
-  }
-  update(position, rotation) {
-    this.io.emit("update-player-position", position, rotation);
   }
   handleSocketEvents() {
     this.io.on("connect", () => {
@@ -46027,7 +46190,7 @@ class SocketClient {
       }
       // Update player count after adding all initial players
       if (this.updatePlayerCount) {
-        this.updatePlayerCount(this.players.size);
+        this.updatePlayerCount(this.players.size, this.players);
       }
     });
 
@@ -46040,7 +46203,7 @@ class SocketClient {
       }
       // Update player count
       if (this.updatePlayerCount) {
-        this.updatePlayerCount(this.players.size);
+        this.updatePlayerCount(this.players.size, this.players);
       }
     });
 
@@ -46050,7 +46213,7 @@ class SocketClient {
       this.removeRemotePlayer(playerData.id);
       // Update player count
       if (this.updatePlayerCount) {
-        this.updatePlayerCount(this.players.size);
+        this.updatePlayerCount(this.players.size, this.players);
       }
     });
 
@@ -46062,24 +46225,14 @@ class SocketClient {
         player.move(position, rotation);
       }
     });
+    this.io.on("update-username", updatedPlayers => {
+      for (const playerData of updatedPlayers) {
+        this.players.get(playerData.id).setUsername(playerData.username);
+      }
+      this.updatePlayerCount(this.players.size, this.players);
+    });
     this.io.on("connect_error", error => {
       console.error("Connection error:", error);
-    });
-
-    // And add this event listener in handleSocketEvents method
-    this.io.on("card-selected", (playerId, cardType) => {
-      console.log("Player selected card:", playerId, cardType);
-      // Handle other players' card selections if needed
-    });
-
-    // And add this event listener in handleSocketEvents
-    this.io.on("question-started", questionData => {
-      console.log("Question started:", questionData);
-      // Handle question start from server if needed
-    });
-    this.io.on("answer-selected", (playerId, questionId, answer, isCorrect) => {
-      console.log("Player answered:", playerId, questionId, answer, isCorrect);
-      // Handle other players' answers if needed
     });
   }
   addRemotePlayer(playerData) {
@@ -46088,11 +46241,7 @@ class SocketClient {
       return;
     }
     console.log("Creating remote player:", playerData.id);
-    const player = new _Player.Player(playerData.id, this.players.size, _worldRelated.physicsWorld);
-
-    // Set initial position if available
-    // player.move(playerData.position, playerData.rotation);
-
+    const player = new _Player.Player(playerData.id, playerData.username, this.players.size, _worldRelated.physicsWorld);
     this.addPlayer(player);
     this.players.set(playerData.id, player);
     console.log("Added remote player:", playerData.id, "Total players:", this.players.size);
@@ -46105,13 +46254,13 @@ class SocketClient {
       console.log("Removed remote player:", playerId);
     }
   }
-
-  // Add this method to your SocketClient class
-  selectCard(cardType) {
-    this.io.emit("select-card", cardType);
+  update(position, rotation) {
+    console.log(position, rotation);
+    console.log("UPDATE SOCKET");
+    this.io.emit("update-player-position", position, rotation);
   }
-  selectAnswer(questionId, answer) {
-    this.io.emit("select-answer", questionId, answer);
+  updateUsername(newUsername) {
+    this.io.emit("update-username", newUsername);
   }
   disconnect() {
     this.io.disconnect();
@@ -46122,7 +46271,7 @@ class SocketClient {
 }
 exports.SocketClient = SocketClient;
 
-},{"./components/Player":47,"./utilities/worldRelated":72,"socket.io-client":27}],69:[function(require,module,exports){
+},{"./components/Player":47,"./utilities/worldRelated":73,"socket.io-client":27}],70:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46157,6 +46306,9 @@ function createAnimationLoop(scene, camera, dirLight, dirLightTarget, map, rende
     animatePlayer(localPlayer, socketClient);
     (0, _Map.updateMapPhysicsAndAnimation)();
 
+    // Update player indicators
+    updatePlayerIndicators(localPlayer, socketClient, camera);
+
     // Update camera and lighting
     updateCameraAndLighting(localPlayer, camera, dirLight, dirLightTarget);
 
@@ -46167,6 +46319,29 @@ function createAnimationLoop(scene, camera, dirLight, dirLightTarget, map, rende
     renderer.render(scene, camera);
   };
 }
+function updatePlayerIndicators(localPlayer, socketClient, camera) {
+  const deltaTime = 0.016;
+
+  // Update local player indicator
+  if (localPlayer && localPlayer.updateIndicatorAnimation) {
+    localPlayer.updateIndicatorAnimation(deltaTime);
+    if (localPlayer.playerIndicator) {
+      localPlayer.playerIndicator.lookAt(camera.position);
+    }
+  }
+
+  // Update remote players indicators
+  if (socketClient && socketClient.players) {
+    socketClient.players.forEach(player => {
+      if (player.updateIndicatorAnimation) {
+        player.updateIndicatorAnimation(deltaTime);
+        if (player.playerIndicator) {
+          player.playerIndicator.lookAt(camera.position);
+        }
+      }
+    });
+  }
+}
 function animatePlayer(localPlayer, socketClient) {
   if (!localPlayer) {
     console.log("🎮 No local player, skipping animation");
@@ -46176,13 +46351,23 @@ function animatePlayer(localPlayer, socketClient) {
   localPlayer.animatePlayer();
 
   // Send position updates to server if position changed
-  sendPositionUpdate(localPlayer, socketClient);
+  console.log("738i12uykehbj");
+  const currentPos = localPlayer.position;
+  const lastPos = animationState.lastSentPosition;
+  if (currentPos.x !== lastPos.x || currentPos.y !== lastPos.y || currentPos.z !== lastPos.z) {
+    console.log("129378123uijk");
+    sendPositionUpdate(localPlayer, socketClient);
+  }
 }
 function sendPositionUpdate(localPlayer, socketClient) {
   if (!localPlayer || !socketClient) return;
   const currentPos = localPlayer.position;
   const lastPos = animationState.lastSentPosition;
+  console.log("Local Player: ", localPlayer);
+  console.log(currentPos);
+  console.log(lastPos);
   if (currentPos.x !== lastPos.x || currentPos.y !== lastPos.y || currentPos.z !== lastPos.z) {
+    console.log("][;.'p[lpl;kasdpj");
     socketClient.update({
       x: currentPos.x,
       y: currentPos.y,
@@ -46194,7 +46379,7 @@ function sendPositionUpdate(localPlayer, socketClient) {
     });
 
     // Store last sent position
-    lastPos.copy(currentPos);
+    animationState.lastSentPosition.copy(currentPos);
   }
 }
 function updateCameraAndLighting(localPlayer, camera, dirLight, dirLightTarget) {
@@ -46308,7 +46493,7 @@ function getAnimationState() {
   };
 }
 
-},{"../components/Map":46,"./worldRelated":72,"three":36}],70:[function(require,module,exports){
+},{"../components/Map":46,"./worldRelated":73,"three":36}],71:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46458,7 +46643,7 @@ function refreshMovementUI() {
   updateMovementUI();
 }
 
-},{"../main.js":59,"../phases/movePhase.js":67}],71:[function(require,module,exports){
+},{"../main.js":60,"../phases/movePhase.js":68}],72:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46621,7 +46806,7 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-},{"../constants.js":58}],72:[function(require,module,exports){
+},{"../constants.js":59}],73:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46652,4 +46837,4 @@ function updatePhysics() {
   physicsWorld.step(timeStep);
 }
 
-},{"cannon-es":2}]},{},[59]);
+},{"cannon-es":2}]},{},[60]);

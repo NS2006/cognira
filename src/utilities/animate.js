@@ -26,16 +26,45 @@ export function createAnimationLoop(scene, camera, dirLight, dirLightTarget, map
         animatePlayer(localPlayer, socketClient);
 
         updateMapPhysicsAndAnimation();
-        
+
+        // Update player indicators
+        updatePlayerIndicators(localPlayer, socketClient, camera);
+
         // Update camera and lighting
         updateCameraAndLighting(localPlayer, camera, dirLight, dirLightTarget);
-        
+
         // Animate map tiles
         animateMapTiles(map);
-        
+
         // Render the scene
         renderer.render(scene, camera);
     };
+}
+
+function updatePlayerIndicators(localPlayer, socketClient, camera) {
+    const deltaTime = 0.016;
+
+    // Update local player indicator
+    if (localPlayer && localPlayer.updateIndicatorAnimation) {
+        localPlayer.updateIndicatorAnimation(deltaTime);
+
+        if (localPlayer.playerIndicator) {
+            localPlayer.playerIndicator.lookAt(camera.position);
+        }
+    }
+
+    // Update remote players indicators
+    if (socketClient && socketClient.players) {
+        socketClient.players.forEach(player => {
+            if (player.updateIndicatorAnimation) {
+                player.updateIndicatorAnimation(deltaTime);
+
+                if (player.playerIndicator) {
+                    player.playerIndicator.lookAt(camera.position);
+                }
+            }
+        });
+    }
 }
 
 function animatePlayer(localPlayer, socketClient) {
@@ -48,7 +77,17 @@ function animatePlayer(localPlayer, socketClient) {
     localPlayer.animatePlayer();
 
     // Send position updates to server if position changed
-    sendPositionUpdate(localPlayer, socketClient);
+    console.log("738i12uykehbj")
+
+    const currentPos = localPlayer.position;
+    const lastPos = animationState.lastSentPosition;
+    
+    if (currentPos.x !== lastPos.x ||
+        currentPos.y !== lastPos.y ||
+        currentPos.z !== lastPos.z) {
+            console.log("129378123uijk")
+            sendPositionUpdate(localPlayer, socketClient);
+    }
 }
 
 function sendPositionUpdate(localPlayer, socketClient) {
@@ -56,10 +95,15 @@ function sendPositionUpdate(localPlayer, socketClient) {
 
     const currentPos = localPlayer.position;
     const lastPos = animationState.lastSentPosition;
+    console.log("Local Player: ", localPlayer);
+    console.log(currentPos);
+    console.log(lastPos);
 
     if (currentPos.x !== lastPos.x ||
         currentPos.y !== lastPos.y ||
         currentPos.z !== lastPos.z) {
+
+            console.log("][;.'p[lpl;kasdpj")
 
         socketClient.update(
             {
@@ -75,7 +119,7 @@ function sendPositionUpdate(localPlayer, socketClient) {
         );
 
         // Store last sent position
-        lastPos.copy(currentPos);
+        animationState.lastSentPosition.copy(currentPos);
     }
 }
 

@@ -4,7 +4,7 @@ import { TILE_SIZE, MAP_SIZE_X, MAP_SIZE_Y } from "../constants";
 import * as CANNON from "cannon-es";
 
 export class Player extends THREE.Object3D {
-  constructor(playerId, initX, physicsWorld) {
+  constructor(playerId, playerUsername, initX, physicsWorld) {
     super();
 
     initX %= 4;
@@ -12,9 +12,11 @@ export class Player extends THREE.Object3D {
     console.log("Player Constructor: " + playerId + " | " + initX);
 
     this.playerId = playerId;
+    this.playerUsername = playerUsername;
     this.physicsWorld = physicsWorld;
     this.radius = 5;
     this.movesQueue = [];
+    this.isLocalPlayer = false;
 
     this.gridPosition = {
       currentY: 0,
@@ -34,6 +36,10 @@ export class Player extends THREE.Object3D {
 
     this._createPhysicsBody(initX);
     this._createPlayerModel();
+
+    // Create player indicator
+    this.playerIndicator = null;
+
     this.initialize(initX);
   }
 
@@ -41,8 +47,24 @@ export class Player extends THREE.Object3D {
     return this.playerId;
   }
 
-  displaySelectedCardInformation(){
-    if(this.selectedCard){
+  get username() {
+    return this.playerUsername;
+  }
+
+  setUsername(username){
+    this.playerUsername = username;
+  }
+
+  setAsLocalPlayer() {
+    this.isLocalPlayer = true;
+
+    if (this.isLocalPlayer) {
+      this._createPlayerIndicator();
+    }
+  }
+
+  displaySelectedCardInformation() {
+    if (this.selectedCard) {
       console.log('Selected Card Information:', {
         id: this.selectedCard.id,
         title: this.selectedCard.title,
@@ -50,11 +72,11 @@ export class Player extends THREE.Object3D {
         weight: this.selectedCard.weight,
         positiveEffect: this.selectedCard.positiveEffect ? 'Function defined' : 'No function',
         negativeEffect: this.selectedCard.negativeEffect ? 'Function defined' : 'No function'
-    });
+      });
     }
   }
 
-  displayPlayerInformation(){
+  displayPlayerInformation() {
     console.log("Player Information: ", {
       playerId: this.playerId,
       baseStep: this.baseStep,
@@ -70,14 +92,14 @@ export class Player extends THREE.Object3D {
   _createPhysicsBody(initX) {
     const shape = new CANNON.Sphere(this.radius);
     const baseZ = -4 + this.radius; // center at ground level
-  
+
     this.body = new CANNON.Body({
       mass: 0, // 🔧 static, no gravity or falling
       shape: shape,
       position: new CANNON.Vec3(initX * TILE_SIZE, 0, baseZ),
       fixedRotation: true,
     });
-  
+
     this.physicsWorld.addBody(this.body);
   }
 
@@ -259,41 +281,123 @@ export class Player extends THREE.Object3D {
     }
   }
 
+_createPlayerIndicator() {
+    // Create a group for the indicator
+    this.playerIndicator = new THREE.Group();
+
+    // Create large text sprite with wider box
+    const canvas = this._createTextCanvas("YOU", "bold 60px Arial", "white", "rgba(0, 128, 0, 0.9)");
+    const texture = new THREE.CanvasTexture(canvas);
+    const textMaterial = new THREE.SpriteMaterial({
+      map: texture,
+      transparent: true,
+      depthTest: false // Ensure text always renders on top
+    });
+    const textSprite = new THREE.Sprite(textMaterial);
+    textSprite.scale.set(25, 10, 1); // Wider scale (40 instead of 30)
+    textSprite.position.set(0, 0, 15); // Positioned above the model
+
+    // Add both to indicator group
+    this.playerIndicator.add(textSprite);
+
+    // Position the entire indicator group high above the player
+    this.playerIndicator.position.set(0, 0, 40); // High above the model
+
+    // Add indicator to player
+    this.add(this.playerIndicator);
+
+    console.log("Large 'YOU' indicator with arrow created");
+
+    // Add subtle floating animation
+    this._startIndicatorAnimation();
+}
+
+_createTextCanvas(text, font, textColor, backgroundColor) {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+
+    // Set very large canvas size for high-quality text - make it wider
+    canvas.width = 350; // Wider canvas (was 2048)
+    canvas.height = 200;
+
+    // Fill background with rounded corners - wider rectangle
+    if (backgroundColor) {
+        context.fillStyle = backgroundColor;
+        context.beginPath();
+        context.roundRect(0, 0, canvas.width, canvas.height, 40); // Slightly larger corners
+        context.fill();
+    }
+
+    // Draw text with enhanced styling - slightly larger font
+    context.font = font;
+    context.fillStyle = textColor;
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    
+    // Add strong text shadow for maximum readability
+    context.shadowColor = 'rgba(0, 0, 0, 0.8)';
+    context.shadowBlur = 10;
+    context.shadowOffsetX = 4;
+    context.shadowOffsetY = 4;
+    
+    context.fillText(text, canvas.width / 2, canvas.height / 2);
+
+    return canvas;
+}
+
+_startIndicatorAnimation() {
+    // Store original position for animation
+    this.indicatorOriginalY = this.playerIndicator.position.y;
+    this.animationTime = 0;
+}
+
+updateIndicatorAnimation(deltaTime) {
+    if (!this.playerIndicator || !this.isLocalPlayer) return;
+
+    // Very subtle floating animation - barely noticeable
+    this.animationTime += deltaTime;
+    const floatHeight = Math.sin(this.animationTime * 1.5) * 0.3; // Much smaller movement
+    this.playerIndicator.position.y = this.indicatorOriginalY + floatHeight;
+    
+    // Remove scale pulsing to keep it simple and not distracting
+}
+
+  // Update your animatePlayer method to also update indicator animation
   animatePlayer() {
     if (!this.movesQueue.length) return;
-  
+
     if (!this.moveClock.running) {
       this.moveClock.start();
     }
-  
+
     const duration = 0.5; // seconds per tile
     const progress = Math.min(this.moveClock.getElapsedTime() / duration, 1);
-  
+
     const direction = this.movesQueue[0];
     const startX = this.gridPosition.currentX * TILE_SIZE;
     const startY = this.gridPosition.currentY * TILE_SIZE;
     const endX = startX + (direction === "left" ? -TILE_SIZE : direction === "right" ? TILE_SIZE : 0);
     const endY = startY + (direction === "forward" ? TILE_SIZE : direction === "backward" ? -TILE_SIZE : 0);
-  
+
     this.position.x = THREE.MathUtils.lerp(startX, endX, progress);
     this.position.y = THREE.MathUtils.lerp(startY, endY, progress);
-  
+
     // Jump arc
     const jumpHeight = Math.sin(progress * Math.PI) * 8;
     this.position.z = -4 + jumpHeight;
-  
+
     // Complete move
     if (progress >= 1) {
       this._stepCompleted();
       this.moveClock.stop();
-  
+
       // ✅ Snap player exactly to target tile
       this.position.set(
         this.gridPosition.currentX * TILE_SIZE,
         this.gridPosition.currentY * TILE_SIZE,
         -4
       );
-  
+
       // ✅ Sync Cannon body center (if used)
       if (this.body) {
         this.body.position.set(
@@ -303,12 +407,12 @@ export class Player extends THREE.Object3D {
         );
       }
     }
-  
+
     // Rotate player facing direction
     this._setRotation(0.3);
-  }  
+  }
 
-  _setPosition(progress) {
+ _setPosition(progress) {
     const startX = this.gridPosition.currentX * TILE_SIZE;
     const startY = this.gridPosition.currentY * TILE_SIZE;
     let endX = startX;
@@ -322,7 +426,7 @@ export class Player extends THREE.Object3D {
     this._update3DPosition(startX, startY, endX, endY, progress);
 
     // Animate jumping
-    const jumpHeight = Math.sin(progress * Math.PI) * 8;
+    // const jumpHeight = Math.sin(progress * Math.PI) * 8;
     // this.position.z = jumpHeight;
   }
 
@@ -342,8 +446,19 @@ export class Player extends THREE.Object3D {
   }
 
   move(position, rotation) {
+    console.log("MOVE MOVE PLAYER")
+    console.log(position)
     if (position !== undefined) {
       this.position.set(position.x, position.y, position.z);
+
+      // ✅ Sync Cannon body center (if used)
+      if (this.body) {
+        this.body.position.set(
+          this.position.x,
+          this.position.y,
+          this.position.z + this.radius
+        );
+      }
     }
 
     if (rotation !== undefined) {
@@ -355,6 +470,17 @@ export class Player extends THREE.Object3D {
     if (this.physicsWorld && this.body) {
       this.physicsWorld.removeBody(this.body);
     }
+
+    // Clean up indicator
+    if (this.playerIndicator) {
+      this.playerIndicator.traverse(child => {
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) child.material.dispose();
+      });
+      this.remove(this.playerIndicator);
+    }
+
+    // Clean up main model
     this.children.forEach(child => {
       if (child.geometry) child.geometry.dispose();
       if (child.material) child.material.dispose();

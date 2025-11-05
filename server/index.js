@@ -30,10 +30,10 @@ server.listen(PORT, () => console.log(`Server listening on port: ${PORT}`));
 socketio.on("connection", (socket) => {
     console.log("Socket connected", socket.id);
 
-    // Create new player with initial position
+    // Create new player with initial position and default username
     const newPlayer = {
         id: socket.id,
-        username: "",
+        username: `Player${socket.id.substring(0, 4)}`, // Add default username
         position: { x: players.size % 4, y: 0, z: 0 },
         rotation: { x: 0, y: 0, z: 0 }
     };
@@ -48,7 +48,19 @@ socketio.on("connection", (socket) => {
     socket.broadcast.emit("player-connected", newPlayer);
 
     console.log("Total players:", players.size);
-    console.log(newPlayer)
+    console.log("New player:", newPlayer);
+
+    // Handle username update
+    socket.on("update-username", (newUsername) => {
+        console.log("Updating username for:", socket.id, newUsername);
+        const player = players.get(socket.id);
+        if (player) {
+            player.username = newUsername;
+            // Broadcast updated player list to all clients
+            const updatedPlayers = Array.from(players.values());
+            socketio.emit("update-username", updatedPlayers);
+        }
+    });
 
     // When a socket disconnects
     socket.on("disconnect", () => {
@@ -69,15 +81,5 @@ socketio.on("connection", (socket) => {
             // Broadcast to ALL other players (including the sender for testing)
             socket.broadcast.emit("update-player-position", socket.id, position, rotation);
         }
-    });
-
-    // Handle card selection
-    socket.on("select-card", (cardType) => {
-        console.log("Player selected card:", socket.id, cardType);
-
-        // Broadcast to other players
-        socket.broadcast.emit("card-selected", socket.id, cardType);
-
-        // You can add game logic here for card effects
     });
 });

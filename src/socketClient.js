@@ -1,3 +1,4 @@
+// socketClient.js
 import { io } from 'socket.io-client';
 import { Player } from './components/Player';
 import { physicsWorld } from './utilities/worldRelated';
@@ -13,10 +14,6 @@ export class SocketClient {
         this.handleSocketEvents();
     }
 
-    update(position, rotation) {
-        this.io.emit("update-player-position", position, rotation);
-    }
-
     handleSocketEvents() {
         this.io.on("connect", () => {
             console.log("Connected to server with ID:", this.io.id);
@@ -30,7 +27,7 @@ export class SocketClient {
             }
             // Update player count after adding all initial players
             if (this.updatePlayerCount) {
-                this.updatePlayerCount(this.players.size);
+                this.updatePlayerCount(this.players.size, this.players);
             }
         });
 
@@ -43,7 +40,7 @@ export class SocketClient {
             }
             // Update player count
             if (this.updatePlayerCount) {
-                this.updatePlayerCount(this.players.size);
+                this.updatePlayerCount(this.players.size, this.players);
             }
         });
 
@@ -53,7 +50,7 @@ export class SocketClient {
             this.removeRemotePlayer(playerData.id);
             // Update player count
             if (this.updatePlayerCount) {
-                this.updatePlayerCount(this.players.size);
+                this.updatePlayerCount(this.players.size, this.players);
             }
         });
 
@@ -66,25 +63,16 @@ export class SocketClient {
             }
         });
 
+        this.io.on("update-username", (updatedPlayers) => {
+            for (const playerData of updatedPlayers) {
+                this.players.get(playerData.id).setUsername(playerData.username);
+            }
+
+            this.updatePlayerCount(this.players.size, this.players);
+        });
+
         this.io.on("connect_error", (error) => {
             console.error("Connection error:", error);
-        });
-
-        // And add this event listener in handleSocketEvents method
-        this.io.on("card-selected", (playerId, cardType) => {
-            console.log("Player selected card:", playerId, cardType);
-            // Handle other players' card selections if needed
-        });
-
-        // And add this event listener in handleSocketEvents
-        this.io.on("question-started", (questionData) => {
-            console.log("Question started:", questionData);
-            // Handle question start from server if needed
-        });
-
-        this.io.on("answer-selected", (playerId, questionId, answer, isCorrect) => {
-            console.log("Player answered:", playerId, questionId, answer, isCorrect);
-            // Handle other players' answers if needed
         });
     }
 
@@ -95,10 +83,7 @@ export class SocketClient {
         }
 
         console.log("Creating remote player:", playerData.id);
-        const player = new Player(playerData.id, this.players.size, physicsWorld);
-
-        // Set initial position if available
-        // player.move(playerData.position, playerData.rotation);
+        const player = new Player(playerData.id, playerData.username, this.players.size, physicsWorld);
 
         this.addPlayer(player);
         this.players.set(playerData.id, player);
@@ -114,13 +99,14 @@ export class SocketClient {
         }
     }
 
-    // Add this method to your SocketClient class
-    selectCard(cardType) {
-        this.io.emit("select-card", cardType);
+    update(position, rotation) {
+        console.log(position, rotation)
+        console.log("UPDATE SOCKET")
+        this.io.emit("update-player-position", position, rotation);
     }
 
-    selectAnswer(questionId, answer) {
-        this.io.emit("select-answer", questionId, answer);
+    updateUsername(newUsername) {
+        this.io.emit("update-username", newUsername);
     }
 
     disconnect() {
