@@ -12,7 +12,7 @@ export class SocketClient {
         // Dynamic socket URL for production/development
         const socketUrl = this.getSocketUrl();
         console.log('🎮 Connecting to:', socketUrl);
-        
+
         this.io = io(socketUrl, {
             transports: ['websocket', 'polling'], // ✅ Better compatibility
             timeout: 10000 // ✅ 10 second timeout
@@ -21,13 +21,11 @@ export class SocketClient {
     }
 
     getSocketUrl() {
-        // If we're in development (localhost)
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             return 'http://localhost:3000';
         }
-        // If we're on Netlify (production)
         else {
-            return 'https://cognira-backend.onrender.com'; // Render backend URL
+            return 'https://cognira-backend-production.up.railway.app/'; // ← Your Railway URL
         }
     }
 
