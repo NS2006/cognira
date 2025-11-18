@@ -16,15 +16,18 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
     ? [
         'https://cognira.netlify.app',
         'http://localhost:3000',
-        'http://127.0.0.1:3000'
+        'http://127.0.0.1:3000',
+        'https://cognira-backend.up.railway.app'
       ]
     : ['http://localhost:3000', 'http://127.0.0.1:3000'];
 
 const socketio = new Server(server, {
     cors: {
         origin: allowedOrigins,
-        methods: ["GET", "POST"]
-    }
+        methods: ["GET", "POST"],
+        credentials: true
+    },
+    transports: ['websocket', 'polling']
 });
 
 const players = new Map();
@@ -43,6 +46,12 @@ app.get('/health', (req, res) => {
         players: players.size,
         timestamp: new Date().toISOString()
     });
+});
+
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`🎮 Cognira server listening on port: ${PORT}`);
+    console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`✅ Health check: http://0.0.0.0:${PORT}/health`);
 });
 
 server.listen(PORT, () => {
