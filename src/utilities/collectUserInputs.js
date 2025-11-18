@@ -1,4 +1,4 @@
-import { getLocalPlayer } from "../main.js";
+import { getLocalPlayer, isGameInitialized } from "../main.js";
 import { isMovementPhaseActive } from "../phases/movePhase.js";
 
 // Track which directions are currently held (to prevent repeat moves)
@@ -10,6 +10,7 @@ const keyHeld = {
 };
 
 function setupInputHandlers() {
+    
     console.log("🎮 Setting up input handlers");
     
     const forwardBtn = document.getElementById("forward");
@@ -68,6 +69,10 @@ function handleMoveOnce(direction) {
 }
 
 function handleKeyDown(event) {
+    if(!isGameInitialized()){
+        return;
+    }
+
     const keyMap = {
         "ArrowUp": "forward",
         "w": "forward",
@@ -96,6 +101,10 @@ function handleKeyDown(event) {
 }
 
 function handleKeyUp(event) {
+    if(!isGameInitialized()){
+        return;
+    }
+    
     const keyMap = {
         "ArrowUp": "forward",
         "w": "forward",

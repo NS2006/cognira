@@ -446,8 +446,6 @@ updateIndicatorAnimation(deltaTime) {
   }
 
   move(position, rotation) {
-    console.log("MOVE MOVE PLAYER")
-    console.log(position)
     if (position !== undefined) {
       this.position.set(position.x, position.y, position.z);
 
