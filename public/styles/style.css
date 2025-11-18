@@ -77,6 +77,68 @@ body {
   animation-delay: 1s;
 }
 
+.ui-leaf {
+  position: fixed;
+  /* width: 100%;
+  height: 100%; */
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 1;
+  pointer-events: none;      /* UI stays clickable */
+  z-index: 9999;
+  color: #055512;
+  /* filter: drop-shadow(0 0 4px rgba(0,0,0,0.4)); */
+}
+
+.ui-leaf img {
+  filter: brightness(0.6) contrast(1.2);
+}
+
+
+/* Positioning */
+.ui-leaf.top-left {
+  display: flex;
+  top: -50px;
+  left: -50px;
+  height: 400px;
+  width: 400px;
+}
+
+/* .ui-leaf.top-left img{
+  height: 80%;
+  width: 80%;
+} */
+
+.ui-leaf.top-right {
+  top: -50px;
+  right: -150px;
+  height: 400px;
+  width: 400px;
+}
+
+.ui-leaf.bottom-left {
+  bottom: 0px;
+  left: -50px;
+  height: 400px;
+  width: 400px;
+  transform: rotate(180deg);
+}
+
+.ui-leaf.mid-right{
+  top: 300px;
+  right: -150px;
+  height: 280px;
+  width: 280px;
+  transform: rotate(180deg);
+}
+
+.ui-leaf.bottom-right {
+  bottom: -300px;
+  left: 70%;
+  height: 700px;
+  width: 700px;
+}
+
 @keyframes float {
 
   0%,
@@ -286,16 +348,18 @@ body {
 .select-card-container {
   display: none;
   /* Hidden by default */
-  width: 70%;
+  width: 90%;
+  height: 90%;
   max-width: 1000px;
   text-align: center;
   position: absolute;
-  top: 80%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 100;
-  background: rgb(144, 144, 144);
-  border-radius: 20px;
+  /* background: rgb(144, 144, 144); */
+  background: rgba(20, 30, 20, 0.95);
+  /* border-radius: 20px; */
   padding-top: 30px;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
@@ -309,7 +373,8 @@ body {
   text-transform: uppercase;
   letter-spacing: 2px;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background: linear-gradient(90deg, #2196F3, #E91E63);
+  /* background: linear-gradient(90deg, #2196F3, #E91E63); */
+  background: white;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -329,6 +394,10 @@ body {
   padding: 20px 0;
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
 } */
+
+.card-info{
+  font-size: 1em;
+}
 
 #dynamicCardContainer {
   display: flex;
@@ -355,6 +424,7 @@ body {
   transform-origin: bottom center;
   transform: translateY(200px) scale(0);
   opacity: 0;
+  border-radius: 5%;
   animation: dealCard 0.5s ease-out forwards;
   animation-fill-mode: forwards;
 }
@@ -416,19 +486,19 @@ body {
 }
 
 .card-image {
-  width: 40px;
-  height: 40px;
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 50%;
+  border-radius: 5%;
   background: rgba(33, 150, 243, 0.1);
   flex-shrink: 0;
 }
 
 .card-image img {
-  width: 24px;
-  height: 24px;
+  width: 100%;
+  height: 100%;
 }
 
 .positive img {
@@ -453,7 +523,7 @@ body {
   width: 100%;
   height: 10px;
   background: #e0e0e0;
-  border-radius: 5px;
+  /* border-radius: 5px; */
   overflow: hidden;
   margin-bottom: 10px;
 }
@@ -467,7 +537,7 @@ body {
 
 .timer-text {
   font-size: 0.9rem;
-  color: #666;
+  color: black;
   font-weight: bold;
 }
 
@@ -488,8 +558,10 @@ body {
 
 /* Add to your style.css */
 #initialCountdownMessage {
+  top: 10%;
+  left: 20%;
   font-family: "Balatro", cursive;
-  animation: pulse-glow 1s infinite alternate;
+  /* animation: pulse-glow 1s infinite alternate; */
 }
 
 @keyframes pulse-glow {

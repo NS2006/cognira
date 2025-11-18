@@ -5,7 +5,7 @@ export const MAP_SIZE_Y = 23;
 export const TILE_SIZE = 42;
 export const GAP_SIZE = 6;
 
-export const MAX_PLAYER = 2;
+export const MAX_PLAYER = 1;
 
 // Phase timing constants (in seconds)
 export const CARD_PHASE_TIME = 10;
@@ -15,7 +15,7 @@ export const PHASE_TRANSITION_DELAY = 0.5;
 
 // Minigame time
 export const QUESTION_PHASE_TIME = 15;
-export const MEMORY_MATRIX_PHASE_TIME = 5;
+export const MEMORY_MATRIX_PHASE_TIME = 40;
 export const MATH_OPERATION_PHASE_TIME = 40;
 
 

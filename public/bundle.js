@@ -41542,27 +41542,45 @@ class Card {
   applyNegative(player) {
     return this.negativeEffect(player);
   }
+
+  // createCardElement(index = 0) {
+  //     const cardElement = document.createElement('button');
+  //     cardElement.className = 'card';
+  //     cardElement.setAttribute('data-card-type', this.id);
+  //     cardElement.style.setProperty('--i', index);
+
+  //     cardElement.innerHTML = `
+  //         <div class="card-title">
+  //             <h1>${this.title}</h1>
+  //         </div>
+  //         <div class="card-description-container">
+  //             ${this.descriptions.map(desc => `
+  //                 <div class="card-description">
+  //                     <div class="card-image ${desc.type}">
+  //                         <img src="./assets/images/${desc.type}.png" alt="${desc.type}">
+  //                     </div>
+  //                     <div class="card-attribute">
+  //                         <p>${desc.text}</p>
+  //                     </div>
+  //                 </div>
+  //             `).join('')}
+  //         </div>
+  //     `;
+
+  //     return cardElement;
+  // }
+
   createCardElement(index = 0) {
     const cardElement = document.createElement('button');
     cardElement.className = 'card';
     cardElement.setAttribute('data-card-type', this.id);
     cardElement.style.setProperty('--i', index);
     cardElement.innerHTML = `
-            <div class="card-title">
-                <h1>${this.title}</h1>
-            </div>
-            <div class="card-description-container">
-                ${this.descriptions.map(desc => `
-                    <div class="card-description">
-                        <div class="card-image ${desc.type}">
-                            <img src="./assets/images/${desc.type}.png" alt="${desc.type}">
-                        </div>
-                        <div class="card-attribute">
-                            <p>${desc.text}</p>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
+            <img 
+                src="./assets/model/Cards/${this.file}.png" 
+                alt="${this.id}" 
+                class="card-image"
+            >
         `;
     return cardElement;
   }
@@ -41577,27 +41595,89 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.CardEffects = void 0;
 const CardEffects = exports.CardEffects = {
-  moveOrStopPositive(player) {
-    console.log("Move or Stop Positive");
+  // moveOrStopPositive(player) {
+  //     console.log("Move or Stop Positive");
+  // },
+
+  // moveOrStopNegative(player) {
+  //     console.log("Move or Stop Negative");
+  //     player.remainingSteps = 0;
+  // },
+
+  // stepModifierPositive(player) {
+  //     console.log("Step Modifier Positive");
+  //     player.remainingSteps += 3;
+  // },
+
+  // stepModifierNegative(player) {
+  //     console.log("Step Modifier Negative");
+  //     player.remainingSteps -= 3;
+  //     player.remainingSteps = player.remainingSteps >= 0 ? player.remainingSteps : 0;
+  // },
+
+  // randomBonusPositive(player) {
+  //     console.log("Random Bonus Positive");
+  // },
+
+  // randomBonusNegative(player) {
+  //     console.log("Random Bonus Negative")
+  // }
+
+  value(player, amount) {
+    console.log(`Value effect: ${amount > 0 ? "+" : ""}${amount}`);
+    player.remainingSteps += amount;
+
+    // prevent negative steps
+    if (player.remainingSteps < 0) player.remainingSteps = 0;
   },
-  moveOrStopNegative(player) {
-    console.log("Move or Stop Negative");
-    player.remainingSteps = 0;
+  /* ============================================
+     MULTIPLIER (x2, x1.5, etc)
+  ============================================ */
+  multiplier(player, amount) {
+    console.log(`Multiplier effect: x${amount}`);
+    player.remainingSteps = Math.floor(player.remainingSteps * amount);
   },
-  stepModifierPositive(player) {
-    console.log("Step Modifier Positive");
-    player.remainingSteps += 3;
+  /* ============================================
+     MOVE / STOP
+  ============================================ */
+  move(player) {
+    console.log("Move effect: player can move");
+    player.canMove = true;
   },
-  stepModifierNegative(player) {
-    console.log("Step Modifier Negative");
-    player.remainingSteps -= 3;
-    player.remainingSteps = player.remainingSteps >= 0 ? player.remainingSteps : 0;
+  stop(player) {
+    console.log("Stop effect: player cannot move");
+    player.canMove = false;
   },
-  randomBonusPositive(player) {
-    console.log("Random Bonus Positive");
+  /* ============================================
+     STOP ALL (Falcon negative)
+  ============================================ */
+  stopAll(players) {
+    console.log("Stop All effect: everyone is stopped");
+    players.forEach(p => {
+      p.canMove = false;
+    });
   },
-  randomBonusNegative(player) {
-    console.log("Random Bonus Negative");
+  /* ============================================
+     IMMUNE (Mouse/Capybara)
+  ============================================ */
+  immune(player) {
+    console.log("Immune effect applied");
+    player.isImmune = true;
+  },
+  /* ============================================
+     STEAL (LEAVE EMPTY for now)
+  ============================================ */
+  steal(player, target, amount) {
+    console.log(`Steal effect placeholder: intended steal ${amount}`);
+
+    // Multiplayer logic will be added later
+    // Leaving blank
+  },
+  /* ============================================
+     NO EFFECT
+  ============================================ */
+  none() {
+    console.log("No effect");
   }
 };
 
@@ -41610,66 +41690,196 @@ Object.defineProperty(exports, "__esModule", {
 exports.CardList = void 0;
 var _CardEffect = require("./CardEffect.js");
 var _Card = require("./Card.js");
+// const cardDefinition = {
+//     move_or_stop: {
+//         id: 'move_or_stop',
+//         title: 'Move or Stop',
+//         descriptions: [
+//             { type: 'positive', text: 'Able to move' },
+//             { type: 'negative', text: 'Cannot move' }
+//         ],
+//         weight: 1
+//     },
+//     step_modifier: {
+//         id: 'step_modifier',
+//         title: 'Step Modifier',
+//         descriptions: [
+//             { type: 'positive', text: '+3 step' },
+//             { type: 'negative', text: '-3 step' }
+//         ],
+//         weight: 1
+//     },
+//     random_bonus: {
+//         id: 'random_bonus',
+//         title: 'Random Bonus',
+//         descriptions: [
+//             { type: 'positive', text: '+1 random effect' },
+//             { type: 'negative', text: 'No effect this round' }
+//         ],
+//         weight: 0.8
+//     }
+// }; 
+
 const cardDefinition = {
-  move_or_stop: {
-    id: 'move_or_stop',
-    title: 'Move or Stop',
-    descriptions: [{
-      type: 'positive',
-      text: 'Able to move'
-    }, {
-      type: 'negative',
-      text: 'Cannot move'
-    }],
-    weight: 1
+  bad_monkey: {
+    id: 'bad_monkey',
+    file: 'Bad Monkey',
+    positive: {
+      type: 'value',
+      amount: 6
+    },
+    // +6
+    negative: {
+      type: 'stop_all'
+    } // stop all
   },
-  step_modifier: {
-    id: 'step_modifier',
-    title: 'Step Modifier',
-    descriptions: [{
-      type: 'positive',
-      text: '+3 step'
-    }, {
-      type: 'negative',
-      text: '-3 step'
-    }],
-    weight: 1
+  bear: {
+    id: 'bear',
+    file: 'Bear',
+    positive: {
+      type: 'value',
+      amount: 4
+    },
+    // +4
+    negative: {
+      type: 'value',
+      amount: -7
+    } // -7
   },
-  random_bonus: {
-    id: 'random_bonus',
-    title: 'Random Bonus',
-    descriptions: [{
-      type: 'positive',
-      text: '+1 random effect'
-    }, {
-      type: 'negative',
-      text: 'No effect this round'
-    }],
-    weight: 0.8
+  cock: {
+    id: 'cock',
+    file: 'Cock',
+    positive: {
+      type: 'multiplier',
+      amount: 2
+    },
+    // x2
+    negative: {
+      type: 'none'
+    }
+  },
+  falcon: {
+    id: 'falcon',
+    file: 'Falcon',
+    positive: {
+      type: 'multiplier',
+      amount: 1.5
+    },
+    // 1.5×
+    negative: {
+      type: 'value',
+      amount: -15
+    }
+  },
+  monkey: {
+    id: 'monkey',
+    file: 'Monkey',
+    positive: {
+      type: 'value',
+      amount: 3
+    },
+    negative: {
+      type: 'value',
+      amount: -3
+    }
+  },
+  mouse: {
+    id: 'mouse',
+    file: 'Mouse',
+    positive: {
+      type: 'immune'
+    },
+    negative: {
+      type: 'none'
+    }
+  },
+  pig: {
+    id: 'pig',
+    file: 'Pig',
+    positive: {
+      type: 'move'
+    },
+    negative: {
+      type: 'stop'
+    }
+  },
+  raven: {
+    id: 'raven',
+    file: 'Raven',
+    positive: {
+      type: 'steal',
+      amount: 1
+    },
+    negative: {
+      type: 'stop'
+    }
+  },
+  snake: {
+    id: 'snake',
+    file: 'Snake',
+    positive: {
+      type: 'steal',
+      amount: 5
+    },
+    negative: {
+      type: 'value',
+      amount: -10
+    }
+  },
+  tiger: {
+    id: 'tiger',
+    file: 'Tiger',
+    positive: {
+      type: 'value',
+      amount: 8
+    },
+    negative: {
+      type: 'none'
+    }
   }
 };
+
+// Helper to map effect descriptor to function
+function mapEffectDescriptorToFunction(effectDesc, isPositive) {
+  if (!effectDesc || !effectDesc.type) return _CardEffect.CardEffects.none;
+  switch (effectDesc.type) {
+    case 'value':
+      return player => _CardEffect.CardEffects.value(player, effectDesc.amount);
+    case 'multiplier':
+      return player => _CardEffect.CardEffects.multiplier(player, effectDesc.amount);
+    case 'move':
+      return player => _CardEffect.CardEffects.move(player);
+    case 'stop':
+      return player => _CardEffect.CardEffects.stop(player);
+    case 'stop_all':
+      // Needs access to all players; here, just log or no-op
+      return (player, players) => _CardEffect.CardEffects.stopAll(players || [player]);
+    case 'immune':
+      return player => _CardEffect.CardEffects.immune(player);
+    case 'steal':
+      // Placeholder: needs target and amount
+      return (player, target) => _CardEffect.CardEffects.steal(player, target, effectDesc.amount);
+    case 'none':
+    default:
+      return () => _CardEffect.CardEffects.none();
+  }
+}
 class CardList {
   constructor() {
     this.cards = this._initializeCards();
   }
   _initializeCards() {
     return Object.values(cardDefinition).map(cardDef => {
-      let positiveEffect, negativeEffect;
-      switch (cardDef.id) {
-        case 'move_or_stop':
-          positiveEffect = _CardEffect.CardEffects.moveOrStopPositive;
-          negativeEffect = _CardEffect.CardEffects.moveOrStopNegative;
-          break;
-        case 'step_modifier':
-          positiveEffect = _CardEffect.CardEffects.stepModifierPositive;
-          negativeEffect = _CardEffect.CardEffects.stepModifierNegative;
-          break;
-        case 'random_bonus':
-          positiveEffect = _CardEffect.CardEffects.randomBonusPositive;
-          negativeEffect = _CardEffect.CardEffects.randomBonusNegative;
-          break;
-      }
-      return new _Card.Card(cardDef.id, cardDef.title, cardDef.descriptions, cardDef.weight, positiveEffect, negativeEffect);
+      // Map effect descriptors to functions
+      const positiveEffect = mapEffectDescriptorToFunction(cardDef.positive, true);
+      const negativeEffect = mapEffectDescriptorToFunction(cardDef.negative, false);
+
+      // Provide file property to Card for image rendering
+      const card = new _Card.Card(cardDef.id, cardDef.title || cardDef.id,
+      // fallback to id if no title
+      cardDef.descriptions || [], cardDef.weight || 1, positiveEffect, negativeEffect);
+      card.file = cardDef.file; // for image path in Card.createCardElement
+      return card;
     });
   }
 
@@ -41826,7 +42036,7 @@ class CardSystem {
 }
 exports.CardSystem = CardSystem;
 
-},{"../main.js":60,"./CardList.js":42}],44:[function(require,module,exports){
+},{"../main.js":61,"./CardList.js":42}],44:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42549,7 +42759,7 @@ function getMapBounds() {
   };
 }
 
-},{"../constants":59,"../main":60,"./Tile":50,"three":36,"three/examples/jsm/loaders/GLTFLoader.js":37}],47:[function(require,module,exports){
+},{"../constants":60,"../main":61,"./Tile":50,"three":36,"three/examples/jsm/loaders/GLTFLoader.js":37}],47:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42800,7 +43010,7 @@ class Player extends THREE.Object3D {
     this.playerIndicator = new THREE.Group();
 
     // Create large text sprite with wider box
-    const canvas = this._createTextCanvas("YOU", "bold 60px Arial", "white", "rgba(0, 128, 0, 0.9)");
+    const canvas = this._createTextCanvas("YOU", "bold 60px Arial", "white", "rgba(230, 13, 13, 0.9)");
     const texture = new THREE.CanvasTexture(canvas);
     const textMaterial = new THREE.SpriteMaterial({
       map: texture,
@@ -42864,8 +43074,8 @@ class Player extends THREE.Object3D {
 
     // Very subtle floating animation - barely noticeable
     this.animationTime += deltaTime;
-    const floatHeight = Math.sin(this.animationTime * 1.5) * 0.3; // Much smaller movement
-    this.playerIndicator.position.y = this.indicatorOriginalY + floatHeight;
+    // const floatHeight = Math.sin(this.animationTime * 1.5) * 0.3; // Much smaller movement
+    this.playerIndicator.position.y = this.indicatorOriginalY;
 
     // Remove scale pulsing to keep it simple and not distracting
   }
@@ -42970,7 +43180,7 @@ class Player extends THREE.Object3D {
 }
 exports.Player = Player;
 
-},{"../constants":59,"cannon-es":2,"three":36,"three/examples/jsm/loaders/GLTFLoader":37}],48:[function(require,module,exports){
+},{"../constants":60,"cannon-es":2,"three":36,"three/examples/jsm/loaders/GLTFLoader":37}],48:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43174,7 +43384,7 @@ function Tile(positionY, platformWidthScale = 0.7, modelName = 'grass.gltf', phy
   return tile;
 }
 
-},{"../constants":59,"../main.js":60,"cannon-es":2,"three":36,"three/examples/jsm/loaders/GLTFLoader.js":37}],51:[function(require,module,exports){
+},{"../constants":60,"../main.js":61,"cannon-es":2,"three":36,"three/examples/jsm/loaders/GLTFLoader.js":37}],51:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43284,7 +43494,7 @@ class Lobby {
 }
 exports.Lobby = Lobby;
 
-},{"../main":60}],52:[function(require,module,exports){
+},{"../main":61}],52:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44088,7 +44298,7 @@ class MathOperationSystem {
 }
 exports.MathOperationSystem = MathOperationSystem;
 
-},{"../../../constants.js":59,"../../../utilities/worldRelated.js":73,"./MathOperationList.js":52}],54:[function(require,module,exports){
+},{"../../../constants.js":60,"../../../utilities/worldRelated.js":74,"./MathOperationList.js":52}],54:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44772,7 +44982,7 @@ class MemoryMatrixSystem {
 }
 exports.MemoryMatrixSystem = MemoryMatrixSystem;
 
-},{"../../../constants.js":59,"../../../utilities/worldRelated.js":73,"./MemoryMatrixList.js":54}],56:[function(require,module,exports){
+},{"../../../constants.js":60,"../../../utilities/worldRelated.js":74,"./MemoryMatrixList.js":54}],56:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45061,7 +45271,7 @@ class QuestionSystem {
 }
 exports.QuestionSystem = QuestionSystem;
 
-},{"../../../constants.js":59,"../../../utilities/worldRelated.js":73,"./QuestionList.js":56}],58:[function(require,module,exports){
+},{"../../../constants.js":60,"../../../utilities/worldRelated.js":74,"./QuestionList.js":56}],58:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45339,13 +45549,91 @@ function startTetrisGame(onComplete, timeLimit = 30000) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.LeafParticles = void 0;
+var THREE = _interopRequireWildcard(require("three"));
+var _constants = require("../../constants");
+function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
+class LeafParticles {
+  constructor(scene, count = 1500) {
+    this.scene = scene;
+    this.count = count; // number of leaves
+
+    // World bounds (cover the whole map)
+    this.minX = 0;
+    this.maxX = (_constants.MAP_SIZE_X - 1) * _constants.TILE_SIZE;
+    this.minZ = 0;
+    this.maxZ = (_constants.MAP_SIZE_Y - 1) * _constants.TILE_SIZE;
+    this.velocity = new Float32Array(count);
+    this._loadTextures().then(textures => {
+      this._createParticles(textures);
+    });
+  }
+  async _loadTextures() {
+    const loader = new THREE.TextureLoader();
+    const files = ["/assets/model/Leaf/leaves_1.png", "/assets/model/Leaf/leaves_2.png"];
+    return await Promise.all(files.map(f => loader.loadAsync(f)));
+  }
+  _createParticles(textures) {
+    const positions = new Float32Array(this.count * 3);
+    for (let i = 0; i < this.count; i++) {
+      // X: random across world
+      positions[i * 3 + 0] = this.minX + Math.random() * (this.maxX - this.minX);
+      // Y: random height above ground
+      positions[i * 3 + 1] = Math.random() * 10 + 5;
+      // Z: random across world
+      positions[i * 3 + 2] = this.minZ + Math.random() * (this.maxZ - this.minZ);
+      this.velocity[i] = 0.02 + Math.random() * 0.2; // downward speed
+    }
+    this.geometry = new THREE.BufferGeometry();
+    this.geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    this.material = new THREE.PointsMaterial({
+      size: 2.5,
+      map: textures[Math.floor(Math.random() * textures.length)],
+      transparent: true,
+      // alphaTest: 0.3,
+      depthWrite: false,
+      rotation: Math.random() * Math.PI,
+      color: new THREE.Color(0.6, 0.6, 0.6)
+    });
+    this.points = new THREE.Points(this.geometry, this.material);
+    this.scene.add(this.points);
+  }
+  update() {
+    if (!this.geometry) return;
+    const positions = this.geometry.attributes.position.array;
+    for (let i = 0; i < this.count; i++) {
+      // Y movement (falling)
+      positions[i * 3 + 1] -= this.velocity[i];
+
+      // X drift
+      positions[i * 3 + 0] += Math.sin(Date.now() * 0.001 + i) * 0.002;
+
+      // Respawn leaf at top
+      if (positions[i * 3 + 1] < -1) {
+        // Respawn at random X/Z across the world
+        positions[i * 3 + 1] = Math.random() * 30 + 10;
+        positions[i * 3 + 0] = this.minX + Math.random() * (this.maxX - this.minX);
+        positions[i * 3 + 2] = this.minZ + Math.random() * (this.maxZ - this.minZ);
+      }
+    }
+    this.geometry.attributes.position.needsUpdate = true;
+  }
+}
+exports.LeafParticles = LeafParticles;
+
+},{"../../constants":60,"three":36}],60:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports.TILE_SIZE = exports.STEPS_UPDATE_INTERVAL = exports.SPATIAL_QUESTION_TIME = exports.QUESTION_PHASE_TIME = exports.PHASE_TRANSITION_DELAY = exports.MOVEMENT_PHASE_TIME = exports.MESSAGE_FADE_OUT_TIME = exports.MESSAGE_DISPLAY_TIME = exports.MEMORY_MATRIX_PHASE_TIME = exports.MAX_PLAYER = exports.MATH_OPERATION_PHASE_TIME = exports.MAP_SIZE_Y = exports.MAP_SIZE_X = exports.GAP_SIZE = exports.CARD_PHASE_TIME = void 0;
 // 4 x 23 GRID
 const MAP_SIZE_X = exports.MAP_SIZE_X = 4;
 const MAP_SIZE_Y = exports.MAP_SIZE_Y = 23;
 const TILE_SIZE = exports.TILE_SIZE = 42;
 const GAP_SIZE = exports.GAP_SIZE = 6;
-const MAX_PLAYER = exports.MAX_PLAYER = 2;
+const MAX_PLAYER = exports.MAX_PLAYER = 1;
 
 // Phase timing constants (in seconds)
 const CARD_PHASE_TIME = exports.CARD_PHASE_TIME = 10;
@@ -45355,7 +45643,7 @@ const PHASE_TRANSITION_DELAY = exports.PHASE_TRANSITION_DELAY = 0.5;
 
 // Minigame time
 const QUESTION_PHASE_TIME = exports.QUESTION_PHASE_TIME = 15;
-const MEMORY_MATRIX_PHASE_TIME = exports.MEMORY_MATRIX_PHASE_TIME = 5;
+const MEMORY_MATRIX_PHASE_TIME = exports.MEMORY_MATRIX_PHASE_TIME = 40;
 const MATH_OPERATION_PHASE_TIME = exports.MATH_OPERATION_PHASE_TIME = 40;
 
 // Animation and UI timing
@@ -45363,7 +45651,7 @@ const MESSAGE_DISPLAY_TIME = exports.MESSAGE_DISPLAY_TIME = 3;
 const MESSAGE_FADE_OUT_TIME = exports.MESSAGE_FADE_OUT_TIME = 1;
 const STEPS_UPDATE_INTERVAL = exports.STEPS_UPDATE_INTERVAL = 0.5;
 
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45394,6 +45682,7 @@ var _animate = require("./utilities/animate");
 require("./utilities/collectUserInputs");
 var _lobby = require("./components/lobby");
 var _constants = require("./constants");
+var _LeafParticleSystem = require("./components/particles/LeafParticleSystem");
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 const mainMenu = document.getElementById("mainMenu");
 const gameCanvas = document.getElementById("gameCanvas");
@@ -45409,6 +45698,7 @@ let gameInitialized = false;
 let _phaseTimer = null;
 let animateFunction = null;
 let lobby;
+let leafParticles = null;
 const renderer = (0, _Renderer.Renderer)();
 initializeGame();
 joinGameButton.addEventListener("click", e => {
@@ -45435,9 +45725,14 @@ function updatePlayerCount(count, players) {
     gameCanvas.style.display = "flex";
     _LoadingManager.loadingManager.startLoading(1000, () => {
       console.log('Loading complete!');
-      animateFunction = (0, _animate.createAnimationLoop)(scene, camera, dirLight, dirLightTarget, _Map.map, renderer, getLocalPlayer, getSocketClient);
+      animateFunction = (0, _animate.createAnimationLoop)(scene, camera, dirLight, dirLightTarget, _Map.map, renderer, getLocalPlayer, getSocketClient, leafParticles // Pass leafParticles to animation loop
+      );
       renderer.setAnimationLoop(animateFunction);
       initializeGameSystems();
+      // Show UI leaf decorations when the game actually starts
+      document.querySelectorAll('.ui-leaf').forEach(el => {
+        el.style.display = 'flex';
+      });
       (0, _countdownPhase.startInitialCountdown)();
     });
   }
@@ -45474,6 +45769,8 @@ function clearPhaseTimer() {
 function initializeGame() {
   console.log("🟡 Initializing game...");
   scene = new THREE.Scene();
+  // Add fog system to the scene
+  scene.fog = new THREE.FogExp2(0xaad0ff, 0.001);
   ambientLight = new THREE.AmbientLight();
   dirLight = (0, _DirectionalLight.DirectionalLight)();
   dirLightTarget = new THREE.Object3D();
@@ -45484,6 +45781,9 @@ function initializeGame() {
     scene.add(obj);
   });
   new _SkyBox.SkyBox(scene);
+
+  // Initialize leaf particles and add to scene
+  leafParticles = new _LeafParticleSystem.LeafParticles(scene, 20, 150);
   (0, _Map.initializeMap)();
   (0, _Map.loadTrees)();
   (0, _Map.loadRiver)();
@@ -45547,7 +45847,7 @@ function cleanupGame() {
   gameInitialized = false;
 }
 
-},{"./components/Camera":39,"./components/CardSystem":43,"./components/DirectionalLight":44,"./components/LoadingManager":45,"./components/Map":46,"./components/Renderer":48,"./components/SkyBox":49,"./components/lobby":51,"./components/minigames/mathOperation/MathOperationSystem":53,"./components/minigames/memoryMatrix/MemoryMatrixSystem":55,"./components/minigames/question/QuestionSystem":57,"./constants":59,"./phases/countdownPhase":62,"./socketClient":69,"./utilities/animate":70,"./utilities/collectUserInputs":71,"three":36}],61:[function(require,module,exports){
+},{"./components/Camera":39,"./components/CardSystem":43,"./components/DirectionalLight":44,"./components/LoadingManager":45,"./components/Map":46,"./components/Renderer":48,"./components/SkyBox":49,"./components/lobby":51,"./components/minigames/mathOperation/MathOperationSystem":53,"./components/minigames/memoryMatrix/MemoryMatrixSystem":55,"./components/minigames/question/QuestionSystem":57,"./components/particles/LeafParticleSystem":59,"./constants":60,"./phases/countdownPhase":63,"./socketClient":70,"./utilities/animate":71,"./utilities/collectUserInputs":72,"three":36}],62:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45603,7 +45903,7 @@ function endCardPhase() {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../constants.js":59,"../main.js":60,"./minigamePhase.js":63}],62:[function(require,module,exports){
+},{"../constants.js":60,"../main.js":61,"./minigamePhase.js":64}],63:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45642,14 +45942,14 @@ function showInitialCountdownMessage() {
     countdownMsg.id = 'initialCountdownMessage';
     countdownMsg.style.cssText = `
       position: fixed;
-      top: 20%;
+      top: 10%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: rgba(0, 0, 0, 0.9);
       color: white;
       padding: 25px 50px;
       border-radius: 15px;
-      font-size: 2em;
+      font-size: 1.5em;
       z-index: 1000;
       text-align: center;
       border: 3px solid #2196F3;
@@ -45676,7 +45976,7 @@ function hideInitialCountdownMessage() {
   }
 }
 
-},{"../main":60,"../utilities/collectUserInputs":71,"./cardPhase":61}],63:[function(require,module,exports){
+},{"../main":61,"../utilities/collectUserInputs":72,"./cardPhase":62}],64:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45755,7 +46055,7 @@ function isMinigamePhaseActive() {
   return minigamePhaseActive;
 }
 
-},{"../constants.js":59,"../main.js":60,"./minigames/mathOperationPhase.js":64,"./minigames/memoryMatrixPhase.js":65,"./minigames/questionPhase.js":66,"./minigames/tetrisPhase.js":67,"./movePhase.js":68}],64:[function(require,module,exports){
+},{"../constants.js":60,"../main.js":61,"./minigames/mathOperationPhase.js":65,"./minigames/memoryMatrixPhase.js":66,"./minigames/questionPhase.js":67,"./minigames/tetrisPhase.js":68,"./movePhase.js":69}],65:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45815,7 +46115,7 @@ function endMathOperationPhase(isCorrect = false) {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../../constants.js":59,"../../main.js":60,"../minigamePhase.js":63}],65:[function(require,module,exports){
+},{"../../constants.js":60,"../../main.js":61,"../minigamePhase.js":64}],66:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45875,7 +46175,7 @@ function endMemoryMatrixPhase(isCorrect = false) {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../../constants.js":59,"../../main.js":60,"../minigamePhase.js":63}],66:[function(require,module,exports){
+},{"../../constants.js":60,"../../main.js":61,"../minigamePhase.js":64}],67:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45936,7 +46236,7 @@ function endQuestionPhase(isCorrect = false) {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../../constants.js":59,"../../main.js":60,"../minigamePhase.js":63}],67:[function(require,module,exports){
+},{"../../constants.js":60,"../../main.js":61,"../minigamePhase.js":64}],68:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46001,7 +46301,7 @@ function endTetrisPhase(success = false) {
   // startMovementPhase();
 }
 
-},{"../../components/minigames/tetris/Tetris":58,"../../main":60}],68:[function(require,module,exports){
+},{"../../components/minigames/tetris/Tetris":58,"../../main":61}],69:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46156,7 +46456,7 @@ function startStepsDisplayUpdater() {
   }, _constants.MOVEMENT_PHASE_TIME * 1000);
 }
 
-},{"../constants.js":59,"../main.js":60,"../utilities/collectUserInputs.js":71,"../utilities/showTime.js":72,"./cardPhase.js":61}],69:[function(require,module,exports){
+},{"../constants.js":60,"../main.js":61,"../utilities/collectUserInputs.js":72,"../utilities/showTime.js":73,"./cardPhase.js":62}],70:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46271,7 +46571,7 @@ class SocketClient {
 }
 exports.SocketClient = SocketClient;
 
-},{"./components/Player":47,"./utilities/worldRelated":73,"socket.io-client":27}],70:[function(require,module,exports){
+},{"./components/Player":47,"./utilities/worldRelated":74,"socket.io-client":27}],71:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46289,7 +46589,8 @@ let animationState = {
   initializedAppear: false,
   lastSentPosition: new THREE.Vector3()
 };
-function createAnimationLoop(scene, camera, dirLight, dirLightTarget, map, renderer, getLocalPlayer, getSocketClient) {
+function createAnimationLoop(scene, camera, dirLight, dirLightTarget, map, renderer, getLocalPlayer, getSocketClient, leafParticles // <-- new optional argument
+) {
   return function animate() {
     const localPlayer = getLocalPlayer();
     const socketClient = getSocketClient();
@@ -46314,6 +46615,11 @@ function createAnimationLoop(scene, camera, dirLight, dirLightTarget, map, rende
 
     // Animate map tiles
     animateMapTiles(map);
+
+    // Update leaf particles if present
+    if (leafParticles && typeof leafParticles.update === "function") {
+      leafParticles.update();
+    }
 
     // Render the scene
     renderer.render(scene, camera);
@@ -46493,7 +46799,7 @@ function getAnimationState() {
   };
 }
 
-},{"../components/Map":46,"./worldRelated":73,"three":36}],71:[function(require,module,exports){
+},{"../components/Map":46,"./worldRelated":74,"three":36}],72:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46643,7 +46949,7 @@ function refreshMovementUI() {
   updateMovementUI();
 }
 
-},{"../main.js":60,"../phases/movePhase.js":68}],72:[function(require,module,exports){
+},{"../main.js":61,"../phases/movePhase.js":69}],73:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46806,7 +47112,7 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-},{"../constants.js":59}],73:[function(require,module,exports){
+},{"../constants.js":60}],74:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46837,4 +47143,4 @@ function updatePhysics() {
   physicsWorld.step(timeStep);
 }
 
-},{"cannon-es":2}]},{},[60]);
+},{"cannon-es":2}]},{},[61]);

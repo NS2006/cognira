@@ -286,7 +286,7 @@ _createPlayerIndicator() {
     this.playerIndicator = new THREE.Group();
 
     // Create large text sprite with wider box
-    const canvas = this._createTextCanvas("YOU", "bold 60px Arial", "white", "rgba(0, 128, 0, 0.9)");
+    const canvas = this._createTextCanvas("YOU", "bold 60px Arial", "white", "rgba(230, 13, 13, 0.9)");
     const texture = new THREE.CanvasTexture(canvas);
     const textMaterial = new THREE.SpriteMaterial({
       map: texture,
@@ -356,8 +356,8 @@ updateIndicatorAnimation(deltaTime) {
 
     // Very subtle floating animation - barely noticeable
     this.animationTime += deltaTime;
-    const floatHeight = Math.sin(this.animationTime * 1.5) * 0.3; // Much smaller movement
-    this.playerIndicator.position.y = this.indicatorOriginalY + floatHeight;
+    // const floatHeight = Math.sin(this.animationTime * 1.5) * 0.3; // Much smaller movement
+    this.playerIndicator.position.y = this.indicatorOriginalY;
     
     // Remove scale pulsing to keep it simple and not distracting
 }

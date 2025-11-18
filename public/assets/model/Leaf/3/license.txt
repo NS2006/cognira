@@ -1,0 +1,11 @@
+Model Information:
+* title:	Oak Leaf Practice Sculpt
+* source:	https://sketchfab.com/3d-models/oak-leaf-practice-sculpt-4a4367dcd67140a59c7094444457e87e
+* author:	BrageU (https://sketchfab.com/besdue)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Oak Leaf Practice Sculpt" (https://sketchfab.com/3d-models/oak-leaf-practice-sculpt-4a4367dcd67140a59c7094444457e87e) by BrageU (https://sketchfab.com/besdue) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

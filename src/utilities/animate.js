@@ -8,7 +8,17 @@ let animationState = {
     lastSentPosition: new THREE.Vector3()
 };
 
-export function createAnimationLoop(scene, camera, dirLight, dirLightTarget, map, renderer, getLocalPlayer, getSocketClient) {
+export function createAnimationLoop(
+    scene,
+    camera,
+    dirLight,
+    dirLightTarget,
+    map,
+    renderer,
+    getLocalPlayer,
+    getSocketClient,
+    leafParticles // <-- new optional argument
+) {
     return function animate() {
         const localPlayer = getLocalPlayer();
         const socketClient = getSocketClient();
@@ -35,6 +45,11 @@ export function createAnimationLoop(scene, camera, dirLight, dirLightTarget, map
 
         // Animate map tiles
         animateMapTiles(map);
+
+        // Update leaf particles if present
+        if (leafParticles && typeof leafParticles.update === "function") {
+            leafParticles.update();
+        }
 
         // Render the scene
         renderer.render(scene, camera);

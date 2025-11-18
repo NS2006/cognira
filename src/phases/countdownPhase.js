@@ -31,14 +31,14 @@ function showInitialCountdownMessage() {
     countdownMsg.id = 'initialCountdownMessage';
     countdownMsg.style.cssText = `
       position: fixed;
-      top: 20%;
+      top: 10%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: rgba(0, 0, 0, 0.9);
       color: white;
       padding: 25px 50px;
       border-radius: 15px;
-      font-size: 2em;
+      font-size: 1.5em;
       z-index: 1000;
       text-align: center;
       border: 3px solid #2196F3;
