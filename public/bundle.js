@@ -46622,7 +46622,7 @@ class SocketClient {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       return 'http://localhost:3000';
     } else {
-      return 'https://cognira-backend.up.railway.app/'; // Railway URL
+      return 'https://cognira-backend.up.railway.app'; // Railway URL
     }
   }
   handleSocketEvents() {
@@ -46972,9 +46972,6 @@ const keyHeld = {
   right: false
 };
 function setupInputHandlers() {
-  if (!(0, _main.isGameInitialized)()) {
-    return;
-  }
   console.log("🎮 Setting up input handlers");
   const forwardBtn = document.getElementById("forward");
   const backwardBtn = document.getElementById("backward");
@@ -47027,6 +47024,9 @@ function handleMoveOnce(direction) {
   setTimeout(() => keyHeld[direction] = false, 150);
 }
 function handleKeyDown(event) {
+  if (!(0, _main.isGameInitialized)()) {
+    return;
+  }
   const keyMap = {
     "ArrowUp": "forward",
     "w": "forward",
@@ -47051,6 +47051,9 @@ function handleKeyDown(event) {
   handleMove(direction);
 }
 function handleKeyUp(event) {
+  if (!(0, _main.isGameInitialized)()) {
+    return;
+  }
   const keyMap = {
     "ArrowUp": "forward",
     "w": "forward",

@@ -10,9 +10,6 @@ const keyHeld = {
 };
 
 function setupInputHandlers() {
-    if(!isGameInitialized()){
-        return;
-    }
     
     console.log("🎮 Setting up input handlers");
     
@@ -72,6 +69,10 @@ function handleMoveOnce(direction) {
 }
 
 function handleKeyDown(event) {
+    if(!isGameInitialized()){
+        return;
+    }
+
     const keyMap = {
         "ArrowUp": "forward",
         "w": "forward",
@@ -100,6 +101,10 @@ function handleKeyDown(event) {
 }
 
 function handleKeyUp(event) {
+    if(!isGameInitialized()){
+        return;
+    }
+    
     const keyMap = {
         "ArrowUp": "forward",
         "w": "forward",
