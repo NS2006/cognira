@@ -9,12 +9,13 @@ import { QuestionSystem } from "./components/minigames/question/QuestionSystem";
 import { MemoryMatrixSystem } from "./components/minigames/memoryMatrix/MemoryMatrixSystem";
 import { MathOperationSystem } from "./components/minigames/mathOperation/MathOperationSystem";
 import { SkyBox } from "./components/SkyBox";
-import { loadingManager } from "./components/LoadingManager"; 
+import { loadingManager } from "./components/LoadingManager";
 import { startInitialCountdown } from "./phases/countdownPhase";
 import { createAnimationLoop, resetAnimationState } from "./utilities/animate";
 import "./utilities/collectUserInputs";
 import { Lobby } from "./components/lobby";
 import { MAX_PLAYER } from "./constants";
+import { LeafParticles } from "./components/particles/LeafParticleSystem";
 
 const mainMenu = document.getElementById("mainMenu");
 const gameCanvas = document.getElementById("gameCanvas");
@@ -28,6 +29,7 @@ let gameInitialized = false;
 let _phaseTimer = null;
 let animateFunction = null;
 let lobby;
+let leafParticles = null;
 
 const renderer = Renderer();
 
@@ -68,18 +70,23 @@ function updatePlayerCount(count, players) {
       console.log('Loading complete!');
       
       animateFunction = createAnimationLoop(
-        scene, 
-        camera, 
-        dirLight, 
-        dirLightTarget, 
-        map, 
-        renderer, 
-        getLocalPlayer, 
-        getSocketClient
+        scene,
+        camera,
+        dirLight,
+        dirLightTarget,
+        map,
+        renderer,
+        getLocalPlayer,
+        getSocketClient,
+        leafParticles // Pass leafParticles to animation loop
       );
       
       renderer.setAnimationLoop(animateFunction);
       initializeGameSystems();
+      // Show UI leaf decorations when the game actually starts
+      document.querySelectorAll('.ui-leaf').forEach(el => {
+        el.style.display = 'flex';
+      });
       startInitialCountdown();
     });
   }
@@ -127,6 +134,9 @@ function initializeGame() {
   console.log("🟡 Initializing game...");
 
   scene = new THREE.Scene();
+  // Add fog system to the scene
+  scene.fog = new THREE.FogExp2(0xaad0ff
+, 0.001);
 
   ambientLight = new THREE.AmbientLight();
 
@@ -149,6 +159,9 @@ function initializeGame() {
   });
 
   new SkyBox(scene);
+
+  // Initialize leaf particles and add to scene
+  leafParticles = new LeafParticles(scene, 20, 150);
 
   initializeMap();
   loadTrees();

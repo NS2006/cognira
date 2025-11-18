@@ -1,35 +1,125 @@
 import { CardEffects } from './CardEffect.js';
 import { Card } from './Card.js';
 
+// const cardDefinition = {
+//     move_or_stop: {
+//         id: 'move_or_stop',
+//         title: 'Move or Stop',
+//         descriptions: [
+//             { type: 'positive', text: 'Able to move' },
+//             { type: 'negative', text: 'Cannot move' }
+//         ],
+//         weight: 1
+//     },
+//     step_modifier: {
+//         id: 'step_modifier',
+//         title: 'Step Modifier',
+//         descriptions: [
+//             { type: 'positive', text: '+3 step' },
+//             { type: 'negative', text: '-3 step' }
+//         ],
+//         weight: 1
+//     },
+//     random_bonus: {
+//         id: 'random_bonus',
+//         title: 'Random Bonus',
+//         descriptions: [
+//             { type: 'positive', text: '+1 random effect' },
+//             { type: 'negative', text: 'No effect this round' }
+//         ],
+//         weight: 0.8
+//     }
+// }; 
+
 const cardDefinition = {
-    move_or_stop: {
-        id: 'move_or_stop',
-        title: 'Move or Stop',
-        descriptions: [
-            { type: 'positive', text: 'Able to move' },
-            { type: 'negative', text: 'Cannot move' }
-        ],
-        weight: 1
+    bad_monkey: {
+        id: 'bad_monkey',
+        file: 'Bad Monkey',
+        positive: { type: 'value', amount: 6 },          // +6
+        negative: { type: 'stop_all' } // stop all
     },
-    step_modifier: {
-        id: 'step_modifier',
-        title: 'Step Modifier',
-        descriptions: [
-            { type: 'positive', text: '+3 step' },
-            { type: 'negative', text: '-3 step' }
-        ],
-        weight: 1
+    bear: {
+        id: 'bear',
+        file: 'Bear',
+        positive: { type: 'value', amount: 4 },     // +4
+        negative: { type: 'value', amount: -7 }      // -7
     },
-    random_bonus: {
-        id: 'random_bonus',
-        title: 'Random Bonus',
-        descriptions: [
-            { type: 'positive', text: '+1 random effect' },
-            { type: 'negative', text: 'No effect this round' }
-        ],
-        weight: 0.8
+    cock: {
+        id: 'cock',
+        file: 'Cock',
+        positive: { type: 'multiplier', amount: 2 }, // x2
+        negative: { type: 'none' }
+    },
+    falcon: {
+        id: 'falcon',
+        file: 'Falcon',
+        positive: { type: 'multiplier', amount: 1.5 }, // 1.5×
+        negative: { type: 'value', amount: -15 }
+    },
+    monkey: {
+        id: 'monkey',
+        file: 'Monkey',
+        positive: { type: 'value', amount: 3 },
+        negative: { type: 'value', amount: -3 }
+    },
+    mouse: {
+        id: 'mouse',
+        file: 'Mouse',
+        positive: { type: 'immune' },
+        negative: { type: 'none' }
+    },
+    pig: {
+        id: 'pig',
+        file: 'Pig',
+        positive: { type: 'move' },
+        negative: { type: 'stop' }
+    },
+    raven: {
+        id: 'raven',
+        file: 'Raven',
+        positive: { type: 'steal', amount: 1 },
+        negative: { type: 'stop' }
+    },
+    snake: {
+        id: 'snake',
+        file: 'Snake',
+        positive: { type: 'steal', amount: 5 },
+        negative: { type: 'value', amount: -10 }
+    },
+    tiger: {
+        id: 'tiger',
+        file: 'Tiger',
+        positive: { type: 'value', amount: 8 },
+        negative: { type: 'none' }
     }
 };
+
+// Helper to map effect descriptor to function
+function mapEffectDescriptorToFunction(effectDesc, isPositive) {
+    if (!effectDesc || !effectDesc.type) return CardEffects.none;
+
+    switch (effectDesc.type) {
+        case 'value':
+            return (player) => CardEffects.value(player, effectDesc.amount);
+        case 'multiplier':
+            return (player) => CardEffects.multiplier(player, effectDesc.amount);
+        case 'move':
+            return (player) => CardEffects.move(player);
+        case 'stop':
+            return (player) => CardEffects.stop(player);
+        case 'stop_all':
+            // Needs access to all players; here, just log or no-op
+            return (player, players) => CardEffects.stopAll(players || [player]);
+        case 'immune':
+            return (player) => CardEffects.immune(player);
+        case 'steal':
+            // Placeholder: needs target and amount
+            return (player, target) => CardEffects.steal(player, target, effectDesc.amount);
+        case 'none':
+        default:
+            return () => CardEffects.none();
+    }
+}
 
 export class CardList {
     constructor() {
@@ -38,31 +128,21 @@ export class CardList {
 
     _initializeCards() {
         return Object.values(cardDefinition).map(cardDef => {
-            let positiveEffect, negativeEffect;
+            // Map effect descriptors to functions
+            const positiveEffect = mapEffectDescriptorToFunction(cardDef.positive, true);
+            const negativeEffect = mapEffectDescriptorToFunction(cardDef.negative, false);
 
-            switch(cardDef.id) {
-                case 'move_or_stop':
-                    positiveEffect = CardEffects.moveOrStopPositive;
-                    negativeEffect = CardEffects.moveOrStopNegative;
-                    break;
-                case 'step_modifier':
-                    positiveEffect = CardEffects.stepModifierPositive;
-                    negativeEffect = CardEffects.stepModifierNegative;
-                    break;
-                case 'random_bonus':
-                    positiveEffect = CardEffects.randomBonusPositive;
-                    negativeEffect = CardEffects.randomBonusNegative;
-                    break;
-            }
-
-            return new Card(
+            // Provide file property to Card for image rendering
+            const card = new Card(
                 cardDef.id,
-                cardDef.title,
-                cardDef.descriptions,
-                cardDef.weight,
+                cardDef.title || cardDef.id, // fallback to id if no title
+                cardDef.descriptions || [],
+                cardDef.weight || 1,
                 positiveEffect,
                 negativeEffect
             );
+            card.file = cardDef.file; // for image path in Card.createCardElement
+            return card;
         });
     }
 

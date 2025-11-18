@@ -1,0 +1,11 @@
+Model Information:
+* title:	Christmas Hat
+* source:	https://sketchfab.com/3d-models/christmas-hat-a16761c7cde842d5810c0f46d78c5746
+* author:	Veillax135 (https://sketchfab.com/Veillax)
+
+Model License:
+* license type:	CC-BY-ND-4.0 (http://creativecommons.org/licenses/by-nd/4.0/)
+* requirements:	Author must be credited. Modified versions can not be distributed. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Christmas Hat" (https://sketchfab.com/3d-models/christmas-hat-a16761c7cde842d5810c0f46d78c5746) by Veillax135 (https://sketchfab.com/Veillax) licensed under CC-BY-ND-4.0 (http://creativecommons.org/licenses/by-nd/4.0/)
