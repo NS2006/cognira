@@ -47,6 +47,16 @@ function handleMove(direction) {
     }
 
     const localPlayer = getLocalPlayer();
+    
+    // Check if remaining step is zero or not
+    if (localPlayer.remainingSteps === 0) {
+        console.log(`🎮 Movement not allowed: Remaining step is 0`);
+        return;
+    }
+
+    // Decrease Remaining Steps
+    localPlayer.remainingSteps = Math.max(0, localPlayer.remainingSteps - 1);
+    
     console.log(`🎮 Move requested: ${direction}, Player exists: ${!!localPlayer}`);
     
     if (localPlayer) {

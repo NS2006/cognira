@@ -43113,9 +43113,6 @@ class Player extends THREE.Object3D {
     if (direction === "backward") this.gridPosition.currentY -= 1;
     if (direction === "left") this.gridPosition.currentX -= 1;
     if (direction === "right") this.gridPosition.currentX += 1;
-
-    // Actually decrease remaining steps
-    this.remainingSteps = Math.max(0, this.remainingSteps - 1);
     (0, _main.updateStepsDisplay)();
     console.log(`Step completed. Remaining steps: ${this.remainingSteps}`);
   }
@@ -46234,7 +46231,7 @@ const MAP_SIZE_X = exports.MAP_SIZE_X = 4;
 const MAP_SIZE_Y = exports.MAP_SIZE_Y = 51;
 const TILE_SIZE = exports.TILE_SIZE = 42;
 const GAP_SIZE = exports.GAP_SIZE = 6;
-const MAX_PLAYER = exports.MAX_PLAYER = 3;
+const MAX_PLAYER = exports.MAX_PLAYER = 1;
 
 // Phase timing constants (in seconds)
 const COUNTDOWN_PHASE_TIME = exports.COUNTDOWN_PHASE_TIME = 3;
@@ -47937,6 +47934,15 @@ function handleMove(direction) {
     return;
   }
   const localPlayer = (0, _main.getLocalPlayer)();
+
+  // Check if remaining step is zero or not
+  if (localPlayer.remainingSteps === 0) {
+    console.log(`🎮 Movement not allowed: Remaining step is 0`);
+    return;
+  }
+
+  // Decrease Remaining Steps
+  localPlayer.remainingSteps = Math.max(0, localPlayer.remainingSteps - 1);
   console.log(`🎮 Move requested: ${direction}, Player exists: ${!!localPlayer}`);
   if (localPlayer) {
     console.log(`🎮 Queueing move: ${direction}`);

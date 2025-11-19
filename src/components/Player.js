@@ -229,9 +229,6 @@ export class Player extends THREE.Object3D {
     if (direction === "left") this.gridPosition.currentX -= 1;
     if (direction === "right") this.gridPosition.currentX += 1;
 
-    // Actually decrease remaining steps
-    this.remainingSteps = Math.max(0, this.remainingSteps - 1);
-
     updateStepsDisplay();
 
     console.log(`Step completed. Remaining steps: ${this.remainingSteps}`);
