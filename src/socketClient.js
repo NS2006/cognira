@@ -82,19 +82,6 @@ export class SocketClient {
             }
         });
 
-        this.io.on("update-username", (updatedPlayers) => {
-            console.log("📝 Username update received:", updatedPlayers);
-            for (const playerData of updatedPlayers) {
-                const player = this.players.get(playerData.id);
-                if (player) {
-                    player.setUsername(playerData.username);
-                }
-            }
-            if (this.updatePlayerCount) {
-                this.updatePlayerCount(this.players.size, this.players);
-            }
-        });
-
         this.io.on("connect_error", (error) => {
             console.error("💥 Connection error:", error);
         });
@@ -128,12 +115,6 @@ export class SocketClient {
             this.io.emit("update-player-position", position, rotation);
         } else {
             console.warn("⚠️ Cannot update position: Socket not connected");
-        }
-    }
-
-    updateUsername(newUsername) {
-        if (this.io.connected) {
-            this.io.emit("update-username", newUsername);
         }
     }
 

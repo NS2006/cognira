@@ -66,7 +66,7 @@ socketio.on("connection", (socket) => {
     // Create new player with initial position and default username
     const newPlayer = {
         id: socket.id,
-        username: `Player${socket.id.substring(0, 4)}`,
+        username: `Player${players.size + 1}`,
         position: { x: players.size % 4, y: 0, z: 0 },
         rotation: { x: 0, y: 0, z: 0 }
     };
@@ -82,18 +82,6 @@ socketio.on("connection", (socket) => {
 
     console.log("Total players:", players.size);
     console.log("New player:", newPlayer);
-
-    // Handle username update
-    socket.on("update-username", (newUsername) => {
-        console.log("Updating username for:", socket.id, newUsername);
-        const player = players.get(socket.id);
-        if (player) {
-            player.username = newUsername;
-            // Broadcast updated player list to all clients
-            const updatedPlayers = Array.from(players.values());
-            socketio.emit("update-username", updatedPlayers);
-        }
-    });
 
     // When a socket disconnects
     socket.on("disconnect", () => {

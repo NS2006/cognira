@@ -16,12 +16,14 @@ import "./utilities/collectUserInputs";
 import { Lobby } from "./components/lobby";
 import { MAX_PLAYER } from "./constants";
 import { LeafParticles } from "./components/particles/LeafParticleSystem";
+import { initializeLeaderboard } from "./phases/leaderboardPhase";
 
 const mainMenu = document.getElementById("mainMenu");
 const gameCanvas = document.getElementById("gameCanvas");
 const joinGameButton = document.getElementById("joinGameButton");
 const controlsButton = document.getElementById("controls");
 
+export let currentRound = 0;
 export let cardSystem, questionSystem, memoryMatrixSystem, mathOperationSystem;
 var scene, socketClient, ambientLight, dirLight, dirLightTarget, camera;
 let localPlayer = null;
@@ -68,6 +70,7 @@ function updatePlayerCount(count, players) {
 
     loadingManager.startLoading(1000, () => {
       console.log('Loading complete!');
+      showGameUI();
       
       animateFunction = createAnimationLoop(
         scene,
@@ -90,82 +93,6 @@ function updatePlayerCount(count, players) {
       startInitialCountdown();
     });
   }
-}
-
-function initializeGameSystems() {
-  // Initialize system with socket client and callback
-  cardSystem = new CardSystem(socketClient);
-  questionSystem = new QuestionSystem(socketClient);
-  memoryMatrixSystem = new MemoryMatrixSystem(socketClient);
-  mathOperationSystem = new MathOperationSystem(socketClient);
-
-  console.log("🔄 Initializing game systems...");
-  console.log("✅ QuestionSystem initialized, callback set:", !!questionSystem.onQuestionComplete);
-  console.log("✅ MemoryMatrixSystem initialized, callback set:", !!memoryMatrixSystem.onGameComplete);
-  console.log("✅ MathOperationSystem initialized, callback set:", !!mathOperationSystem.onGameComplete);
-}
-
-export function isGameInitialized(){
-  return gameInitialized;
-}
-
-export function getPhaseTimer() {
-  return _phaseTimer;
-}
-
-export function setPhaseTimer(timer) {
-  _phaseTimer = timer;
-}
-
-export function clearPhaseTimer() {
-  if (_phaseTimer) {
-    clearTimeout(_phaseTimer);
-    _phaseTimer = null;
-  }
-
-  // Remove any phase messages
-  const moveMsg = document.getElementById('movementPhaseMessage');
-  if (moveMsg) {
-    moveMsg.remove();
-  }
-}
-
-function initializeGame() {
-  console.log("🟡 Initializing game...");
-
-  scene = new THREE.Scene();
-  // Add fog system to the scene
-  scene.fog = new THREE.FogExp2(0xaad0ff
-, 0.001);
-
-  ambientLight = new THREE.AmbientLight();
-
-  dirLight = DirectionalLight();
-
-  dirLightTarget = new THREE.Object3D();
-  dirLight.target = dirLightTarget;
-
-  camera = Camera();
-  let objects = [
-    camera,
-    map,
-    ambientLight,
-    dirLight,
-    dirLightTarget
-  ];
-
-  objects.forEach(obj => {
-    scene.add(obj);
-  });
-
-  new SkyBox(scene);
-
-  // Initialize leaf particles and add to scene
-  leafParticles = new LeafParticles(scene, 20, 150);
-
-  initializeMap();
-  loadTrees();
-  loadRiver();
 }
 
 function addPlayer(player) {
@@ -202,6 +129,134 @@ function removePlayer(player) {
 
   scene.remove(player);
   console.log("Player removed from scene:", player.playerId);
+}
+
+function initializeGameSystems() {
+  // Initialize system with socket client and callback
+  cardSystem = new CardSystem(socketClient);
+  questionSystem = new QuestionSystem(socketClient);
+  memoryMatrixSystem = new MemoryMatrixSystem(socketClient);
+  mathOperationSystem = new MathOperationSystem(socketClient);
+
+  console.log("🔄 Initializing game systems...");
+  console.log("✅ QuestionSystem initialized, callback set:", !!questionSystem.onQuestionComplete);
+  console.log("✅ MemoryMatrixSystem initialized, callback set:", !!memoryMatrixSystem.onGameComplete);
+  console.log("✅ MathOperationSystem initialized, callback set:", !!mathOperationSystem.onGameComplete);
+}
+
+export function updateRoundDisplay() {
+    const roundDisplay = document.getElementById('currentRoundDisplay');
+    if (roundDisplay) {
+        roundDisplay.textContent = currentRound;
+        // Add animation for round change
+        roundDisplay.classList.add('changed');
+        setTimeout(() => roundDisplay.classList.remove('changed'), 500);
+    }
+}
+
+export function updateStepsDisplay() {
+    const stepsDisplay = document.getElementById('currentStepsDisplay');
+    const localPlayer = getLocalPlayer();
+    
+    if (stepsDisplay && localPlayer) {
+        stepsDisplay.textContent = localPlayer.remainingSteps;
+        // Add animation for steps change
+        stepsDisplay.classList.add('changed');
+        setTimeout(() => stepsDisplay.classList.remove('changed'), 500);
+    } else if (stepsDisplay) {
+        stepsDisplay.textContent = '0';
+    }
+}
+
+export function showGameUI() {
+    const gameInfo = document.getElementById('gameInfo');
+    if (gameInfo) {
+        gameInfo.style.display = 'block';
+    }
+}
+
+export function hideGameUI() {
+    const gameInfo = document.getElementById('gameInfo');
+    if (gameInfo) {
+        gameInfo.style.display = 'none';
+    }
+}
+
+// Function to increment round (call this when a new round starts)
+export function incrementRound() {
+    currentRound++;
+    updateRoundDisplay();
+    console.log(`🔄 Round updated to: ${currentRound}`);
+}
+
+// Function to increment round (call this when a new round starts)
+export function resetRound() {
+    currentRound = 0;
+    updateRoundDisplay();
+    console.log(`🔄 Round updated to: ${currentRound}`);
+}
+
+export function isGameInitialized(){
+  return gameInitialized;
+}
+
+export function getPhaseTimer() {
+  return _phaseTimer;
+}
+
+export function setPhaseTimer(timer) {
+  _phaseTimer = timer;
+}
+
+export function clearPhaseTimer() {
+  if (_phaseTimer) {
+    clearTimeout(_phaseTimer);
+    _phaseTimer = null;
+  }
+
+  // Remove any phase messages
+  const moveMsg = document.getElementById('movementPhaseMessage');
+  if (moveMsg) {
+    moveMsg.remove();
+  }
+}
+
+function initializeGame() {
+  console.log("🟡 Initializing game...");
+
+  scene = new THREE.Scene();
+  // Add fog system to the scene
+  scene.fog = new THREE.FogExp2(0xaad0ff, 0.001);
+
+  ambientLight = new THREE.AmbientLight();
+
+  dirLight = DirectionalLight();
+
+  dirLightTarget = new THREE.Object3D();
+  dirLight.target = dirLightTarget;
+
+  camera = Camera();
+  let objects = [
+    camera,
+    map,
+    ambientLight,
+    dirLight,
+    dirLightTarget
+  ];
+
+  objects.forEach(obj => {
+    scene.add(obj);
+  });
+
+  new SkyBox(scene);
+
+  // Initialize leaf particles and add to scene
+  leafParticles = new LeafParticles(scene, 20, 150);
+
+  initializeMap();
+  initializeLeaderboard();
+  loadTrees();
+  loadRiver();
 }
 
 // Export for input system if needed

@@ -47,19 +47,19 @@
         <!-- Player cards will be dynamically inserted here -->
       </div>
     </div>
+  </div>
 
-    <div class="lobby-controls">
-      <div class="username-section">
-        <label for="usernameInput">Your Username:</label>
-        <input type="text" id="usernameInput" maxlength="20" placeholder="Enter your username">
-        <button id="updateUsernameButton" class="update-btn">Update</button>
+  <!-- Game Info UI - Top Right Corner -->
+  <div id="gameInfo" style="display: none;">
+    <div class="game-info-container">
+      <div class="round-info">
+        <span class="label">Round:</span>
+        <span id="currentRoundDisplay" class="value">1</span>
       </div>
-    </div>
-
-    <!-- Countdown message when game is about to start -->
-    <div id="countdownMessage" class="countdown-message" style="display: none;">
-      <h2>Game Starting in <span id="countdownTimer">5</span> seconds!</h2>
-      <p>Get ready to play!</p>
+      <div class="steps-info">
+        <span class="label">Steps:</span>
+        <span id="currentStepsDisplay" class="value">0</span>
+      </div>
     </div>
   </div>
 
@@ -71,7 +71,7 @@
     <div class="decoration-circle circle-4"></div>
   </div>
 
-  <!-- Card Container - Will be populated dynamically -->
+  <!-- Card Container -->
   <div class="select-card-container" id="cardContainer" style="display: none;">
     <h1>Pick a card</h1>
     <div class="timer-container">
@@ -124,7 +124,7 @@
     </div>
   </div>
 
-    <!-- UI Leaf Decorations -->
+  <!-- UI Leaf Decorations -->
   <div class="ui-leaf top-left" style="display: none;">
     <img src="assets/images/leaf_4.png" alt="">
   </div>

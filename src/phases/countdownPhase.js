@@ -1,7 +1,7 @@
 import { clearPhaseTimer, phaseTimer } from "../main";
-import { startCardPhase } from "./cardPhase";
 import { updateMovementUI } from "../utilities/collectUserInputs";
 import { COUNTDOWN_PHASE_TIME } from "../constants";
+import { startRoundPhase } from "./roundPhase";
 
 export function startInitialCountdown() {
   console.log("⏱️ Starting initial countdown");
@@ -20,7 +20,7 @@ export function startInitialCountdown() {
   phaseTimer = setTimeout(() => {
     console.log("✅ Initial countdown over, starting first card phase");
     hideInitialCountdownMessage();
-    startCardPhase();
+    startRoundPhase();
   }, COUNTDOWN_PHASE_TIME * 1000);
 }
 

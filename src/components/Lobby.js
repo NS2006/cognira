@@ -10,24 +10,12 @@ export class Lobby {
         this.lobbyContainer = document.getElementById('lobbyContainer');
         this.playersList = document.getElementById('playersList');
         this.lobbyPlayerCount = document.getElementById('lobbyPlayerCount');
-        this.usernameInput = document.getElementById('usernameInput');
-        this.updateUsernameButton = document.getElementById('updateUsernameButton');
-
-        this.initializeEventListeners();
-    }
-
-    initializeEventListeners() {
-        this.updateUsernameButton.addEventListener('click', () => this.updateUsername());
-        this.usernameInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.updateUsername();
-        });
     }
 
     show(players = null) {
         this.localPlayer = getLocalPlayer();
 
         this.lobbyContainer.style.display = 'block';
-        this.usernameInput.value = this.localPlayer.username;
         
         if (players) {
             this.updatePlayers(players);
@@ -81,24 +69,6 @@ export class Lobby {
         `;
 
         return card;
-    }
-
-    updateUsername() {
-        const newUsername = this.usernameInput.value.trim();
-        if (newUsername && newUsername !== this.localPlayer.username) {
-            this.localPlayer.setUsername(newUsername);
-            
-            // Update local display
-            if (this.players.has(this.localPlayer.id)) {
-                this.players.get(this.localPlayer.id).username = newUsername;
-                this.updatePlayersList();
-            }
-
-            // Send to server via socket
-            if (this.socketClient && this.socketClient.updateUsername) {
-                this.socketClient.updateUsername(newUsername);
-            }
-        }
     }
 
     setLocalPlayerId(playerId) {

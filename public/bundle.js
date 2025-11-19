@@ -42934,6 +42934,7 @@ var THREE = _interopRequireWildcard(require("three"));
 var _GLTFLoader = require("three/examples/jsm/loaders/GLTFLoader");
 var _constants = require("../constants");
 var CANNON = _interopRequireWildcard(require("cannon-es"));
+var _main = require("../main");
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 class Player extends THREE.Object3D {
   constructor(playerId, playerUsername, initX, physicsWorld) {
@@ -42956,7 +42957,7 @@ class Player extends THREE.Object3D {
     this.isModelLoaded = false;
 
     // Initialize step system
-    this.baseStep = 5; // Base movement steps per turn
+    this.baseStep = 100; // Base movement steps per turn
     this.remainingSteps = this.baseStep;
     this.selectedCard = null;
     this._createPhysicsBody(initX);
@@ -43124,6 +43125,7 @@ class Player extends THREE.Object3D {
 
     // Actually decrease remaining steps
     this.remainingSteps = Math.max(0, this.remainingSteps - 1);
+    (0, _main.updateStepsDisplay)();
     console.log(`Step completed. Remaining steps: ${this.remainingSteps}`);
   }
 
@@ -43135,6 +43137,7 @@ class Player extends THREE.Object3D {
     // Reset to base step
     this.remainingSteps = this.baseStep;
     this.selectedCard = null;
+    (0, _main.updateStepsDisplay)();
     console.log(`Steps reset for player ${this.playerId}: ${this.remainingSteps} steps`);
   }
   _isValidMove(direction) {
@@ -43309,6 +43312,8 @@ class Player extends THREE.Object3D {
   move(position, rotation) {
     if (position !== undefined) {
       this.position.set(position.x, position.y, position.z);
+      this.gridPosition.currentX = Math.round(position.x / _constants.TILE_SIZE);
+      this.gridPosition.currentY = Math.round(position.y / _constants.TILE_SIZE);
 
       // ✅ Sync Cannon body center (if used)
       if (this.body) {
@@ -43342,7 +43347,7 @@ class Player extends THREE.Object3D {
 }
 exports.Player = Player;
 
-},{"../constants":60,"cannon-es":2,"three":36,"three/examples/jsm/loaders/GLTFLoader":37}],48:[function(require,module,exports){
+},{"../constants":60,"../main":61,"cannon-es":2,"three":36,"three/examples/jsm/loaders/GLTFLoader":37}],48:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43563,20 +43568,10 @@ class Lobby {
     this.lobbyContainer = document.getElementById('lobbyContainer');
     this.playersList = document.getElementById('playersList');
     this.lobbyPlayerCount = document.getElementById('lobbyPlayerCount');
-    this.usernameInput = document.getElementById('usernameInput');
-    this.updateUsernameButton = document.getElementById('updateUsernameButton');
-    this.initializeEventListeners();
-  }
-  initializeEventListeners() {
-    this.updateUsernameButton.addEventListener('click', () => this.updateUsername());
-    this.usernameInput.addEventListener('keypress', e => {
-      if (e.key === 'Enter') this.updateUsername();
-    });
   }
   show(players = null) {
     this.localPlayer = (0, _main.getLocalPlayer)();
     this.lobbyContainer.style.display = 'block';
-    this.usernameInput.value = this.localPlayer.username;
     if (players) {
       this.updatePlayers(players);
     }
@@ -43620,25 +43615,6 @@ class Lobby {
             </div>
         `;
     return card;
-  }
-  updateUsername() {
-    const newUsername = this.usernameInput.value.trim();
-    if (newUsername && newUsername !== this.localPlayer.username) {
-      this.localPlayer.setUsername(newUsername);
-
-      // Update local display
-      if (this.players.has(this.localPlayer.id)) {
-        this.players.get(this.localPlayer.id).username = newUsername;
-        this.updatePlayersList();
-      }
-
-      // Send to server via socket
-      console.log("uawiuq1908291");
-      if (this.socketClient && this.socketClient.updateUsername) {
-        console.log("asdhjkasdl");
-        this.socketClient.updateUsername(newUsername);
-      }
-    }
   }
   setLocalPlayerId(playerId) {
     this.localPlayerId = playerId;
@@ -44426,7 +44402,7 @@ class MathOperationSystem {
 }
 exports.MathOperationSystem = MathOperationSystem;
 
-},{"../../../constants.js":60,"../../../utilities/worldRelated.js":74,"./MathOperationList.js":52}],54:[function(require,module,exports){
+},{"../../../constants.js":60,"../../../utilities/worldRelated.js":76,"./MathOperationList.js":52}],54:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45110,7 +45086,7 @@ class MemoryMatrixSystem {
 }
 exports.MemoryMatrixSystem = MemoryMatrixSystem;
 
-},{"../../../constants.js":60,"../../../utilities/worldRelated.js":74,"./MemoryMatrixList.js":54}],56:[function(require,module,exports){
+},{"../../../constants.js":60,"../../../utilities/worldRelated.js":76,"./MemoryMatrixList.js":54}],56:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45399,7 +45375,7 @@ class QuestionSystem {
 }
 exports.QuestionSystem = QuestionSystem;
 
-},{"../../../constants.js":60,"../../../utilities/worldRelated.js":74,"./QuestionList.js":56}],58:[function(require,module,exports){
+},{"../../../constants.js":60,"../../../utilities/worldRelated.js":76,"./QuestionList.js":56}],58:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45755,24 +45731,26 @@ exports.LeafParticles = LeafParticles;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TILE_SIZE = exports.STEPS_UPDATE_INTERVAL = exports.SPATIAL_QUESTION_TIME = exports.QUESTION_PHASE_TIME = exports.PHASE_TRANSITION_DELAY = exports.MOVEMENT_PHASE_TIME = exports.MESSAGE_FADE_OUT_TIME = exports.MESSAGE_DISPLAY_TIME = exports.MEMORY_MATRIX_PHASE_TIME = exports.MAX_PLAYER = exports.MATH_OPERATION_PHASE_TIME = exports.MAP_SIZE_Y = exports.MAP_SIZE_X = exports.GAP_SIZE = exports.CARD_PHASE_TIME = void 0;
+exports.TILE_SIZE = exports.STEPS_UPDATE_INTERVAL = exports.ROUND_PHASE_TIME = exports.QUESTION_PHASE_TIME = exports.PHASE_TRANSITION_DELAY = exports.MOVEMENT_PHASE_TIME = exports.MESSAGE_FADE_OUT_TIME = exports.MESSAGE_DISPLAY_TIME = exports.MEMORY_MATRIX_PHASE_TIME = exports.MAX_PLAYER = exports.MATH_OPERATION_PHASE_TIME = exports.MAP_SIZE_Y = exports.MAP_SIZE_X = exports.LEADERBOARD_PHASE_TIME = exports.GAP_SIZE = exports.COUNTDOWN_PHASE_TIME = exports.CARD_PHASE_TIME = void 0;
 // 4 x 23 GRID
 const MAP_SIZE_X = exports.MAP_SIZE_X = 4;
-const MAP_SIZE_Y = exports.MAP_SIZE_Y = 23;
+const MAP_SIZE_Y = exports.MAP_SIZE_Y = 51;
 const TILE_SIZE = exports.TILE_SIZE = 42;
 const GAP_SIZE = exports.GAP_SIZE = 6;
-const MAX_PLAYER = exports.MAX_PLAYER = 2;
+const MAX_PLAYER = exports.MAX_PLAYER = 3;
 
 // Phase timing constants (in seconds)
-const CARD_PHASE_TIME = exports.CARD_PHASE_TIME = 10;
-const MOVEMENT_PHASE_TIME = exports.MOVEMENT_PHASE_TIME = 30;
-const SPATIAL_QUESTION_TIME = exports.SPATIAL_QUESTION_TIME = 30;
+const COUNTDOWN_PHASE_TIME = exports.COUNTDOWN_PHASE_TIME = 3;
+const ROUND_PHASE_TIME = exports.ROUND_PHASE_TIME = 3;
+const CARD_PHASE_TIME = exports.CARD_PHASE_TIME = 1;
+const MOVEMENT_PHASE_TIME = exports.MOVEMENT_PHASE_TIME = 10;
+const LEADERBOARD_PHASE_TIME = exports.LEADERBOARD_PHASE_TIME = 15;
 const PHASE_TRANSITION_DELAY = exports.PHASE_TRANSITION_DELAY = 0.5;
 
 // Minigame time
 const QUESTION_PHASE_TIME = exports.QUESTION_PHASE_TIME = 15;
 const MEMORY_MATRIX_PHASE_TIME = exports.MEMORY_MATRIX_PHASE_TIME = 40;
-const MATH_OPERATION_PHASE_TIME = exports.MATH_OPERATION_PHASE_TIME = 40;
+const MATH_OPERATION_PHASE_TIME = exports.MATH_OPERATION_PHASE_TIME = 2;
 
 // Animation and UI timing
 const MESSAGE_DISPLAY_TIME = exports.MESSAGE_DISPLAY_TIME = 3;
@@ -45788,12 +45766,19 @@ Object.defineProperty(exports, "__esModule", {
 exports.cardSystem = void 0;
 exports.cleanupGame = cleanupGame;
 exports.clearPhaseTimer = clearPhaseTimer;
+exports.currentRound = void 0;
 exports.getLocalPlayer = getLocalPlayer;
 exports.getPhaseTimer = getPhaseTimer;
 exports.getSocketClient = getSocketClient;
+exports.hideGameUI = hideGameUI;
+exports.incrementRound = incrementRound;
 exports.isGameInitialized = isGameInitialized;
 exports.questionSystem = exports.memoryMatrixSystem = exports.mathOperationSystem = void 0;
+exports.resetRound = resetRound;
 exports.setPhaseTimer = setPhaseTimer;
+exports.showGameUI = showGameUI;
+exports.updateRoundDisplay = updateRoundDisplay;
+exports.updateStepsDisplay = updateStepsDisplay;
 var THREE = _interopRequireWildcard(require("three"));
 var _Renderer = require("./components/Renderer");
 var _Camera = require("./components/Camera");
@@ -45812,11 +45797,14 @@ require("./utilities/collectUserInputs");
 var _lobby = require("./components/lobby");
 var _constants = require("./constants");
 var _LeafParticleSystem = require("./components/particles/LeafParticleSystem");
+var _leaderboardPhase = require("./phases/leaderboardPhase");
+var _currentRound;
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 const mainMenu = document.getElementById("mainMenu");
 const gameCanvas = document.getElementById("gameCanvas");
 const joinGameButton = document.getElementById("joinGameButton");
 const controlsButton = document.getElementById("controls");
+let currentRound = exports.currentRound = 0;
 let cardSystem = exports.cardSystem = void 0,
   questionSystem = exports.questionSystem = void 0,
   memoryMatrixSystem = exports.memoryMatrixSystem = void 0,
@@ -45857,6 +45845,7 @@ function updatePlayerCount(count, players) {
     gameCanvas.style.display = "flex";
     _LoadingManager.loadingManager.startLoading(1000, () => {
       console.log('Loading complete!');
+      showGameUI();
       animateFunction = (0, _animate.createAnimationLoop)(scene, camera, dirLight, dirLightTarget, _Map.map, renderer, getLocalPlayer, getSocketClient, leafParticles // Pass leafParticles to animation loop
       );
       renderer.setAnimationLoop(animateFunction);
@@ -45869,6 +45858,38 @@ function updatePlayerCount(count, players) {
     });
   }
 }
+function addPlayer(player) {
+  console.log("=== addPlayer CALLED ===");
+  if (player.playerId === socketClient.id && !localPlayer) {
+    localPlayer = player;
+    localPlayer.setAsLocalPlayer();
+    console.log("✅ LOCAL PLAYER SET!:", player.playerId);
+
+    // Set initial positions
+    dirLight.position.set(0, 0, 50);
+    dirLightTarget.position.set(0, 0, 0);
+
+    // Set player grid position
+    localPlayer.gridPosition.currentX = socketClient.players.size % 4;
+    localPlayer.gridPosition.currentY = 0;
+
+    // Initialize player steps
+    localPlayer.resetSteps();
+  } else {
+    console.log("🌐 Remote player added:", player.playerId);
+  }
+  scene.add(player);
+  console.log("Player added to scene. Total scene children:", scene.children.length);
+}
+function removePlayer(player) {
+  // Don't remove local player from our reference
+  if (player === localPlayer) {
+    console.log("Cannot remove local player");
+    return;
+  }
+  scene.remove(player);
+  console.log("Player removed from scene:", player.playerId);
+}
 function initializeGameSystems() {
   // Initialize system with socket client and callback
   exports.cardSystem = cardSystem = new _CardSystem.CardSystem(socketClient);
@@ -45879,6 +45900,53 @@ function initializeGameSystems() {
   console.log("✅ QuestionSystem initialized, callback set:", !!questionSystem.onQuestionComplete);
   console.log("✅ MemoryMatrixSystem initialized, callback set:", !!memoryMatrixSystem.onGameComplete);
   console.log("✅ MathOperationSystem initialized, callback set:", !!mathOperationSystem.onGameComplete);
+}
+function updateRoundDisplay() {
+  const roundDisplay = document.getElementById('currentRoundDisplay');
+  if (roundDisplay) {
+    roundDisplay.textContent = currentRound;
+    // Add animation for round change
+    roundDisplay.classList.add('changed');
+    setTimeout(() => roundDisplay.classList.remove('changed'), 500);
+  }
+}
+function updateStepsDisplay() {
+  const stepsDisplay = document.getElementById('currentStepsDisplay');
+  const localPlayer = getLocalPlayer();
+  if (stepsDisplay && localPlayer) {
+    stepsDisplay.textContent = localPlayer.remainingSteps;
+    // Add animation for steps change
+    stepsDisplay.classList.add('changed');
+    setTimeout(() => stepsDisplay.classList.remove('changed'), 500);
+  } else if (stepsDisplay) {
+    stepsDisplay.textContent = '0';
+  }
+}
+function showGameUI() {
+  const gameInfo = document.getElementById('gameInfo');
+  if (gameInfo) {
+    gameInfo.style.display = 'block';
+  }
+}
+function hideGameUI() {
+  const gameInfo = document.getElementById('gameInfo');
+  if (gameInfo) {
+    gameInfo.style.display = 'none';
+  }
+}
+
+// Function to increment round (call this when a new round starts)
+function incrementRound() {
+  _currentRound = currentRound++, exports.currentRound = currentRound, _currentRound;
+  updateRoundDisplay();
+  console.log(`🔄 Round updated to: ${currentRound}`);
+}
+
+// Function to increment round (call this when a new round starts)
+function resetRound() {
+  exports.currentRound = currentRound = 0;
+  updateRoundDisplay();
+  console.log(`🔄 Round updated to: ${currentRound}`);
 }
 function isGameInitialized() {
   return gameInitialized;
@@ -45920,40 +45988,9 @@ function initializeGame() {
   // Initialize leaf particles and add to scene
   leafParticles = new _LeafParticleSystem.LeafParticles(scene, 20, 150);
   (0, _Map.initializeMap)();
+  (0, _leaderboardPhase.initializeLeaderboard)();
   (0, _Map.loadTrees)();
   (0, _Map.loadRiver)();
-}
-function addPlayer(player) {
-  console.log("=== addPlayer CALLED ===");
-  if (player.playerId === socketClient.id && !localPlayer) {
-    localPlayer = player;
-    localPlayer.setAsLocalPlayer();
-    console.log("✅ LOCAL PLAYER SET!:", player.playerId);
-
-    // Set initial positions
-    dirLight.position.set(0, 0, 50);
-    dirLightTarget.position.set(0, 0, 0);
-
-    // Set player grid position
-    localPlayer.gridPosition.currentX = socketClient.players.size % 4;
-    localPlayer.gridPosition.currentY = 0;
-
-    // Initialize player steps
-    localPlayer.resetSteps();
-  } else {
-    console.log("🌐 Remote player added:", player.playerId);
-  }
-  scene.add(player);
-  console.log("Player added to scene. Total scene children:", scene.children.length);
-}
-function removePlayer(player) {
-  // Don't remove local player from our reference
-  if (player === localPlayer) {
-    console.log("Cannot remove local player");
-    return;
-  }
-  scene.remove(player);
-  console.log("Player removed from scene:", player.playerId);
 }
 
 // Export for input system if needed
@@ -45982,7 +46019,7 @@ function cleanupGame() {
   gameInitialized = false;
 }
 
-},{"./components/Camera":39,"./components/CardSystem":43,"./components/DirectionalLight":44,"./components/LoadingManager":45,"./components/Map":46,"./components/Renderer":48,"./components/SkyBox":49,"./components/lobby":51,"./components/minigames/mathOperation/MathOperationSystem":53,"./components/minigames/memoryMatrix/MemoryMatrixSystem":55,"./components/minigames/question/QuestionSystem":57,"./components/particles/LeafParticleSystem":59,"./constants":60,"./phases/countdownPhase":63,"./socketClient":70,"./utilities/animate":71,"./utilities/collectUserInputs":72,"three":36}],62:[function(require,module,exports){
+},{"./components/Camera":39,"./components/CardSystem":43,"./components/DirectionalLight":44,"./components/LoadingManager":45,"./components/Map":46,"./components/Renderer":48,"./components/SkyBox":49,"./components/lobby":51,"./components/minigames/mathOperation/MathOperationSystem":53,"./components/minigames/memoryMatrix/MemoryMatrixSystem":55,"./components/minigames/question/QuestionSystem":57,"./components/particles/LeafParticleSystem":59,"./constants":60,"./phases/countdownPhase":63,"./phases/leaderboardPhase":64,"./socketClient":72,"./utilities/animate":73,"./utilities/collectUserInputs":74,"three":36}],62:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46038,7 +46075,7 @@ function endCardPhase() {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../constants.js":60,"../main.js":61,"./minigamePhase.js":64}],63:[function(require,module,exports){
+},{"../constants.js":60,"../main.js":61,"./minigamePhase.js":65}],63:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46046,10 +46083,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.startInitialCountdown = startInitialCountdown;
 var _main = require("../main");
-var _cardPhase = require("./cardPhase");
 var _collectUserInputs = require("../utilities/collectUserInputs");
+var _constants = require("../constants");
+var _roundPhase = require("./roundPhase");
 function startInitialCountdown() {
-  console.log("⏱️ Starting 5-second initial countdown");
+  console.log("⏱️ Starting initial countdown");
   if (_collectUserInputs.updateMovementUI) {
     (0, _collectUserInputs.updateMovementUI)();
   }
@@ -46064,8 +46102,8 @@ function startInitialCountdown() {
   _main.phaseTimer = (setTimeout(() => {
     console.log("✅ Initial countdown over, starting first card phase");
     hideInitialCountdownMessage();
-    (0, _cardPhase.startCardPhase)();
-  }, 5000), function () {
+    (0, _roundPhase.startRoundPhase)();
+  }, _constants.COUNTDOWN_PHASE_TIME * 1000), function () {
     throw new Error('"' + "phaseTimer" + '" is read-only.');
   }());
 }
@@ -46092,7 +46130,7 @@ function showInitialCountdownMessage() {
     `;
     document.body.appendChild(countdownMsg);
   }
-  let timeLeft = 5;
+  let timeLeft = _constants.COUNTDOWN_PHASE_TIME;
   countdownMsg.textContent = `Game starts in ${timeLeft} seconds`;
 
   // Update countdown
@@ -46111,7 +46149,266 @@ function hideInitialCountdownMessage() {
   }
 }
 
-},{"../main":61,"../utilities/collectUserInputs":72,"./cardPhase":62}],64:[function(require,module,exports){
+},{"../constants":60,"../main":61,"../utilities/collectUserInputs":74,"./roundPhase":71}],64:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.endLeaderboardPhase = endLeaderboardPhase;
+exports.initializeLeaderboard = initializeLeaderboard;
+exports.isLeaderboardPhaseActive = isLeaderboardPhaseActive;
+exports.startLeaderboardPhase = startLeaderboardPhase;
+var _main = require("../main.js");
+var _roundPhase = require("./roundPhase.js");
+var _constants = require("../constants.js");
+let leaderboardPhaseActive = false;
+let leaderboardPhaseTimer = null;
+let previousRankings = new Map();
+function startLeaderboardPhase() {
+  if (leaderboardPhaseActive) {
+    console.log("🏆 Leaderboard phase already active, skipping");
+    return;
+  }
+  console.log("🏆 Starting leaderboard phase");
+  leaderboardPhaseActive = true;
+
+  // Clear any existing timers
+  (0, _main.clearPhaseTimer)();
+
+  // Calculate current rankings
+  const currentRankings = calculateRankings();
+
+  // Show leaderboard
+  showLeaderboard(currentRankings);
+
+  // Set timer to automatically move to next round
+  leaderboardPhaseTimer = setTimeout(() => {
+    console.log("🏆 Leaderboard phase completed");
+    endLeaderboardPhase();
+  }, _constants.LEADERBOARD_PHASE_TIME * 1000);
+  (0, _main.setPhaseTimer)(leaderboardPhaseTimer);
+}
+function endLeaderboardPhase() {
+  if (!leaderboardPhaseActive) {
+    console.log("🏆 Leaderboard phase not active, skipping end");
+    return;
+  }
+  console.log("🏆 Ending leaderboard phase");
+  leaderboardPhaseActive = false;
+
+  // Clear timers
+  if (leaderboardPhaseTimer) {
+    clearTimeout(leaderboardPhaseTimer);
+    leaderboardPhaseTimer = null;
+  }
+  (0, _main.clearPhaseTimer)();
+
+  // Remove leaderboard
+  removeLeaderboard();
+
+  // Store current rankings for next comparison
+  storeCurrentRankings();
+
+  // Add delay before next phase to ensure clean transition
+  setTimeout(() => {
+    // Move to next round phase
+    console.log("🏆 Leaderboard phase completed, moving to next round");
+    (0, _roundPhase.startRoundPhase)();
+  }, _constants.PHASE_TRANSITION_DELAY * 1000);
+}
+function isLeaderboardPhaseActive() {
+  return leaderboardPhaseActive;
+}
+function calculateRankings() {
+  const players = Array.from((0, _main.getSocketClient)().players.values());
+
+  // Sort players by currentY (descending) and then by username for tie-breaking
+  const sortedPlayers = players.sort((a, b) => {
+    // Primary sort: Y position (higher = better)
+    if (b.gridPosition.currentY !== a.gridPosition.currentY) {
+      return b.gridPosition.currentY - a.gridPosition.currentY;
+    }
+
+    // Secondary sort: Username (alphabetical order)
+    return a.playerUsername.localeCompare(b.playerUsername);
+  });
+
+  // Simplified ranking assignment
+  const rankings = [];
+  let currentRank = 1;
+  let previousY = null;
+  sortedPlayers.forEach((player, index) => {
+    // First player always gets rank 1
+    if (index === 0) {
+      rankings.push({
+        playerId: player.playerId,
+        username: player.playerUsername,
+        position: player.gridPosition,
+        rank: currentRank,
+        isLocalPlayer: player.isLocalPlayer
+      });
+      previousY = player.gridPosition.currentY;
+      return;
+    }
+
+    // Check if current player has same Y as previous player
+    if (player.gridPosition.currentY === previousY) {
+      // Same Y = same rank as previous player
+      rankings.push({
+        playerId: player.playerId,
+        username: player.playerUsername,
+        position: player.gridPosition,
+        rank: currentRank,
+        // Same rank as previous
+        isLocalPlayer: player.isLocalPlayer
+      });
+    } else {
+      // Different Y = increment rank
+      currentRank = index + 1; // Or currentRank++ if you prefer consecutive numbers
+      rankings.push({
+        playerId: player.playerId,
+        username: player.playerUsername,
+        position: player.gridPosition,
+        rank: currentRank,
+        isLocalPlayer: player.isLocalPlayer
+      });
+      previousY = player.gridPosition.currentY;
+    }
+  });
+  console.log("🏆 Final rankings:", rankings.map(r => `${r.username} (Y:${r.position.currentY}) -> Rank ${r.rank}`));
+  return rankings;
+}
+function showLeaderboard(currentRankings) {
+  // Remove any existing leaderboard first
+  removeLeaderboard();
+
+  // Create leaderboard container
+  const leaderboardDiv = document.createElement('div');
+  leaderboardDiv.id = 'leaderboardContainer';
+  leaderboardDiv.innerHTML = `
+        <div class="leaderboard-overlay">
+            <div class="leaderboard-content">
+                <div class="leaderboard-header">
+                    <h1>Round ${_main.currentRound} Results</h1>
+                    <div class="leaderboard-subtitle">Race to the Finish!</div>
+                </div>
+                <div class="leaderboard-list" id="leaderboardList">
+                    <!-- Rankings will be populated here -->
+                </div>
+                <div class="leaderboard-footer">
+                    <div class="leaderboard-timer">
+                        <div class="timer-bar">
+                            <div class="timer-progress" id="leaderboardProgress"></div>
+                        </div>
+                        <div class="timer-text">Next round in: <span id="leaderboardTimer">${_constants.LEADERBOARD_PHASE_TIME}</span>s</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+  document.body.appendChild(leaderboardDiv);
+
+  // Populate leaderboard
+  populateLeaderboardList(currentRankings);
+
+  // Start progress bar and timer
+  startLeaderboardTimer();
+
+  // Auto-remove after specified time
+  setTimeout(() => {
+    leaderboardDiv.style.opacity = '0';
+    leaderboardDiv.style.transition = 'opacity 0.5s ease-out';
+    setTimeout(() => {
+      if (document.body.contains(leaderboardDiv)) {
+        document.body.removeChild(leaderboardDiv);
+      }
+    }, 500);
+  }, (_constants.LEADERBOARD_PHASE_TIME - 0.5) * 1000);
+}
+function populateLeaderboardList(currentRankings) {
+  const leaderboardList = document.getElementById('leaderboardList');
+  if (!leaderboardList) return;
+  leaderboardList.innerHTML = '';
+  currentRankings.forEach((player, index) => {
+    const previousRank = getPreviousRank(player.playerId);
+    // Only show change if there was a previous rank AND it's different
+    const hasChanged = previousRank !== null && previousRank !== player.rank;
+    const rankChange = hasChanged ? previousRank - player.rank : 0; // Positive = improved, Negative = dropped
+
+    const playerElement = document.createElement('div');
+    playerElement.className = `leaderboard-item ${player.isLocalPlayer ? 'local-player' : ''} ${hasChanged ? 'ranking-changed' : ''}`;
+    playerElement.innerHTML = `
+            <div class="rank-section">
+                <div class="rank-number">${player.rank}</div>
+                ${hasChanged ? `
+                    <div class="rank-change ${rankChange > 0 ? 'improved' : 'dropped'}">
+                        ${rankChange > 0 ? '↑' : '↓'} ${Math.abs(rankChange)}
+                    </div>
+                ` : ''}
+            </div>
+            <div class="player-info">
+                <div class="player-name">${player.username} ${player.isLocalPlayer ? ' (You)' : ''}</div>
+                <div class="player-position">Position: (${player.position.currentX}, ${player.position.currentY})</div>
+            </div>
+            <div class="player-medal">
+                ${player.rank === 1 ? '🥇' : player.rank === 2 ? '🥈' : player.rank === 3 ? '🥉' : ''}
+            </div>
+        `;
+
+    // Add animation delay for staggered entrance
+    playerElement.style.animationDelay = `${index * 0.1}s`;
+    leaderboardList.appendChild(playerElement);
+  });
+}
+function getPreviousRank(playerId) {
+  return previousRankings.get(playerId) || null;
+}
+function storeCurrentRankings() {
+  const currentRankings = calculateRankings();
+  previousRankings.clear();
+  currentRankings.forEach(player => {
+    previousRankings.set(player.playerId, player.rank);
+  });
+  console.log("🏆 Stored previous rankings:", Array.from(previousRankings.entries()));
+}
+function removeLeaderboard() {
+  const existingLeaderboard = document.getElementById('leaderboardContainer');
+  if (existingLeaderboard) {
+    document.body.removeChild(existingLeaderboard);
+  }
+}
+function startLeaderboardTimer() {
+  const timerElement = document.getElementById('leaderboardTimer');
+  const progressElement = document.getElementById('leaderboardProgress');
+  if (!timerElement || !progressElement) return;
+  let timeLeft = _constants.LEADERBOARD_PHASE_TIME;
+  const totalTime = _constants.LEADERBOARD_PHASE_TIME * 1000;
+  const updateInterval = 100; // Update every 100ms
+
+  const timerInterval = setInterval(() => {
+    timeLeft -= 0.1;
+    if (timeLeft <= 0) {
+      timeLeft = 0;
+      clearInterval(timerInterval);
+    }
+    timerElement.textContent = timeLeft.toFixed(1);
+    progressElement.style.width = `${(_constants.LEADERBOARD_PHASE_TIME - timeLeft) / _constants.LEADERBOARD_PHASE_TIME * 100}%`;
+  }, updateInterval);
+
+  // Clear interval when leaderboard phase ends
+  setTimeout(() => {
+    clearInterval(timerInterval);
+  }, totalTime);
+}
+
+// Initialize previous rankings on first load
+function initializeLeaderboard() {
+  previousRankings = new Map();
+  console.log("🏆 Leaderboard system initialized");
+}
+
+},{"../constants.js":60,"../main.js":61,"./roundPhase.js":71}],65:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46168,6 +46465,7 @@ function endMinigamePhase() {
     console.log("🎮 Minigame phase not active, skipping end");
     return;
   }
+  (0, _main.updateStepsDisplay)();
   console.log(`🎮 Ending minigame phase (${currentMinigameType})`);
   minigamePhaseActive = false;
 
@@ -46190,7 +46488,7 @@ function isMinigamePhaseActive() {
   return minigamePhaseActive;
 }
 
-},{"../constants.js":60,"../main.js":61,"./minigames/mathOperationPhase.js":65,"./minigames/memoryMatrixPhase.js":66,"./minigames/questionPhase.js":67,"./minigames/tetrisPhase.js":68,"./movePhase.js":69}],65:[function(require,module,exports){
+},{"../constants.js":60,"../main.js":61,"./minigames/mathOperationPhase.js":66,"./minigames/memoryMatrixPhase.js":67,"./minigames/questionPhase.js":68,"./minigames/tetrisPhase.js":69,"./movePhase.js":70}],66:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46250,7 +46548,7 @@ function endMathOperationPhase(isCorrect = false) {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../../constants.js":60,"../../main.js":61,"../minigamePhase.js":64}],66:[function(require,module,exports){
+},{"../../constants.js":60,"../../main.js":61,"../minigamePhase.js":65}],67:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46310,7 +46608,7 @@ function endMemoryMatrixPhase(isCorrect = false) {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../../constants.js":60,"../../main.js":61,"../minigamePhase.js":64}],67:[function(require,module,exports){
+},{"../../constants.js":60,"../../main.js":61,"../minigamePhase.js":65}],68:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46371,7 +46669,7 @@ function endQuestionPhase(isCorrect = false) {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../../constants.js":60,"../../main.js":61,"../minigamePhase.js":64}],68:[function(require,module,exports){
+},{"../../constants.js":60,"../../main.js":61,"../minigamePhase.js":65}],69:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46436,7 +46734,7 @@ function endTetrisPhase(success = false) {
   // startMovementPhase();
 }
 
-},{"../../components/minigames/tetris/Tetris":58,"../../main":61}],69:[function(require,module,exports){
+},{"../../components/minigames/tetris/Tetris":58,"../../main":61}],70:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46447,9 +46745,9 @@ exports.isMovementPhaseActive = isMovementPhaseActive;
 exports.startMovementPhase = startMovementPhase;
 var _main = require("../main.js");
 var _collectUserInputs = require("../utilities/collectUserInputs.js");
-var _cardPhase = require("./cardPhase.js");
 var _constants = require("../constants.js");
 var _showTime = require("../utilities/showTime.js");
+var _leaderboardPhase = require("./leaderboardPhase.js");
 let movementPhaseActive = false;
 let movementPhaseTimer = null;
 function startMovementPhase() {
@@ -46516,7 +46814,7 @@ function endMovementPhase() {
   // Add delay before next phase to ensure clean transition
   setTimeout(() => {
     console.log("🔄 Movement phase completed, ready for next phase");
-    (0, _cardPhase.startCardPhase)();
+    (0, _leaderboardPhase.startLeaderboardPhase)();
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 function isMovementPhaseActive() {
@@ -46591,7 +46889,151 @@ function startStepsDisplayUpdater() {
   }, _constants.MOVEMENT_PHASE_TIME * 1000);
 }
 
-},{"../constants.js":60,"../main.js":61,"../utilities/collectUserInputs.js":72,"../utilities/showTime.js":73,"./cardPhase.js":62}],70:[function(require,module,exports){
+},{"../constants.js":60,"../main.js":61,"../utilities/collectUserInputs.js":74,"../utilities/showTime.js":75,"./leaderboardPhase.js":64}],71:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.endRoundPhase = endRoundPhase;
+exports.isRoundPhaseActive = isRoundPhaseActive;
+exports.startRoundPhase = startRoundPhase;
+var _main = require("../main.js");
+var _cardPhase = require("./cardPhase.js");
+var _constants = require("../constants.js");
+let roundPhaseActive = false;
+let roundPhaseTimer = null;
+function startRoundPhase() {
+  if (roundPhaseActive) {
+    console.log("🔄 Round phase already active, skipping");
+    return;
+  }
+  console.log(`🔄 Starting round phase for round ${_main.currentRound}`);
+  roundPhaseActive = true;
+  (0, _main.incrementRound)();
+  (0, _main.getLocalPlayer)().resetSteps();
+  (0, _main.updateRoundDisplay)();
+  (0, _main.updateStepsDisplay)();
+
+  // Clear any existing timers
+  (0, _main.clearPhaseTimer)();
+
+  // Show round transition message
+  showRoundTransitionMessage();
+
+  // Set timer to automatically move to card phase
+  roundPhaseTimer = setTimeout(() => {
+    console.log(`🔄 Round ${_main.currentRound} phase completed`);
+    endRoundPhase();
+  }, _constants.ROUND_PHASE_TIME * 1000);
+  (0, _main.setPhaseTimer)(roundPhaseTimer);
+}
+function endRoundPhase() {
+  if (!roundPhaseActive) {
+    console.log("🔄 Round phase not active, skipping end");
+    return;
+  }
+  console.log("🔄 Ending round phase");
+  roundPhaseActive = false;
+
+  // Clear timers
+  if (roundPhaseTimer) {
+    clearTimeout(roundPhaseTimer);
+    roundPhaseTimer = null;
+  }
+  (0, _main.clearPhaseTimer)();
+
+  // Remove round message
+  removeRoundTransitionMessage();
+
+  // Add delay before next phase to ensure clean transition
+  setTimeout(() => {
+    // Move to card phase
+    console.log("🔄 Round phase completed, moving to card phase");
+    (0, _cardPhase.startCardPhase)();
+  }, _constants.PHASE_TRANSITION_DELAY * 1000);
+}
+function isRoundPhaseActive() {
+  return roundPhaseActive;
+}
+function showRoundTransitionMessage() {
+  // Remove any existing message first
+  removeRoundTransitionMessage();
+
+  // Determine message based on round number
+  let roundTitle, roundSubtitle;
+  roundTitle = `Round ${_main.currentRound}`;
+  if (_main.currentRound === 1) {
+    roundSubtitle = "New Adventure Begins!";
+  } else if (_main.currentRound % 5 === 0) {
+    roundSubtitle = "Win or Win!";
+  } else if (_main.currentRound % 3 === 0) {
+    roundSubtitle = "Don't Fall Behind! Go Go!";
+  } else if (_main.currentRound % 2 === 0) {
+    roundSubtitle = "Go Go!!! First to the Finish Wins!";
+  } else {
+    roundSubtitle = "Finding Your Pace!";
+  }
+
+  // Create round transition message
+  const messageDiv = document.createElement('div');
+  messageDiv.id = 'roundTransitionMessage';
+  messageDiv.innerHTML = `
+        <div class="round-message-container">
+            <div class="round-title">${roundTitle}</div>
+            <div class="round-subtitle">${roundSubtitle}</div>
+            <div class="round-progress">
+                <div class="round-progress-bar">
+                    <div class="round-progress-fill" id="roundProgressFill"></div>
+                </div>
+            </div>
+        </div>
+    `;
+  document.body.appendChild(messageDiv);
+
+  // Start progress bar animation
+  startRoundProgressBar();
+
+  // Auto-remove after specified time (with fade out)
+  setTimeout(() => {
+    messageDiv.style.opacity = '0';
+    messageDiv.style.transition = 'opacity 0.5s ease-out';
+    setTimeout(() => {
+      if (document.body.contains(messageDiv)) {
+        document.body.removeChild(messageDiv);
+      }
+    }, 500);
+  }, (_constants.ROUND_PHASE_TIME - 0.5) * 1000);
+}
+function removeRoundTransitionMessage() {
+  const existingMessage = document.getElementById('roundTransitionMessage');
+  if (existingMessage) {
+    document.body.removeChild(existingMessage);
+  }
+}
+function startRoundProgressBar() {
+  const progressFill = document.getElementById('roundProgressFill');
+  if (!progressFill) return;
+  let progress = 0;
+  const totalTime = (_constants.ROUND_PHASE_TIME - 0.5) * 1000; // Convert to milliseconds
+  const updateInterval = 50; // Update every 50ms for smooth animation
+  const increment = updateInterval / totalTime * 100;
+  const progressInterval = setInterval(() => {
+    progress += increment;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(progressInterval);
+    }
+    progressFill.style.width = `${progress}%`;
+  }, updateInterval);
+
+  // Clear interval when round phase ends
+  setTimeout(() => {
+    clearInterval(progressInterval);
+  }, totalTime);
+}
+
+},{"../constants.js":60,"../main.js":61,"./cardPhase.js":62}],72:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46676,18 +47118,6 @@ class SocketClient {
         player.move(position, rotation);
       }
     });
-    this.io.on("update-username", updatedPlayers => {
-      console.log("📝 Username update received:", updatedPlayers);
-      for (const playerData of updatedPlayers) {
-        const player = this.players.get(playerData.id);
-        if (player) {
-          player.setUsername(playerData.username);
-        }
-      }
-      if (this.updatePlayerCount) {
-        this.updatePlayerCount(this.players.size, this.players);
-      }
-    });
     this.io.on("connect_error", error => {
       console.error("💥 Connection error:", error);
     });
@@ -46718,11 +47148,6 @@ class SocketClient {
       console.warn("⚠️ Cannot update position: Socket not connected");
     }
   }
-  updateUsername(newUsername) {
-    if (this.io.connected) {
-      this.io.emit("update-username", newUsername);
-    }
-  }
   disconnect() {
     this.io.disconnect();
   }
@@ -46737,7 +47162,7 @@ class SocketClient {
 }
 exports.SocketClient = SocketClient;
 
-},{"./components/Player":47,"./utilities/worldRelated":74,"socket.io-client":27}],71:[function(require,module,exports){
+},{"./components/Player":47,"./utilities/worldRelated":76,"socket.io-client":27}],73:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46960,7 +47385,7 @@ function getAnimationState() {
   };
 }
 
-},{"../components/Map":46,"./worldRelated":74,"three":36}],72:[function(require,module,exports){
+},{"../components/Map":46,"./worldRelated":76,"three":36}],74:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -47116,7 +47541,7 @@ function refreshMovementUI() {
   updateMovementUI();
 }
 
-},{"../main.js":61,"../phases/movePhase.js":69}],73:[function(require,module,exports){
+},{"../main.js":61,"../phases/movePhase.js":70}],75:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -47279,7 +47704,7 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-},{"../constants.js":60}],74:[function(require,module,exports){
+},{"../constants.js":60}],76:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

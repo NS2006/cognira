@@ -1,4 +1,4 @@
-import { clearPhaseTimer } from "../main.js";
+import { clearPhaseTimer, updateStepsDisplay } from "../main.js";
 import { PHASE_TRANSITION_DELAY } from "../constants.js";
 import { startMovementPhase } from "./movePhase.js";
 import { startQuestionPhase } from "./minigames/questionPhase.js";
@@ -50,6 +50,8 @@ export function endMinigamePhase() {
     console.log("🎮 Minigame phase not active, skipping end");
     return;
   }
+
+  updateStepsDisplay();
 
   console.log(`🎮 Ending minigame phase (${currentMinigameType})`);
   minigamePhaseActive = false;

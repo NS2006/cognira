@@ -1,6 +1,5 @@
-import { clearPhaseTimer, setPhaseTimer, getLocalPlayer } from "../main.js";
+import { clearPhaseTimer, setPhaseTimer, getLocalPlayer} from "../main.js";
 import { updateMovementUI } from "../utilities/collectUserInputs.js";
-import { startCardPhase } from "./cardPhase.js";
 import { 
   MOVEMENT_PHASE_TIME, 
   PHASE_TRANSITION_DELAY, 
@@ -9,6 +8,7 @@ import {
   STEPS_UPDATE_INTERVAL 
 } from "../constants.js";
 import { hideTimeDisplay, PhaseTimes, showPhaseTime } from "../utilities/showTime.js";
+import { startLeaderboardPhase } from "./leaderboardPhase.js";
 
 let movementPhaseActive = false;
 let movementPhaseTimer = null;
@@ -82,7 +82,8 @@ export function endMovementPhase() {
   // Add delay before next phase to ensure clean transition
   setTimeout(() => {
     console.log("🔄 Movement phase completed, ready for next phase");
-    startCardPhase();
+    
+    startLeaderboardPhase();
   }, PHASE_TRANSITION_DELAY * 1000);
 }
 

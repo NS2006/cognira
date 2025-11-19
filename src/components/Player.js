@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { TILE_SIZE, MAP_SIZE_X, MAP_SIZE_Y } from "../constants";
 import * as CANNON from "cannon-es";
+import { updateStepsDisplay } from "../main";
 
 export class Player extends THREE.Object3D {
   constructor(playerId, playerUsername, initX, physicsWorld) {
@@ -30,7 +31,7 @@ export class Player extends THREE.Object3D {
     this.isModelLoaded = false;
 
     // Initialize step system
-    this.baseStep = 5; // Base movement steps per turn
+    this.baseStep = 100; // Base movement steps per turn
     this.remainingSteps = this.baseStep;
     this.selectedCard = null;
 
@@ -51,7 +52,7 @@ export class Player extends THREE.Object3D {
     return this.playerUsername;
   }
 
-  setUsername(username){
+  setUsername(username) {
     this.playerUsername = username;
   }
 
@@ -224,6 +225,8 @@ export class Player extends THREE.Object3D {
     // Actually decrease remaining steps
     this.remainingSteps = Math.max(0, this.remainingSteps - 1);
 
+    updateStepsDisplay();
+
     console.log(`Step completed. Remaining steps: ${this.remainingSteps}`);
   }
 
@@ -237,8 +240,12 @@ export class Player extends THREE.Object3D {
 
     this.selectedCard = null;
 
+    updateStepsDisplay();
+
     console.log(`Steps reset for player ${this.playerId}: ${this.remainingSteps} steps`);
   }
+
+
 
   _isValidMove(direction) {
     const allDirections = [...this.movesQueue, direction];
@@ -281,7 +288,7 @@ export class Player extends THREE.Object3D {
     }
   }
 
-_createPlayerIndicator() {
+  _createPlayerIndicator() {
     // Create a group for the indicator
     this.playerIndicator = new THREE.Group();
 
@@ -310,9 +317,9 @@ _createPlayerIndicator() {
 
     // Add subtle floating animation
     this._startIndicatorAnimation();
-}
+  }
 
-_createTextCanvas(text, font, textColor, backgroundColor) {
+  _createTextCanvas(text, font, textColor, backgroundColor) {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
 
@@ -322,10 +329,10 @@ _createTextCanvas(text, font, textColor, backgroundColor) {
 
     // Fill background with rounded corners - wider rectangle
     if (backgroundColor) {
-        context.fillStyle = backgroundColor;
-        context.beginPath();
-        context.roundRect(0, 0, canvas.width, canvas.height, 40); // Slightly larger corners
-        context.fill();
+      context.fillStyle = backgroundColor;
+      context.beginPath();
+      context.roundRect(0, 0, canvas.width, canvas.height, 40); // Slightly larger corners
+      context.fill();
     }
 
     // Draw text with enhanced styling - slightly larger font
@@ -333,34 +340,34 @@ _createTextCanvas(text, font, textColor, backgroundColor) {
     context.fillStyle = textColor;
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    
+
     // Add strong text shadow for maximum readability
     context.shadowColor = 'rgba(0, 0, 0, 0.8)';
     context.shadowBlur = 10;
     context.shadowOffsetX = 4;
     context.shadowOffsetY = 4;
-    
+
     context.fillText(text, canvas.width / 2, canvas.height / 2);
 
     return canvas;
-}
+  }
 
-_startIndicatorAnimation() {
+  _startIndicatorAnimation() {
     // Store original position for animation
     this.indicatorOriginalY = this.playerIndicator.position.y;
     this.animationTime = 0;
-}
+  }
 
-updateIndicatorAnimation(deltaTime) {
+  updateIndicatorAnimation(deltaTime) {
     if (!this.playerIndicator || !this.isLocalPlayer) return;
 
     // Very subtle floating animation - barely noticeable
     this.animationTime += deltaTime;
     // const floatHeight = Math.sin(this.animationTime * 1.5) * 0.3; // Much smaller movement
     this.playerIndicator.position.y = this.indicatorOriginalY;
-    
+
     // Remove scale pulsing to keep it simple and not distracting
-}
+  }
 
   // Update your animatePlayer method to also update indicator animation
   animatePlayer() {
@@ -412,7 +419,7 @@ updateIndicatorAnimation(deltaTime) {
     this._setRotation(0.3);
   }
 
- _setPosition(progress) {
+  _setPosition(progress) {
     const startX = this.gridPosition.currentX * TILE_SIZE;
     const startY = this.gridPosition.currentY * TILE_SIZE;
     let endX = startX;
@@ -448,6 +455,9 @@ updateIndicatorAnimation(deltaTime) {
   move(position, rotation) {
     if (position !== undefined) {
       this.position.set(position.x, position.y, position.z);
+
+      this.gridPosition.currentX = Math.round(position.x / TILE_SIZE);
+      this.gridPosition.currentY = Math.round(position.y / TILE_SIZE);
 
       // ✅ Sync Cannon body center (if used)
       if (this.body) {
