@@ -55,7 +55,7 @@ function updatePlayerCount(count, players) {
     }
   lobby.show(players);
 
-  if (count == MAX_PLAYER && !gameInitialized) {
+  if (count >= MAX_PLAYER && !gameInitialized) {
     lobby.hide();
 
     gameInitialized = true;

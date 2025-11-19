@@ -5,7 +5,7 @@ export const MAP_SIZE_Y = 23;
 export const TILE_SIZE = 42;
 export const GAP_SIZE = 6;
 
-export const MAX_PLAYER = 1;
+export const MAX_PLAYER = 2;
 
 // Phase timing constants (in seconds)
 export const CARD_PHASE_TIME = 10;
