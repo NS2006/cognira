@@ -87,7 +87,7 @@ export class Player extends THREE.Object3D {
 
   _createPlayerModel() {
     // Load the chicken GLTF model
-    this._loadChickenGLTF();
+    this._loadRandomAnimal();
   }
 
   _createPhysicsBody(initX) {
@@ -112,78 +112,85 @@ export class Player extends THREE.Object3D {
     this.position.z = -4; // always grounded baseline
   }
 
-  _loadChickenGLTF() {
+  _loadRandomAnimal() {
     const loader = new GLTFLoader();
+    const ANIMAL_MODELS = [
+      "Animal/Bear/Bear.gltf",
+      "Animal/Bunny/Bunny.gltf",
+      "Animal/Chicken/Chicken.gltf",
+      "Animal/Fox/Fox.gltf",
+      "Animal/Monkey/Monkey.gltf",
+      "Animal/Mouse/Mouse.gltf",
+      "Animal/Parrot/Parrot.gltf"
+    ];
+
+    // Pick random animal path
+    const randomPath = ANIMAL_MODELS[Math.floor(Math.random() * ANIMAL_MODELS.length)];
+    const fullPath = `assets/model/${randomPath}`;
+
+    console.log("🎲 Loading animal model:", fullPath);
 
     loader.load(
-      'assets/model/chicken.gltf',
+      fullPath,
       (gltf) => {
-        console.log("🐔 Chicken GLTF model loaded successfully");
+        console.log("✅ Animal GLTF loaded:", fullPath);
 
-        this.remove(this.chickenModel);
+        // Remove previous model if exists
+        if (this.chickenModel) this.remove(this.chickenModel);
 
-        // The loaded model is in gltf.scene
         this.chickenModel = gltf.scene;
 
-        // Center the model
+        // Center model
         const box = new THREE.Box3().setFromObject(this.chickenModel);
         const center = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
-
-        console.log("🐔 GLTF Model bounds:", { center, size });
-
-        // Center the model by offsetting its position
         this.chickenModel.position.x = -center.x;
         this.chickenModel.position.y = -center.y;
         this.chickenModel.position.z = -center.z;
 
-        // Apply rotation
-        this.chickenModel.rotation.x = Math.PI / 2;
-        this.chickenModel.rotation.y = Math.PI;
-        this.chickenModel.rotation.z = 0;
+        if (randomPath.includes("Bear")) {
+          this.chickenModel.rotation.set(
+              Math.PI/2, -Math.PI/2, 0
+          );
+        } else {
+            this.chickenModel.rotation.set(Math.PI/2, Math.PI, 0);
+        }
 
-        // Scale - adjust as needed for GLTF (might need different scale than OBJ)
-        this.chickenModel.scale.set(11, 11, 11);
 
-        // Configure materials and shadows
+        this.chickenModel.scale.set(10, 10, 10);
+
+        // Setup materials & shadows
         this.chickenModel.traverse((child) => {
           if (child.isMesh) {
             child.castShadow = true;
             child.receiveShadow = true;
-
-            // GLTF materials are usually already set up, but ensure they're visible
-            if (child.material) {
-              child.material.needsUpdate = true;
-              child.material.transparent = false;
-              child.material.opacity = 1;
-            }
+            if (child.material) child.material.needsUpdate = true;
           }
         });
 
-        // Position on platform
         const platformHeight = 3;
-        const scaledBox = new THREE.Box3().setFromObject(this.chickenModel);
-        const chickenBottomZ = scaledBox.min.z;
-        const chickenHeight = platformHeight - chickenBottomZ;
-        this.chickenModel.position.z = chickenHeight;
+            const scaledBox = new THREE.Box3().setFromObject(this.chickenModel);
+            const animalBottomZ = scaledBox.min.z;
+            const offsetToPlatform = platformHeight - animalBottomZ;
 
-        console.log("🐔 GLTF Chicken positioned on platform:", {
-          platformHeight,
-          chickenBottomZ,
-          finalHeight: chickenHeight
-        });
+            this.chickenModel.position.z += offsetToPlatform;
 
-        this.add(this.chickenModel);
-        this.isModelLoaded = true;
-      },
-      (xhr) => {
-        console.log(`🐔 Loading GLTF: ${(xhr.loaded / xhr.total * 100)}% loaded`);
-      },
-      (error) => {
-        console.error("🐔 Error loading chicken GLTF model:", error);
-        // Keep the placeholder if loading fails
-      }
-    );
+            console.log("🐾 Positioned on platform:", {
+                platformHeight,
+                animalBottomZ,
+                offsetToPlatform
+            });
+
+            // ------ 6️⃣ ADD TO PLAYER ------
+            this.add(this.chickenModel);
+            this.isModelLoaded = true;
+          },
+          (xhr) => {
+              console.log(`🐾 Loading ${fullPath}: ${(xhr.loaded / xhr.total) * 100}%`);
+          },
+          (err) => {
+              console.error("🐾 Error loading animal:", err);
+          }
+      );
   }
 
   // Initialize player with base step
