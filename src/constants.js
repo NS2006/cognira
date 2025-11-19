@@ -8,6 +8,7 @@ export const GAP_SIZE = 6;
 export const MAX_PLAYER = 2;
 
 // Phase timing constants (in seconds)
+export const COUNTDOWN_PHASE_TIME = 3;
 export const CARD_PHASE_TIME = 10;
 export const MOVEMENT_PHASE_TIME = 30; 
 export const SPATIAL_QUESTION_TIME = 30;

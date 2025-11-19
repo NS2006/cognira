@@ -1,9 +1,10 @@
 import { clearPhaseTimer, phaseTimer } from "../main";
 import { startCardPhase } from "./cardPhase";
 import { updateMovementUI } from "../utilities/collectUserInputs";
+import { COUNTDOWN_PHASE_TIME } from "../constants";
 
 export function startInitialCountdown() {
-  console.log("⏱️ Starting 5-second initial countdown");
+  console.log("⏱️ Starting initial countdown");
 
   if (updateMovementUI) {
     updateMovementUI();
@@ -20,7 +21,7 @@ export function startInitialCountdown() {
     console.log("✅ Initial countdown over, starting first card phase");
     hideInitialCountdownMessage();
     startCardPhase();
-  }, 5000);
+  }, COUNTDOWN_PHASE_TIME * 1000);
 }
 
 function showInitialCountdownMessage() {
@@ -47,7 +48,7 @@ function showInitialCountdownMessage() {
     document.body.appendChild(countdownMsg);
   }
 
-  let timeLeft = 5;
+  let timeLeft = COUNTDOWN_PHASE_TIME;
   countdownMsg.textContent = `Game starts in ${timeLeft} seconds`;
 
   // Update countdown

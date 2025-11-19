@@ -95,9 +95,7 @@ export class Lobby {
             }
 
             // Send to server via socket
-            console.log("uawiuq1908291")
             if (this.socketClient && this.socketClient.updateUsername) {
-                console.log("asdhjkasdl")
                 this.socketClient.updateUsername(newUsername);
             }
         }
