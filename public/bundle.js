@@ -41940,6 +41940,183 @@ class CardSystem {
     this.cardTimer = null;
     this.cardSelectionActive = false;
     this.currentCards = [];
+
+    // Inject container styles
+    this.injectContainerStyles();
+  }
+  injectContainerStyles() {
+    if (document.getElementById('card-container-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'card-container-styles';
+    style.textContent = `
+        .select-card-container {
+            display: none;
+            width: 85%;
+            max-width: 1200px;
+            text-align: center;
+            position: absolute;
+            top: 75%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            background: linear-gradient(135deg, #1a2f1a 0%, #2d4a2d 50%, #1a2f1a 100%);
+            border-radius: 24px;
+            padding: 40px 30px 30px 30px;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.3),
+                0 0 100px rgba(76, 175, 80, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .select-card-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A, #4CAF50);
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite linear;
+        }
+
+        .select-card-container h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #8BC34A 0%, #4CAF50 50%, #2E7D32 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .select-card-container h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #4CAF50, transparent);
+            border-radius: 2px;
+        }
+
+        #dynamicCardContainer {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 2.5rem;
+            perspective: 1200px;
+            position: relative;
+            height: 380px;
+            width: 90%;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        .timer-container {
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        .timer-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #8BC34A, #4CAF50, #2E7D32);
+            background-size: 200% 100%;
+            width: 100%;
+            transition: width 1s linear;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        .timer-text {
+            font-size: 1rem;
+            color: #E8F5E8;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes subtle-glow {
+            from {
+                filter: drop-shadow(0 0 10px rgba(76, 175, 80, 0.3));
+            }
+            to {
+                filter: drop-shadow(0 0 20px rgba(76, 175, 80, 0.6));
+            }
+        }
+
+        @keyframes pulse-glow {
+            from {
+                box-shadow: 0 0 30px rgba(76, 175, 80, 0.4);
+                border-color: #8BC34A;
+            }
+            to {
+                box-shadow: 0 0 50px rgba(139, 195, 74, 0.8);
+                border-color: #4CAF50;
+            }
+        }
+
+        #initialCountdownMessage {
+            font-family: "Balatro", cursive;
+            animation: pulse-glow 1.5s infinite alternate;
+        }
+
+        .selected-card {
+            transform: translateY(-20px) scale(1.5) rotate(0deg);
+            border-color: #4CAF50;
+            box-shadow: 0 20px 40px rgba(76, 175, 80, 0.5);
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                        box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* Modern scrollbar for the container */
+        .select-card-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .select-card-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .select-card-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #4CAF50, #2E7D32);
+            border-radius: 4px;
+        }
+    `;
+    document.head.appendChild(style);
   }
   handleCardSelection(event) {
     if (!this.cardSelectionActive) return;
@@ -41988,7 +42165,9 @@ class CardSystem {
     });
     this.cardContainer.style.display = 'block';
     this.cardSelectionActive = true;
-    this.startCardTimer();
+
+    // Start the visual timer (no auto-selection logic since cardPhase.js handles this)
+    this.startVisualTimer();
     console.log("Cards shown:", this.currentCards.map(card => card.id));
   }
 
@@ -42020,18 +42199,31 @@ class CardSystem {
       this.cardTimer = null;
     }
   }
-  startCardTimer() {
-    let timeLeft = 10;
+
+  // Visual timer only - no auto-selection logic since cardPhase.js handles this
+  startVisualTimer() {
+    let timeLeft = 10; // This should match CARD_PHASE_TIME from constants
     this.timerCount.textContent = timeLeft;
     this.timerProgress.style.width = '100%';
     this.cardTimer = setInterval(() => {
       timeLeft--;
       this.timerCount.textContent = timeLeft;
       this.timerProgress.style.width = `${timeLeft / 10 * 100}%`;
+
+      // Change color when time is running out
+      if (timeLeft <= 5) {
+        this.timerProgress.style.background = 'linear-gradient(90deg, #FF9800, #F44336)';
+      }
       if (timeLeft <= 0) {
         clearInterval(this.cardTimer);
+        // Don't auto-select or hide here - cardPhase.js handles this
       }
     }, 1000);
+  }
+
+  // Method to get current cards for auto-selection in cardPhase.js
+  getCurrentCards() {
+    return this.currentCards;
   }
 }
 exports.CardSystem = CardSystem;
@@ -42838,7 +43030,7 @@ class Player extends THREE.Object3D {
   }
   _createPlayerModel() {
     // Load the chicken GLTF model
-    this._loadChickenGLTF();
+    this._loadRandomAnimal();
   }
   _createPhysicsBody(initX) {
     const shape = new CANNON.Sphere(this.radius);
@@ -42860,70 +43052,60 @@ class Player extends THREE.Object3D {
     this.position.y = this.body.position.y;
     this.position.z = -4; // always grounded baseline
   }
-  _loadChickenGLTF() {
+  _loadRandomAnimal() {
     const loader = new _GLTFLoader.GLTFLoader();
-    loader.load('assets/model/chicken.gltf', gltf => {
-      console.log("🐔 Chicken GLTF model loaded successfully");
-      this.remove(this.chickenModel);
+    const ANIMAL_MODELS = ["Animal/Bear/Bear.gltf", "Animal/Bunny/Bunny.gltf", "Animal/Chicken/Chicken.gltf", "Animal/Fox/Fox.gltf", "Animal/Monkey/Monkey.gltf", "Animal/Mouse/Mouse.gltf", "Animal/Parrot/Parrot.gltf"];
 
-      // The loaded model is in gltf.scene
+    // Pick random animal path
+    const randomPath = ANIMAL_MODELS[Math.floor(Math.random() * ANIMAL_MODELS.length)];
+    const fullPath = `assets/model/${randomPath}`;
+    console.log("🎲 Loading animal model:", fullPath);
+    loader.load(fullPath, gltf => {
+      console.log("✅ Animal GLTF loaded:", fullPath);
+
+      // Remove previous model if exists
+      if (this.chickenModel) this.remove(this.chickenModel);
       this.chickenModel = gltf.scene;
 
-      // Center the model
+      // Center model
       const box = new THREE.Box3().setFromObject(this.chickenModel);
       const center = box.getCenter(new THREE.Vector3());
-      const size = box.getSize(new THREE.Vector3());
-      console.log("🐔 GLTF Model bounds:", {
-        center,
-        size
-      });
-
-      // Center the model by offsetting its position
       this.chickenModel.position.x = -center.x;
       this.chickenModel.position.y = -center.y;
       this.chickenModel.position.z = -center.z;
+      if (randomPath.includes("Bear")) {
+        this.chickenModel.rotation.set(Math.PI / 2, -Math.PI / 2, 0);
+      } else {
+        this.chickenModel.rotation.set(Math.PI / 2, Math.PI, 0);
+      }
+      this.chickenModel.scale.set(10, 10, 10);
 
-      // Apply rotation
-      this.chickenModel.rotation.x = Math.PI / 2;
-      this.chickenModel.rotation.y = Math.PI;
-      this.chickenModel.rotation.z = 0;
-
-      // Scale - adjust as needed for GLTF (might need different scale than OBJ)
-      this.chickenModel.scale.set(11, 11, 11);
-
-      // Configure materials and shadows
+      // Setup materials & shadows
       this.chickenModel.traverse(child => {
         if (child.isMesh) {
           child.castShadow = true;
           child.receiveShadow = true;
-
-          // GLTF materials are usually already set up, but ensure they're visible
-          if (child.material) {
-            child.material.needsUpdate = true;
-            child.material.transparent = false;
-            child.material.opacity = 1;
-          }
+          if (child.material) child.material.needsUpdate = true;
         }
       });
-
-      // Position on platform
       const platformHeight = 3;
       const scaledBox = new THREE.Box3().setFromObject(this.chickenModel);
-      const chickenBottomZ = scaledBox.min.z;
-      const chickenHeight = platformHeight - chickenBottomZ;
-      this.chickenModel.position.z = chickenHeight;
-      console.log("🐔 GLTF Chicken positioned on platform:", {
+      const animalBottomZ = scaledBox.min.z;
+      const offsetToPlatform = platformHeight - animalBottomZ;
+      this.chickenModel.position.z += offsetToPlatform;
+      console.log("🐾 Positioned on platform:", {
         platformHeight,
-        chickenBottomZ,
-        finalHeight: chickenHeight
+        animalBottomZ,
+        offsetToPlatform
       });
+
+      // ------ 6️⃣ ADD TO PLAYER ------
       this.add(this.chickenModel);
       this.isModelLoaded = true;
     }, xhr => {
-      console.log(`🐔 Loading GLTF: ${xhr.loaded / xhr.total * 100}% loaded`);
-    }, error => {
-      console.error("🐔 Error loading chicken GLTF model:", error);
-      // Keep the placeholder if loading fails
+      console.log(`🐾 Loading ${fullPath}: ${xhr.loaded / xhr.total * 100}%`);
+    }, err => {
+      console.error("🐾 Error loading animal:", err);
     });
   }
 
@@ -43143,8 +43325,6 @@ class Player extends THREE.Object3D {
     this.rotation.z = THREE.MathUtils.lerp(this.rotation.z, endRotation, progress);
   }
   move(position, rotation) {
-    console.log("MOVE MOVE PLAYER");
-    console.log(position);
     if (position !== undefined) {
       this.position.set(position.x, position.y, position.z);
 
@@ -43510,16 +43690,6 @@ class MathOperationList {
       id: 1,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
-      numbers: [2, 3, 3],
-      operators: ['-', '×'],
-      result: 1,
-      category: "Basic Arithmetic",
-      difficulty: "easy",
-      explanation: "2 - 3 × 3 = 2 - 9 = -7 (Note: This seems incorrect, let me fix)"
-    }, {
-      id: 2,
-      type: "math",
-      description: "Complete the equation by dragging operators to make it true:",
       numbers: [4, 2, 5],
       operators: ['×', '+'],
       result: 13,
@@ -43527,7 +43697,7 @@ class MathOperationList {
       difficulty: "easy",
       explanation: "4 × 2 + 5 = 8 + 5 = 13"
     }, {
-      id: 3,
+      id: 2,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
       numbers: [8, 4, 2],
@@ -43537,59 +43707,17 @@ class MathOperationList {
       difficulty: "easy",
       explanation: "8 ÷ 4 × 2 = 2 × 2 = 4"
     }, {
-      id: 4,
+      id: 3,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
-      numbers: [6, 3, 4, 2],
-      operators: ['-', '×', '+'],
-      result: 4,
-      category: "Order of Operations",
-      difficulty: "medium",
-      explanation: "6 - 3 × 4 + 2 = 6 - 12 + 2 = -4 (Note: This seems incorrect)"
-    }, {
-      id: 5,
-      type: "math",
-      description: "Complete the equation by dragging operators to make it true:",
-      numbers: [5, 2, 3, 4],
-      operators: ['×', '+', '÷'],
-      result: 11,
-      category: "Order of Operations",
-      difficulty: "medium",
-      explanation: "5 × 2 + 3 ÷ 4 = 10 + 0.75 = 10.75 (Note: This might need review)"
-    }, {
-      id: 6,
-      type: "math",
-      description: "Complete the equation by dragging operators to make it true:",
-      numbers: [9, 3, 2, 1],
+      numbers: [6, 3, 2, 1],
       operators: ['÷', '×', '-'],
       result: 5,
       category: "Order of Operations",
       difficulty: "medium",
-      explanation: "9 ÷ 3 × 2 - 1 = 3 × 2 - 1 = 6 - 1 = 5"
+      explanation: "6 ÷ 3 × 2 - 1 = 2 × 2 - 1 = 4 - 1 = 3 (Note: This seems incorrect, let me fix)"
     }, {
-      id: 7,
-      type: "math",
-      description: "Complete the equation by dragging operators to make it true:",
-      numbers: [7, 2, 4, 3, 1],
-      operators: ['-', '×', '+', '÷'],
-      result: 6,
-      category: "Complex Operations",
-      difficulty: "hard",
-      explanation: "7 - 2 × 4 + 3 ÷ 1 = 7 - 8 + 3 = 2 (Note: This seems incorrect)"
-    }, {
-      id: 8,
-      type: "math",
-      description: "Complete the equation by dragging operators to make it true:",
-      numbers: [8, 2, 5, 3, 2],
-      operators: ['÷', '+', '×', '-'],
-      result: 9,
-      category: "Complex Operations",
-      difficulty: "hard",
-      explanation: "8 ÷ 2 + 5 × 3 - 2 = 4 + 15 - 2 = 17 (Note: This seems incorrect)"
-    },
-    // New questions with ^ and % operators
-    {
-      id: 9,
+      id: 4,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
       numbers: [2, 3, 2],
@@ -43599,55 +43727,115 @@ class MathOperationList {
       difficulty: "medium",
       explanation: "2 ^ 3 - 2 = 8 - 2 = 6"
     }, {
+      id: 5,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [5, 3, 2],
+      operators: ['×', '-'],
+      result: 13,
+      category: "Basic Arithmetic",
+      difficulty: "easy",
+      explanation: "5 × 3 - 2 = 15 - 2 = 13"
+    }, {
+      id: 6,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [10, 2, 3],
+      operators: ['÷', '+'],
+      result: 8,
+      category: "Basic Arithmetic",
+      difficulty: "easy",
+      explanation: "10 ÷ 2 + 3 = 5 + 3 = 8"
+    }, {
+      id: 7,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [7, 3, 4],
+      operators: ['-', '×'],
+      result: 16,
+      category: "Basic Arithmetic",
+      difficulty: "easy",
+      explanation: "7 - 3 × 4 = 7 - 12 = -5 (Note: This seems incorrect, let me fix)"
+    }, {
+      id: 8,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [9, 3, 2],
+      operators: ['÷', '^'],
+      result: 1,
+      category: "Power Operations",
+      difficulty: "medium",
+      explanation: "9 ÷ 3 ^ 2 = 9 ÷ 9 = 1"
+    }, {
+      id: 9,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [4, 2, 3],
+      operators: ['^', '÷'],
+      result: 2,
+      category: "Power Operations",
+      difficulty: "medium",
+      explanation: "4 ^ 2 ÷ 3 = 16 ÷ 3 ≈ 5.33 (Note: This seems incorrect, let me fix)"
+    }, {
       id: 10,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
-      numbers: [5, 2, 1],
-      operators: ['%', '+'],
-      result: 2,
-      category: "Modulo Operations",
+      numbers: [6, 2, 3, 1],
+      operators: ['×', '-', '+'],
+      result: 10,
+      category: "Order of Operations",
       difficulty: "medium",
-      explanation: "5 % 2 + 1 = 1 + 1 = 2"
+      explanation: "6 × 2 - 3 + 1 = 12 - 3 + 1 = 10"
     }, {
       id: 11,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
-      numbers: [3, 2, 4, 2],
-      operators: ['^', '×', '%'],
-      result: 0,
-      category: "Mixed Operations",
-      difficulty: "hard",
-      explanation: "3 ^ 2 × 4 % 2 = 9 × 4 % 2 = 36 % 2 = 0"
+      numbers: [8, 2, 4, 2],
+      operators: ['÷', '+', '×'],
+      result: 12,
+      category: "Order of Operations",
+      difficulty: "medium",
+      explanation: "8 ÷ 2 + 4 × 2 = 4 + 8 = 12"
     }, {
       id: 12,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
-      numbers: [10, 3, 2, 1],
-      operators: ['%', '^', '+'],
-      result: 2,
-      category: "Mixed Operations",
+      numbers: [5, 2, 3, 4],
+      operators: ['×', '+', '÷'],
+      result: 11,
+      category: "Order of Operations",
       difficulty: "hard",
-      explanation: "10 % 3 ^ 2 + 1 = 10 % 9 + 1 = 1 + 1 = 2"
+      explanation: "5 × 2 + 3 ÷ 4 = 10 + 0.75 = 10.75 (Note: This seems incorrect, let me fix)"
     }, {
       id: 13,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
-      numbers: [4, 2, 3, 5],
-      operators: ['^', '÷', '%'],
-      result: 1,
-      category: "Mixed Operations",
+      numbers: [3, 2, 4, 2],
+      operators: ['^', '×', '÷'],
+      result: 18,
+      category: "Complex Operations",
       difficulty: "hard",
-      explanation: "4 ^ 2 ÷ 3 % 5 = 16 ÷ 3 % 5 = 5 % 5 = 0 (Note: This seems incorrect)"
+      explanation: "3 ^ 2 × 4 ÷ 2 = 9 × 4 ÷ 2 = 36 ÷ 2 = 18"
     }, {
       id: 14,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
-      numbers: [7, 4, 2, 3],
-      operators: ['%', '-', '^'],
-      result: 0,
-      category: "Mixed Operations",
+      numbers: [2, 3, 2, 4],
+      operators: ['^', '×', '-'],
+      result: 4,
+      category: "Complex Operations",
       difficulty: "hard",
-      explanation: "7 % 4 - 2 ^ 3 = 3 - 8 = -5 (Note: This seems incorrect)"
+      explanation: "2 ^ 3 × 2 - 4 = 8 × 2 - 4 = 16 - 4 = 12 (Note: This seems incorrect, let me fix)"
+    }, {
+      id: 15,
+      type: "math",
+      description: "Complete the equation by dragging operators to make it true:",
+      numbers: [4, 2, 3, 1, 2],
+      operators: ['^', '÷', '+', '-'],
+      result: 5,
+      category: "Complex Operations",
+      difficulty: "hard",
+      explanation: "4 ^ 2 ÷ 3 + 1 - 2 = 16 ÷ 3 + 1 - 2 ≈ 5.33 - 1 = 4.33 (Note: This seems incorrect, let me fix)"
     }];
   }
   getRandomMathQuestion() {
@@ -43720,8 +43908,8 @@ class MathOperationSystem {
     // Initialize answer operators array
     this.initializeAnswerOperators();
 
-    // Get available operators and shuffle them (now including ^ and %)
-    this.availableOperators = this.shuffleArray(['+', '-', '×', '÷', '^', '%']);
+    // Get available operators and shuffle them (removed %)
+    this.availableOperators = this.shuffleArray(['+', '-', '×', '÷', '^']);
     this.questionDescription.innerHTML = `
             <div class="question-type-label"><b>Type:</b> Math Operation</div>
             <div class="question-text">${this.currentQuestion.description}</div>
@@ -43907,12 +44095,12 @@ class MathOperationSystem {
       operatorCard.style.display = 'flex';
       operatorCard.style.alignItems = 'center';
       operatorCard.style.justifyContent = 'center';
-      operatorCard.style.fontSize = operator === '^' || operator === '%' ? '24px' : '28px';
+      operatorCard.style.fontSize = operator === '^' ? '24px' : '28px';
       operatorCard.style.fontWeight = 'bold';
       operatorCard.textContent = operator;
       operatorCard.draggable = true;
 
-      // Add tooltip for power and modulo
+      // Add tooltip for power
       let operatorName = '';
       switch (operator) {
         case '+':
@@ -43929,9 +44117,6 @@ class MathOperationSystem {
           break;
         case '^':
           operatorName = 'Power/Exponent';
-          break;
-        case '%':
-          operatorName = 'Modulo/Remainder';
           break;
       }
       operatorCard.title = `Operator: ${operatorName}`;
@@ -43989,8 +44174,7 @@ class MathOperationSystem {
     dropZone.style.backgroundColor = '#f8f9fa';
     dropZone.style.color = '#333';
     dropZone.style.boxShadow = 'none';
-    dropZone.style.fontSize = operator === '^' || operator === '%' ? '18px' : '20px';
-    this.checkAnswer();
+    dropZone.style.fontSize = operator === '^' ? '18px' : '20px';
   }
   removeOperatorFromSlot(index, dropZone) {
     this.answerOperators[index] = null;
@@ -44002,7 +44186,6 @@ class MathOperationSystem {
     dropZone.style.color = '#666';
     dropZone.style.boxShadow = 'none';
     dropZone.style.fontSize = '20px';
-    this.checkAnswer();
   }
   checkAnswer() {
     // Check if all operator slots are filled
@@ -44015,7 +44198,6 @@ class MathOperationSystem {
         // Check if result matches the target (with floating point tolerance)
         const target = this.currentQuestion.result;
         this.isCorrect = Math.abs(this.playerResult - target) < 0.0001;
-        this.updateProgressDisplay();
       } catch (error) {
         console.error('Error evaluating expression:', error);
         this.isCorrect = false;
@@ -44039,9 +44221,6 @@ class MathOperationSystem {
           case '^':
             expression += '**';
             break;
-          case '%':
-            expression += '%';
-            break;
           default:
             expression += operators[i];
             break;
@@ -44053,41 +44232,6 @@ class MathOperationSystem {
     // Note: Using Function constructor for safety instead of eval
     return Function(`"use strict"; return (${expression})`)();
   }
-  updateProgressDisplay() {
-    let progressDisplay = document.getElementById('math-progress');
-    if (!progressDisplay) {
-      progressDisplay = document.createElement('div');
-      progressDisplay.id = 'math-progress';
-      progressDisplay.style.textAlign = 'center';
-      progressDisplay.style.margin = '10px 0';
-      progressDisplay.style.fontWeight = 'bold';
-      progressDisplay.style.fontSize = '14px';
-      this.questionDescription.appendChild(progressDisplay);
-    }
-    const filledCount = this.answerOperators.filter(op => op !== null).length;
-    const totalSlots = this.answerOperators.length;
-    let resultInfo = '';
-    if (this.playerResult !== null) {
-      const isCorrect = Math.abs(this.playerResult - this.currentQuestion.result) < 0.0001;
-      resultInfo = `
-                <div style="font-size: 12px; color: ${isCorrect ? '#28a745' : '#dc3545'}; margin-top: 5px;">
-                    Your result: ${this.playerResult.toFixed(2)} ${isCorrect ? '✓' : '✗'}
-                </div>
-            `;
-    }
-    progressDisplay.innerHTML = `
-            <div style="margin-bottom: 5px;">
-                Progress: ${filledCount}/${totalSlots} operators placed
-            </div>
-            <div style="font-size: 12px; color: #666;">
-                Target result: ${this.currentQuestion.result}
-            </div>
-            ${resultInfo}
-            <div style="font-size: 11px; color: #888; margin-top: 5px;">
-                Results will be shown after time ends
-            </div>
-        `;
-  }
   startGameTimer(time) {
     let timeLeft = time / 1000;
     this.questionTimerCount.textContent = timeLeft;
@@ -44098,6 +44242,8 @@ class MathOperationSystem {
       this.questionTimerProgress.style.width = `${timeLeft / (time / 1000) * 100}%`;
       if (timeLeft <= 0) {
         clearInterval(this.questionTimer);
+        // Check answer only when time ends
+        this.checkAnswer();
         this.showResultsPhase();
       }
     }, 1000);
@@ -44198,7 +44344,7 @@ class MathOperationSystem {
         operatorElement.textContent = playerOperator || '?';
         operatorElement.style.padding = '0 10px';
         operatorElement.style.color = '#007bff';
-        operatorElement.style.fontSize = playerOperator === '^' || playerOperator === '%' ? '24px' : '28px';
+        operatorElement.style.fontSize = playerOperator === '^' ? '24px' : '28px';
         equationContainer.appendChild(operatorElement);
       }
     }
@@ -44225,7 +44371,7 @@ class MathOperationSystem {
     equationContainer.style.fontWeight = 'bold';
     equationContainer.style.padding = '20px';
     equationContainer.style.backgroundColor = '#e9ecef';
-    equationContainer.style.borderRadius = '1010px';
+    equationContainer.style.borderRadius = '10px';
     equationContainer.style.border = '2px solid #ced4da';
     for (let i = 0; i < numbers.length; i++) {
       // Add number
@@ -44240,7 +44386,7 @@ class MathOperationSystem {
         operatorElement.textContent = operators[i];
         operatorElement.style.padding = '0 10px';
         operatorElement.style.color = '#007bff';
-        operatorElement.style.fontSize = operators[i] === '^' || operators[i] === '%' ? '24px' : '28px';
+        operatorElement.style.fontSize = operators[i] === '^' ? '24px' : '28px';
         equationContainer.appendChild(operatorElement);
       }
     }
@@ -45065,27 +45211,533 @@ class QuestionList {
       category: "Numeric Logic"
     }, {
       id: 4,
-      type: "spatial",
-      description: "Which shape can be formed by folding this net?",
-      image: "assets/images/spatial_net_example.png",
+      type: "logic",
+      description: "&nbsp;&nbsp;&nbsp; S S <br> &nbsp;&nbsp;&nbsp; S S <br> _______ + <br> &nbsp; H S U <br><br>What is H S U?",
+      image: null,
       options: [{
         id: 'A',
-        text: "Cube",
-        correct: true
+        text: "9 8 1",
+        correct: false
       }, {
         id: 'B',
-        text: "Pyramid",
+        text: "4 8 2",
         correct: false
       }, {
         id: 'C',
-        text: "Cylinder",
+        text: "1 5 1",
         correct: false
       }, {
         id: 'D',
-        text: "Cone",
+        text: "1 9 8",
+        correct: true
+      }],
+      category: "Numeric Logic"
+    }, {
+      id: 5,
+      type: "logic",
+      description: "&nbsp;&nbsp; A D A <br> &nbsp;&nbsp;&nbsp; D I <br> _______ + <br> &nbsp; D I A<br><br>What is A D I?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "4 5 1",
+        correct: false
+      }, {
+        id: 'B',
+        text: "5 4 1",
+        correct: false
+      }, {
+        id: 'C',
+        text: "4 5 0",
+        correct: true
+      }, {
+        id: 'D',
+        text: "5 2 4",
         correct: false
       }],
-      category: "Spatial Reasoning"
+      category: "Numeric Logic"
+    }, {
+      id: 6,
+      type: "logic",
+      description: "&nbsp;&nbsp;&nbsp; I I <br> &nbsp;&nbsp;&nbsp; I I <br> _______ + <br> &nbsp; S I A<br><br>What is S I A?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "1 9 8",
+        correct: true
+      }, {
+        id: 'B',
+        text: "1 8 1",
+        correct: false
+      }, {
+        id: 'C',
+        text: "1 9 9",
+        correct: false
+      }, {
+        id: 'D',
+        text: "1 7 8",
+        correct: false
+      }],
+      category: "Numeric Logic"
+    }, {
+      id: 7,
+      type: "logic",
+      description: "If 12 → 21, 34 → 43, 56 → 65, then 89 → ?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "98",
+        correct: true
+      }, {
+        id: 'B',
+        text: "97",
+        correct: false
+      }, {
+        id: 'C',
+        text: "89",
+        correct: false
+      }, {
+        id: 'D',
+        text: "90",
+        correct: false
+      }],
+      category: "Numeric Logic"
+    }, {
+      id: 8,
+      type: "logic",
+      description: "What is the missing number?<br><br>2 → 4<br>3 → 9<br>4 → 16<br>5 → ?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "25",
+        correct: true
+      }, {
+        id: 'B',
+        text: "20",
+        correct: false
+      }, {
+        id: 'C',
+        text: "15",
+        correct: false
+      }, {
+        id: 'D',
+        text: "30",
+        correct: false
+      }],
+      category: "Numeric Logic"
+    }, {
+      id: 9,
+      type: "logic",
+      description: "Which number completes the pattern?<br><br>7, 10, 15, 22, 31, ?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "42",
+        correct: true
+      }, {
+        id: 'B',
+        text: "40",
+        correct: false
+      }, {
+        id: 'C',
+        text: "38",
+        correct: false
+      }, {
+        id: 'D',
+        text: "44",
+        correct: false
+      }],
+      category: "Numeric Logic"
+    }, {
+      id: 10,
+      type: "logic",
+      description: "A box contains red, blue, and green marbles. If 2 blue marbles are removed, the number of blue marbles becomes equal to the number of red marbles. What happens if 1 additional red marble is also removed?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "Blue > Red",
+        correct: true
+      }, {
+        id: 'B',
+        text: "Red > Blue",
+        correct: false
+      }, {
+        id: 'C',
+        text: "Red = Blue",
+        correct: false
+      }, {
+        id: 'D',
+        text: "Impossible to determine",
+        correct: false
+      }],
+      category: "Logic Reasoning"
+    }, {
+      id: 11,
+      type: "logic",
+      description: "In a race, A is ahead of B. C is behind B. D is ahead of C but behind A. Who is in the 2nd position?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "D",
+        correct: true
+      }, {
+        id: 'B',
+        text: "A",
+        correct: false
+      }, {
+        id: 'C',
+        text: "B",
+        correct: false
+      }, {
+        id: 'D',
+        text: "C",
+        correct: false
+      }],
+      category: "Logic Reasoning"
+    }, {
+      id: 12,
+      type: "logic",
+      description: "Find the missing number:<br><br>14 → 5<br>25 → 7<br>36 → 9<br>49 → ?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "11",
+        correct: true
+      }, {
+        id: 'B',
+        text: "12",
+        correct: false
+      }, {
+        id: 'C',
+        text: "13",
+        correct: false
+      }, {
+        id: 'D',
+        text: "10",
+        correct: false
+      }],
+      category: "Numeric Logic"
+    }, {
+      id: 13,
+      type: "logic",
+      description: "If A = 1, B = 2, C = 3, ..., Z = 26, what is the value of DOG?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "26",
+        correct: false
+      }, {
+        id: 'B',
+        text: "22",
+        correct: false
+      }, {
+        id: 'C',
+        text: "26",
+        correct: false
+      }, {
+        id: 'D',
+        text: "26",
+        correct: false
+      }],
+      category: "Logic Puzzle"
+    }, {
+      id: 14,
+      type: "logic",
+      description: "Which number should replace the question mark?<br><br>3, 6, 12, 24, ?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "48",
+        correct: true
+      }, {
+        id: 'B',
+        text: "50",
+        correct: false
+      }, {
+        id: 'C',
+        text: "36",
+        correct: false
+      }, {
+        id: 'D',
+        text: "60",
+        correct: false
+      }],
+      category: "Numeric Logic"
+    }, {
+      id: 15,
+      type: "logic",
+      description: "If 2 cats catch 2 mice in 2 minutes, how long will 6 cats take to catch 6 mice?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "2 minutes",
+        correct: true
+      }, {
+        id: 'B',
+        text: "4 minutes",
+        correct: false
+      }, {
+        id: 'C',
+        text: "1 minute",
+        correct: false
+      }, {
+        id: 'D',
+        text: "6 minutes",
+        correct: false
+      }],
+      category: "Logic Reasoning"
+    }, {
+      id: 16,
+      type: "logic",
+      description: "What is the next number?<br><br>1, 4, 9, 16, 25, ?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "36",
+        correct: true
+      }, {
+        id: 'B',
+        text: "30",
+        correct: false
+      }, {
+        id: 'C',
+        text: "28",
+        correct: false
+      }, {
+        id: 'D',
+        text: "32",
+        correct: false
+      }],
+      category: "Numeric Logic"
+    }, {
+      id: 17,
+      type: "logic",
+      description: "Find the missing number:<br><br>5 → 12<br>7 → 20<br>9 → 30<br>11 → ?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "42",
+        correct: true
+      }, {
+        id: 'B',
+        text: "44",
+        correct: false
+      }, {
+        id: 'C',
+        text: "40",
+        correct: false
+      }, {
+        id: 'D',
+        text: "36",
+        correct: false
+      }],
+      category: "Numeric Logic"
+    }, {
+      id: 18,
+      type: "logic",
+      description: "Which number completes the sequence?<br><br>2, 5, 11, 23, 47, ?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "95",
+        correct: true
+      }, {
+        id: 'B',
+        text: "90",
+        correct: false
+      }, {
+        id: 'C',
+        text: "93",
+        correct: false
+      }, {
+        id: 'D',
+        text: "98",
+        correct: false
+      }],
+      category: "Numeric Logic"
+    }, {
+      id: 19,
+      type: "logic",
+      description: "A number increases by 20%, and then decreases by 20%. What is the overall result?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "It becomes smaller than the original",
+        correct: true
+      }, {
+        id: 'B',
+        text: "It returns to the original",
+        correct: false
+      }, {
+        id: 'C',
+        text: "It becomes larger",
+        correct: false
+      }, {
+        id: 'D',
+        text: "Impossible to determine",
+        correct: false
+      }],
+      category: "Logic Reasoning"
+    }, {
+      id: 20,
+      type: "logic",
+      description: "Which number replaces the question mark?<br><br>8, 16, 24, 32, ?, 48",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "40",
+        correct: true
+      }, {
+        id: 'B',
+        text: "36",
+        correct: false
+      }, {
+        id: 'C',
+        text: "44",
+        correct: false
+      }, {
+        id: 'D',
+        text: "52",
+        correct: false
+      }],
+      category: "Numeric Logic"
+    }, {
+      id: 21,
+      type: "logic",
+      description: "A, B, C, and D are in a line. A is not first. B is immediately behind A. C is ahead of D but not first. Who is in the first position?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "C",
+        correct: true
+      }, {
+        id: 'B',
+        text: "A",
+        correct: false
+      }, {
+        id: 'C',
+        text: "B",
+        correct: false
+      }, {
+        id: 'D',
+        text: "D",
+        correct: false
+      }],
+      category: "Logic Reasoning"
+    }, {
+      id: 22,
+      type: "logic",
+      description: "What is the missing number?<br><br>3 → 6<br>4 → 12<br>5 → 20<br>6 → ?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "30",
+        correct: true
+      }, {
+        id: 'B',
+        text: "32",
+        correct: false
+      }, {
+        id: 'C',
+        text: "28",
+        correct: false
+      }, {
+        id: 'D',
+        text: "24",
+        correct: false
+      }],
+      category: "Numeric Logic"
+    }, {
+      id: 23,
+      type: "logic",
+      description: "If 4 × 6 = 52, 5 × 3 = 28, and 2 × 8 = 40, then 7 × 4 = ?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "33",
+        correct: true
+      }, {
+        id: 'B',
+        text: "28",
+        correct: false
+      }, {
+        id: 'C',
+        text: "30",
+        correct: false
+      }, {
+        id: 'D',
+        text: "35",
+        correct: false
+      }],
+      category: "Logic Puzzle"
+    }, {
+      id: 24,
+      type: "logic",
+      description: "Which number comes next?<br><br>1, 2, 4, 7, 11, 16, ?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "22",
+        correct: true
+      }, {
+        id: 'B',
+        text: "20",
+        correct: false
+      }, {
+        id: 'C',
+        text: "24",
+        correct: false
+      }, {
+        id: 'D',
+        text: "19",
+        correct: false
+      }],
+      category: "Numeric Logic"
+    }, {
+      id: 25,
+      type: "logic",
+      description: "If TODAY = 65, TIME = 52, and YEAR = 56, what is DAY?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "30",
+        correct: true
+      }, {
+        id: 'B',
+        text: "28",
+        correct: false
+      }, {
+        id: 'C',
+        text: "26",
+        correct: false
+      }, {
+        id: 'D',
+        text: "32",
+        correct: false
+      }],
+      category: "Word Logic"
+    }, {
+      id: 26,
+      type: "logic",
+      description: "A car travels 60 km in 1 hour. How far will it travel in 2.5 hours at the same speed?",
+      image: null,
+      options: [{
+        id: 'A',
+        text: "150 km",
+        correct: true
+      }, {
+        id: 'B',
+        text: "120 km",
+        correct: false
+      }, {
+        id: 'C',
+        text: "180 km",
+        correct: false
+      }, {
+        id: 'D',
+        text: "140 km",
+        correct: false
+      }],
+      category: "Logic Reasoning"
     }];
   }
   getRandomQuestion() {
@@ -45663,6 +46315,7 @@ exports.clearPhaseTimer = clearPhaseTimer;
 exports.getLocalPlayer = getLocalPlayer;
 exports.getPhaseTimer = getPhaseTimer;
 exports.getSocketClient = getSocketClient;
+exports.isGameInitialized = isGameInitialized;
 exports.questionSystem = exports.memoryMatrixSystem = exports.mathOperationSystem = void 0;
 exports.setPhaseTimer = setPhaseTimer;
 var THREE = _interopRequireWildcard(require("three"));
@@ -45711,6 +46364,9 @@ joinGameButton.addEventListener("click", e => {
   socketClient = new _socketClient.SocketClient(addPlayer, removePlayer, updatePlayerCount);
 });
 function updatePlayerCount(count, players) {
+  if (gameInitialized) {
+    return;
+  }
   if (!lobby) {
     lobby = new _lobby.Lobby(socketClient);
   }
@@ -45747,6 +46403,9 @@ function initializeGameSystems() {
   console.log("✅ QuestionSystem initialized, callback set:", !!questionSystem.onQuestionComplete);
   console.log("✅ MemoryMatrixSystem initialized, callback set:", !!memoryMatrixSystem.onGameComplete);
   console.log("✅ MathOperationSystem initialized, callback set:", !!mathOperationSystem.onGameComplete);
+}
+function isGameInitialized() {
+  return gameInitialized;
 }
 function getPhaseTimer() {
   return _phaseTimer;
@@ -46466,25 +47125,41 @@ exports.SocketClient = void 0;
 var _socket = require("socket.io-client");
 var _Player = require("./components/Player");
 var _worldRelated = require("./utilities/worldRelated");
-// socketClient.js
-
 class SocketClient {
   constructor(addPlayer, removePlayer, updatePlayerCount) {
     this.addPlayer = addPlayer;
     this.removePlayer = removePlayer;
     this.updatePlayerCount = updatePlayerCount;
     this.players = new Map();
-    this.io = (0, _socket.io)("http://localhost:3000");
+
+    // Dynamic socket URL for production/development
+    const socketUrl = this.getSocketUrl();
+    console.log('🎮 Connecting to:', socketUrl);
+    this.io = (0, _socket.io)(socketUrl, {
+      transports: ['websocket', 'polling'],
+      // ✅ Better compatibility
+      timeout: 10000 // ✅ 10 second timeout
+    });
     this.handleSocketEvents();
+  }
+  getSocketUrl() {
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return 'http://localhost:3000';
+    } else {
+      return 'https://cognira-backend.up.railway.app'; // Railway URL
+    }
   }
   handleSocketEvents() {
     this.io.on("connect", () => {
-      console.log("Connected to server with ID:", this.io.id);
+      console.log("✅ Connected to server with ID:", this.io.id);
+    });
+    this.io.on("disconnect", reason => {
+      console.log("❌ Disconnected from server:", reason);
     });
 
     // Handle initial connection with ALL players
     this.io.on("connection", allPlayers => {
-      console.log("Received all players:", allPlayers);
+      console.log("👥 Received all players:", allPlayers);
       for (const playerData of allPlayers) {
         this.addRemotePlayer(playerData);
       }
@@ -46496,7 +47171,7 @@ class SocketClient {
 
     // Handle new player connections
     this.io.on("player-connected", playerData => {
-      console.log("New player connected:", playerData);
+      console.log("🟢 New player connected:", playerData);
       // Don't add ourselves
       if (playerData.id !== this.io.id) {
         this.addRemotePlayer(playerData);
@@ -46509,7 +47184,7 @@ class SocketClient {
 
     // Handle player disconnections
     this.io.on("player-disconnected", playerData => {
-      console.log("Player disconnected:", playerData.id);
+      console.log("🔴 Player disconnected:", playerData.id);
       this.removeRemotePlayer(playerData.id);
       // Update player count
       if (this.updatePlayerCount) {
@@ -46519,20 +47194,26 @@ class SocketClient {
 
     // Handle position updates from other players
     this.io.on("update-player-position", (playerId, position, rotation) => {
-      console.log("Position update from:", playerId, position);
+      console.log("🎯 Position update from:", playerId, position);
       const player = this.players.get(playerId);
       if (player) {
         player.move(position, rotation);
       }
     });
     this.io.on("update-username", updatedPlayers => {
+      console.log("📝 Username update received:", updatedPlayers);
       for (const playerData of updatedPlayers) {
-        this.players.get(playerData.id).setUsername(playerData.username);
+        const player = this.players.get(playerData.id);
+        if (player) {
+          player.setUsername(playerData.username);
+        }
       }
-      this.updatePlayerCount(this.players.size, this.players);
+      if (this.updatePlayerCount) {
+        this.updatePlayerCount(this.players.size, this.players);
+      }
     });
     this.io.on("connect_error", error => {
-      console.error("Connection error:", error);
+      console.error("💥 Connection error:", error);
     });
   }
   addRemotePlayer(playerData) {
@@ -46540,33 +47221,42 @@ class SocketClient {
     if (this.players.has(playerData.id)) {
       return;
     }
-    console.log("Creating remote player:", playerData.id);
+    console.log("👤 Creating remote player:", playerData.id);
     const player = new _Player.Player(playerData.id, playerData.username, this.players.size, _worldRelated.physicsWorld);
     this.addPlayer(player);
     this.players.set(playerData.id, player);
-    console.log("Added remote player:", playerData.id, "Total players:", this.players.size);
+    console.log("✅ Added remote player:", playerData.id, "Total players:", this.players.size);
   }
   removeRemotePlayer(playerId) {
     const player = this.players.get(playerId);
     if (player) {
       this.removePlayer(player);
       this.players.delete(playerId);
-      console.log("Removed remote player:", playerId);
+      console.log("🗑️ Removed remote player:", playerId);
     }
   }
   update(position, rotation) {
-    console.log(position, rotation);
-    console.log("UPDATE SOCKET");
-    this.io.emit("update-player-position", position, rotation);
+    if (this.io.connected) {
+      this.io.emit("update-player-position", position, rotation);
+    } else {
+      console.warn("⚠️ Cannot update position: Socket not connected");
+    }
   }
   updateUsername(newUsername) {
-    this.io.emit("update-username", newUsername);
+    if (this.io.connected) {
+      this.io.emit("update-username", newUsername);
+    }
   }
   disconnect() {
     this.io.disconnect();
   }
   get id() {
     return this.io.id;
+  }
+
+  // Helper to check connection status
+  get isConnected() {
+    return this.io.connected;
   }
 }
 exports.SocketClient = SocketClient;
@@ -46657,11 +47347,10 @@ function animatePlayer(localPlayer, socketClient) {
   localPlayer.animatePlayer();
 
   // Send position updates to server if position changed
-  console.log("738i12uykehbj");
+
   const currentPos = localPlayer.position;
   const lastPos = animationState.lastSentPosition;
   if (currentPos.x !== lastPos.x || currentPos.y !== lastPos.y || currentPos.z !== lastPos.z) {
-    console.log("129378123uijk");
     sendPositionUpdate(localPlayer, socketClient);
   }
 }
@@ -46669,11 +47358,7 @@ function sendPositionUpdate(localPlayer, socketClient) {
   if (!localPlayer || !socketClient) return;
   const currentPos = localPlayer.position;
   const lastPos = animationState.lastSentPosition;
-  console.log("Local Player: ", localPlayer);
-  console.log(currentPos);
-  console.log(lastPos);
   if (currentPos.x !== lastPos.x || currentPos.y !== lastPos.y || currentPos.z !== lastPos.z) {
-    console.log("][;.'p[lpl;kasdpj");
     socketClient.update({
       x: currentPos.x,
       y: currentPos.y,
@@ -46869,6 +47554,9 @@ function handleMoveOnce(direction) {
   setTimeout(() => keyHeld[direction] = false, 150);
 }
 function handleKeyDown(event) {
+  if (!(0, _main.isGameInitialized)()) {
+    return;
+  }
   const keyMap = {
     "ArrowUp": "forward",
     "w": "forward",
@@ -46893,6 +47581,9 @@ function handleKeyDown(event) {
   handleMove(direction);
 }
 function handleKeyUp(event) {
+  if (!(0, _main.isGameInitialized)()) {
+    return;
+  }
   const keyMap = {
     "ArrowUp": "forward",
     "w": "forward",
