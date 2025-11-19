@@ -46,6 +46,9 @@ joinGameButton.addEventListener("click", (e) => {
 });
 
 function updatePlayerCount(count, players) {
+  if(gameInitialized){
+    return;
+  }
 
   if (!lobby) {
       lobby = new Lobby(socketClient);
@@ -100,6 +103,10 @@ function initializeGameSystems() {
   console.log("✅ QuestionSystem initialized, callback set:", !!questionSystem.onQuestionComplete);
   console.log("✅ MemoryMatrixSystem initialized, callback set:", !!memoryMatrixSystem.onGameComplete);
   console.log("✅ MathOperationSystem initialized, callback set:", !!mathOperationSystem.onGameComplete);
+}
+
+export function isGameInitialized(){
+  return gameInitialized;
 }
 
 export function getPhaseTimer() {

@@ -1,0 +1,11 @@
+Model Information:
+* title:	Low poly Cap
+* source:	https://sketchfab.com/3d-models/low-poly-cap-1a9881bb62624ff78574ce773ecb2a0a
+* author:	PRINCE.JACK (https://sketchfab.com/J.A.C.K)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Low poly Cap" (https://sketchfab.com/3d-models/low-poly-cap-1a9881bb62624ff78574ce773ecb2a0a) by PRINCE.JACK (https://sketchfab.com/J.A.C.K) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

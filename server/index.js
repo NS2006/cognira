@@ -9,12 +9,25 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const server = createServer(app);
-const PORT = 3000;
+const PORT = process.env.PORT || 3000; // Use environment port for Render
+
+// Production CORS settings
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+    ? [
+        'https://cognira.netlify.app',
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        'https://cognira-backend.up.railway.app'
+      ]
+    : ['http://localhost:3000', 'http://127.0.0.1:3000'];
+
 const socketio = new Server(server, {
     cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
+        origin: allowedOrigins,
+        methods: ["GET", "POST"],
+        credentials: true
+    },
+    transports: ['websocket', 'polling']
 });
 
 const players = new Map();
@@ -25,7 +38,27 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-server.listen(PORT, () => console.log(`Server listening on port: ${PORT}`));
+// Health check endpoint for Render
+app.get('/health', (req, res) => {
+    res.status(200).json({ 
+        status: 'OK', 
+        game: 'Cognira',
+        players: players.size,
+        timestamp: new Date().toISOString()
+    });
+});
+
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`🎮 Cognira server listening on port: ${PORT}`);
+    console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`✅ Health check: http://0.0.0.0:${PORT}/health`);
+});
+
+server.listen(PORT, () => {
+    console.log(`🎮 Cognira server listening on port: ${PORT}`);
+    console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`✅ Health check: http://localhost:${PORT}/health`);
+});
 
 socketio.on("connection", (socket) => {
     console.log("Socket connected", socket.id);
@@ -33,7 +66,7 @@ socketio.on("connection", (socket) => {
     // Create new player with initial position and default username
     const newPlayer = {
         id: socket.id,
-        username: `Player${socket.id.substring(0, 4)}`, // Add default username
+        username: `Player${socket.id.substring(0, 4)}`,
         position: { x: players.size % 4, y: 0, z: 0 },
         rotation: { x: 0, y: 0, z: 0 }
     };
@@ -78,7 +111,7 @@ socketio.on("connection", (socket) => {
             player.position = position;
             player.rotation = rotation;
 
-            // Broadcast to ALL other players (including the sender for testing)
+            // Broadcast to ALL other players
             socket.broadcast.emit("update-player-position", socket.id, position, rotation);
         }
     });
