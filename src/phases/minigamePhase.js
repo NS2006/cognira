@@ -24,7 +24,7 @@ export function startMinigamePhase() {
   // Small delay before starting minigame
   setTimeout(() => {
     // Randomly choose the minigame
-    const minigameTypes = ['mathOperation'];
+    const minigameTypes = ['mathOperation', 'question', 'memoryMatrix'];
     currentMinigameType = minigameTypes[Math.floor(Math.random() * minigameTypes.length)];
     
     console.log(`🎯 Selected minigame: ${currentMinigameType}`);

@@ -1,3 +1,4 @@
+import { CARD_PHASE_TIME } from '../constants.js';
 import { getLocalPlayer } from '../main.js';
 import { CardList } from './CardList.js';
 
@@ -292,7 +293,7 @@ export class CardSystem {
 
     // Visual timer only - no auto-selection logic since cardPhase.js handles this
     startVisualTimer() {
-        let timeLeft = 10; // This should match CARD_PHASE_TIME from constants
+        let timeLeft = CARD_PHASE_TIME;
         this.timerCount.textContent = timeLeft;
         this.timerProgress.style.width = '100%';
 

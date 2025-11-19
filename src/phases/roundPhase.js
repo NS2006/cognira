@@ -14,7 +14,14 @@ export function startRoundPhase() {
     console.log(`🔄 Starting round phase for round ${currentRound}`);
     roundPhaseActive = true;
     incrementRound();
-    getLocalPlayer().resetSteps();
+    
+    const localPlayer = getLocalPlayer();
+    
+    // Get additional one base step every new round
+    localPlayer.baseStep++; 
+    
+    // Reset step
+    localPlayer.resetSteps();
 
     updateRoundDisplay();
     updateStepsDisplay();
@@ -83,6 +90,10 @@ function showRoundTransitionMessage() {
         roundSubtitle = "Go Go!!! First to the Finish Wins!";
     } else {
         roundSubtitle = "Finding Your Pace!";
+    }
+
+    if (currentRound !== 1){
+        roundSubtitle += "<br><br> +1 base step";
     }
 
     // Create round transition message

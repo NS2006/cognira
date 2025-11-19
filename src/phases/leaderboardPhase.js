@@ -202,7 +202,6 @@ function populateLeaderboardList(currentRankings) {
             </div>
             <div class="player-info">
                 <div class="player-name">${player.username} ${player.isLocalPlayer ? ' (You)' : ''}</div>
-                <div class="player-position">Position: (${player.position.currentX}, ${player.position.currentY})</div>
             </div>
             <div class="player-medal">
                 ${player.rank === 1 ? '🥇' : player.rank === 2 ? '🥈' : player.rank === 3 ? '🥉' : ''}

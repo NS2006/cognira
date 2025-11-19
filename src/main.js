@@ -109,9 +109,6 @@ function addPlayer(player) {
     // Set player grid position
     localPlayer.gridPosition.currentX = socketClient.players.size % 4;
     localPlayer.gridPosition.currentY = 0;
-
-    // Initialize player steps
-    localPlayer.resetSteps();
   } else {
     console.log("🌐 Remote player added:", player.playerId);
   }

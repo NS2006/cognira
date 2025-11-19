@@ -11,16 +11,16 @@ export const MAX_PLAYER = 3;
 // Phase timing constants (in seconds)
 export const COUNTDOWN_PHASE_TIME = 3;
 export const ROUND_PHASE_TIME = 3;
-export const CARD_PHASE_TIME = 1;
-export const MOVEMENT_PHASE_TIME = 10;
-export const LEADERBOARD_PHASE_TIME = 15; 
+export const CARD_PHASE_TIME = 10;
+export const MOVEMENT_PHASE_TIME = 15; 
+export const LEADERBOARD_PHASE_TIME = 8; 
 export const PHASE_TRANSITION_DELAY = 0.5; 
 
 
 // Minigame time
 export const QUESTION_PHASE_TIME = 15;
-export const MEMORY_MATRIX_PHASE_TIME = 40;
-export const MATH_OPERATION_PHASE_TIME = 2;
+export const MEMORY_MATRIX_PHASE_TIME = 30;
+export const MATH_OPERATION_PHASE_TIME = 30;
 
 
 // Animation and UI timing
