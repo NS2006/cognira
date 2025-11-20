@@ -43682,7 +43682,7 @@ class MathOperationList {
       result: 5,
       category: "Order of Operations",
       difficulty: "medium",
-      explanation: "6 ÷ 3 × 2 - 1 = 2 × 2 - 1 = 4 - 1 = 3 (Note: This seems incorrect, let me fix)"
+      explanation: "6 ÷ 3 × 2 - 1 = 2 × 2 - 1 = 4 - 1 = 3"
     }, {
       id: 4,
       type: "math",
@@ -43722,7 +43722,7 @@ class MathOperationList {
       result: 16,
       category: "Basic Arithmetic",
       difficulty: "easy",
-      explanation: "7 - 3 × 4 = 7 - 12 = -5 (Note: This seems incorrect, let me fix)"
+      explanation: "7 - 3 × 4 = 7 - 12 = -5"
     }, {
       id: 8,
       type: "math",
@@ -43738,11 +43738,11 @@ class MathOperationList {
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
       numbers: [4, 2, 3],
-      operators: ['^', '÷'],
-      result: 2,
+      operators: ['^', '+'],
+      result: 19,
       category: "Power Operations",
       difficulty: "medium",
-      explanation: "4 ^ 2 ÷ 3 = 16 ÷ 3 ≈ 5.33 (Note: This seems incorrect, let me fix)"
+      explanation: "4 ^ 2 + 3 = 16 + 3 ≈ 19"
     }, {
       id: 10,
       type: "math",
@@ -43768,11 +43768,11 @@ class MathOperationList {
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
       numbers: [5, 2, 3, 4],
-      operators: ['×', '+', '÷'],
-      result: 11,
+      operators: ['×', '+', '×'],
+      result: 22,
       category: "Order of Operations",
       difficulty: "hard",
-      explanation: "5 × 2 + 3 ÷ 4 = 10 + 0.75 = 10.75 (Note: This seems incorrect, let me fix)"
+      explanation: "5 × 2 + 3 × 4 = 10 + 12 = 22 (Note: This seems incorrect, let me fix)"
     }, {
       id: 13,
       type: "math",
@@ -43789,20 +43789,20 @@ class MathOperationList {
       description: "Complete the equation by dragging operators to make it true:",
       numbers: [2, 3, 2, 4],
       operators: ['^', '×', '-'],
-      result: 4,
+      result: 12,
       category: "Complex Operations",
       difficulty: "hard",
-      explanation: "2 ^ 3 × 2 - 4 = 8 × 2 - 4 = 16 - 4 = 12 (Note: This seems incorrect, let me fix)"
+      explanation: "2 ^ 3 × 2 - 4 = 8 × 2 - 4 = 16 - 4 = 12"
     }, {
       id: 15,
       type: "math",
       description: "Complete the equation by dragging operators to make it true:",
-      numbers: [4, 2, 3, 1, 2],
-      operators: ['^', '÷', '+', '-'],
-      result: 5,
+      numbers: [4, 3, 2, 3, 2],
+      operators: ['^', '÷', '-', '^'],
+      result: 23,
       category: "Complex Operations",
       difficulty: "hard",
-      explanation: "4 ^ 2 ÷ 3 + 1 - 2 = 16 ÷ 3 + 1 - 2 ≈ 5.33 - 1 = 4.33 (Note: This seems incorrect, let me fix)"
+      explanation: "4 ^ 3 ÷ 2 - 3 ^ 2 = 64 ÷ 2 - 9 = 32 - 9 = 23"
     }];
   }
   getRandomMathQuestion() {
@@ -46256,14 +46256,14 @@ const MAP_SIZE_X = exports.MAP_SIZE_X = 4;
 const MAP_SIZE_Y = exports.MAP_SIZE_Y = 51;
 const TILE_SIZE = exports.TILE_SIZE = 42;
 const GAP_SIZE = exports.GAP_SIZE = 6;
-const MAX_PLAYER = exports.MAX_PLAYER = 1;
+const MAX_PLAYER = exports.MAX_PLAYER = 2;
 
 // Phase timing constants (in seconds)
 const COUNTDOWN_PHASE_TIME = exports.COUNTDOWN_PHASE_TIME = 1;
 const ROUND_PHASE_TIME = exports.ROUND_PHASE_TIME = 1;
-const CARD_PHASE_TIME = exports.CARD_PHASE_TIME = 3;
-const CARD_RESULT_PHASE_TIME = exports.CARD_RESULT_PHASE_TIME = 5;
-const MOVEMENT_PHASE_TIME = exports.MOVEMENT_PHASE_TIME = 15;
+const CARD_PHASE_TIME = exports.CARD_PHASE_TIME = 1;
+const CARD_RESULT_PHASE_TIME = exports.CARD_RESULT_PHASE_TIME = 1;
+const MOVEMENT_PHASE_TIME = exports.MOVEMENT_PHASE_TIME = 10;
 const LEADERBOARD_PHASE_TIME = exports.LEADERBOARD_PHASE_TIME = 1;
 const PHASE_TRANSITION_DELAY = exports.PHASE_TRANSITION_DELAY = 0.5;
 
@@ -46294,7 +46294,7 @@ exports.hideGameUI = hideGameUI;
 exports.incrementRound = incrementRound;
 exports.initializeSocketConnection = initializeSocketConnection;
 exports.isGameInitialized = isGameInitialized;
-exports.questionSystem = exports.memoryMatrixSystem = exports.mathOperationSystem = void 0;
+exports.questionSystem = exports.minigameSequence = exports.memoryMatrixSystem = exports.mathOperationSystem = void 0;
 exports.resetRound = resetRound;
 exports.setPhaseTimer = setPhaseTimer;
 exports.showGameUI = showGameUI;
@@ -46327,6 +46327,7 @@ const gameCanvas = document.getElementById("gameCanvas");
 const joinGameButton = document.getElementById("joinGameButton");
 const controlsButton = document.getElementById("controls");
 let currentRound = exports.currentRound = 0;
+let minigameSequence = exports.minigameSequence = []; // Store minigame sequence
 let cardSystem = exports.cardSystem = void 0,
   questionSystem = exports.questionSystem = void 0,
   memoryMatrixSystem = exports.memoryMatrixSystem = void 0,
@@ -46357,8 +46358,14 @@ function initializeSocketConnection(username) {
   // Hide join button
   joinGameButton.style.display = "none";
 
-  // Initialize socket connection with the chosen username
-  socketClient = new _socketClient.SocketClient(addPlayer, removePlayer, updatePlayerCount, username);
+  // Initialize socket connection
+  socketClient = new _socketClient.SocketClient(username, addPlayer, removePlayer, updatePlayerCount, handleMinigameSequenceReceived);
+}
+
+// Handle received minigame sequence
+function handleMinigameSequenceReceived(sequence) {
+  exports.minigameSequence = minigameSequence = sequence;
+  console.log(`🎲 Minigame sequence stored: ${minigameSequence.join(', ')}`);
 }
 function updatePlayerCount(count, players) {
   if (gameInitialized) {
@@ -47153,16 +47160,14 @@ function startMinigamePhase() {
 
   // Small delay before starting minigame
   setTimeout(() => {
-    // Randomly choose the minigame
-    const minigameTypes = ['mathOperation', 'question', 'memoryMatrix'];
-    currentMinigameType = minigameTypes[Math.floor(Math.random() * minigameTypes.length)];
+    currentMinigameType = _main.minigameSequence[_main.currentRound % _main.minigameSequence.length];
     console.log(`🎯 Selected minigame: ${currentMinigameType}`);
 
     // Start the selected minigame
     if (currentMinigameType === 'question') {
       (0, _questionPhase.startQuestionPhase)();
-    } else if (currentMinigameType === 'tetris') {
-      (0, _tetrisPhase.startTetrisPhase)();
+      // } else if (currentMinigameType === 'tetris') {
+      //   startTetrisPhase();
     } else if (currentMinigameType === 'memoryMatrix') {
       (0, _memoryMatrixPhase.startMemoryMatrixPhase)();
     } else if (currentMinigameType === 'mathOperation') {
@@ -47765,21 +47770,22 @@ var _socket = require("socket.io-client");
 var _Player = require("./components/Player");
 var _worldRelated = require("./utilities/worldRelated");
 class SocketClient {
-  constructor(addPlayer, removePlayer, updatePlayerCount, username) {
+  constructor(username, addPlayer, removePlayer, updatePlayerCount, onMinigameSequenceReceived) {
     this.addPlayer = addPlayer;
     this.removePlayer = removePlayer;
     this.updatePlayerCount = updatePlayerCount;
     this.username = username;
     this.players = new Map();
+    this.onMinigameSequenceReceived = onMinigameSequenceReceived; // Callback for minigame sequence
 
     // Dynamic socket URL for production/development
     const socketUrl = this.getSocketUrl();
     console.log('🎮 Connecting to:', socketUrl, 'with username:', username);
 
-    // ✅ UPDATED: Pass username in auth object
+    // Pass username in auth object
     this.io = (0, _socket.io)(socketUrl, {
       auth: {
-        username: username // ✅ Send username during connection
+        username: username
       },
       transports: ['websocket', 'polling'],
       timeout: 10000
@@ -47801,13 +47807,20 @@ class SocketClient {
       console.log("❌ Disconnected from server:", reason);
     });
 
+    // Handle minigame sequence from server
+    this.io.on("minigame-sequence", sequence => {
+      console.log("🎲 Received minigame sequence from server:", sequence);
+      if (this.onMinigameSequenceReceived) {
+        this.onMinigameSequenceReceived(sequence);
+      }
+    });
+
     // Handle initial connection with ALL players
     this.io.on("connection", allPlayers => {
       console.log("👥 Received all players:", allPlayers);
       for (const playerData of allPlayers) {
         this.addRemotePlayer(playerData);
       }
-      // Update player count after adding all initial players
       if (this.updatePlayerCount) {
         this.updatePlayerCount(this.players.size, this.players);
       }
@@ -47816,11 +47829,9 @@ class SocketClient {
     // Handle new player connections
     this.io.on("player-connected", playerData => {
       console.log("🟢 New player connected:", playerData);
-      // Don't add ourselves
       if (playerData.id !== this.io.id) {
         this.addRemotePlayer(playerData);
       }
-      // Update player count
       if (this.updatePlayerCount) {
         this.updatePlayerCount(this.players.size, this.players);
       }
@@ -47830,7 +47841,6 @@ class SocketClient {
     this.io.on("player-disconnected", playerData => {
       console.log("🔴 Player disconnected:", playerData.id);
       this.removeRemotePlayer(playerData.id);
-      // Update player count
       if (this.updatePlayerCount) {
         this.updatePlayerCount(this.players.size, this.players);
       }
@@ -47861,7 +47871,6 @@ class SocketClient {
     });
   }
   addRemotePlayer(playerData) {
-    // Skip if player already exists
     if (this.players.has(playerData.id)) {
       return;
     }
@@ -47886,8 +47895,6 @@ class SocketClient {
       console.warn("⚠️ Cannot update position: Socket not connected");
     }
   }
-
-  // Method to update username
   updateUsername(newUsername) {
     if (this.io.connected) {
       console.log("📝 Sending username update to server:", newUsername);
@@ -47902,8 +47909,6 @@ class SocketClient {
   get id() {
     return this.io.id;
   }
-
-  // Helper to check connection status
   get isConnected() {
     return this.io.connected;
   }

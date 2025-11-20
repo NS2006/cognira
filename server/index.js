@@ -11,6 +11,9 @@ const app = express();
 const server = createServer(app);
 const PORT = process.env.PORT || 3000;
 
+// Minigame types
+const minigameTypes = ['mathOperation', 'question', 'memoryMatrix'];
+
 // Production CORS settings
 const allowedOrigins = process.env.NODE_ENV === 'production' 
     ? [
@@ -31,6 +34,8 @@ const socketio = new Server(server, {
 });
 
 const players = new Map();
+let minigameSequence = []; // Store the fixed minigame sequence
+let sequenceGenerated = false;
 
 app.use(express.static('public'));
 
@@ -48,15 +53,31 @@ app.get('/health', (req, res) => {
     });
 });
 
-// Remove duplicate server.listen - keep only this one:
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`🎮 Cognira server listening on port: ${PORT}`);
     console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`✅ Health check: http://0.0.0.0:${PORT}/health`);
 });
 
+function generateMinigameSequence(length = 10) {
+    const sequence = [];
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * minigameTypes.length);
+        sequence.push(minigameTypes[randomIndex]);
+    }
+    console.log(`🎲 Generated minigame sequence: ${sequence.join(', ')}`);
+    return sequence;
+}
+
 socketio.on("connection", (socket) => {
     console.log("Socket connected", socket.id);
+
+    // Generate minigame sequence if not already generated
+    if (!sequenceGenerated) {
+        minigameSequence = generateMinigameSequence();
+        sequenceGenerated = true;
+        console.log(`🎲 First player joined, minigame sequence set for all players`);
+    }
 
     // Get username from handshake or use default
     const clientUsername = socket.handshake.auth.username || `Player${players.size + 1}`;
@@ -66,12 +87,16 @@ socketio.on("connection", (socket) => {
     // Create new player with custom username
     const newPlayer = {
         id: socket.id,
-        username: clientUsername, // custom username
+        username: clientUsername,
         position: { x: players.size % 4, y: 0, z: 0 },
         rotation: { x: 0, y: 0, z: 0 }
     };
 
     players.set(socket.id, newPlayer);
+
+    // Send minigame sequence to the connecting player
+    socket.emit('minigame-sequence', minigameSequence);
+    console.log(`🎲 Sent minigame sequence to player ${socket.id}`);
 
     // Send ALL players to the new client (including themselves)
     const allPlayers = Array.from(players.values());
@@ -91,7 +116,6 @@ socketio.on("connection", (socket) => {
             const oldUsername = player.username;
             player.username = newUsername;
             
-            // Broadcast the updated player list to all clients
             const updatedPlayers = Array.from(players.values());
             socketio.emit("update-username", updatedPlayers);
             
@@ -105,17 +129,21 @@ socketio.on("connection", (socket) => {
         socket.broadcast.emit("player-disconnected", { id: socket.id });
         players.delete(socket.id);
         console.log("Total players:", players.size);
+        
+        // ✅ NEW: Reset minigame sequence if all players disconnect
+        if (players.size === 0) {
+            sequenceGenerated = false;
+            minigameSequence = [];
+            console.log('🎲 All players disconnected, minigame sequence reset');
+        }
     });
 
     // Handle player position updates
     socket.on("update-player-position", (position, rotation) => {
-        // Update the player's position on the server
         const player = players.get(socket.id);
         if (player) {
             player.position = position;
             player.rotation = rotation;
-
-            // Broadcast to ALL other players
             socket.broadcast.emit("update-player-position", socket.id, position, rotation);
         }
     });

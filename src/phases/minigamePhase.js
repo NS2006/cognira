@@ -1,4 +1,4 @@
-import { clearPhaseTimer, getLocalPlayer, updateStepsDisplay } from "../main.js";
+import { clearPhaseTimer, currentRound, getLocalPlayer, minigameSequence, updateStepsDisplay } from "../main.js";
 import { PHASE_TRANSITION_DELAY } from "../constants.js";
 import { startQuestionPhase } from "./minigames/questionPhase.js";
 import { startTetrisPhase } from "./minigames/tetrisPhase.js";
@@ -23,17 +23,15 @@ export function startMinigamePhase() {
 
   // Small delay before starting minigame
   setTimeout(() => {
-    // Randomly choose the minigame
-    const minigameTypes = ['mathOperation', 'question', 'memoryMatrix'];
-    currentMinigameType = minigameTypes[Math.floor(Math.random() * minigameTypes.length)];
+    currentMinigameType = minigameSequence[currentRound % minigameSequence.length];
     
     console.log(`🎯 Selected minigame: ${currentMinigameType}`);
 
     // Start the selected minigame
     if (currentMinigameType === 'question') {
       startQuestionPhase();
-    } else if (currentMinigameType === 'tetris') {
-      startTetrisPhase();
+    // } else if (currentMinigameType === 'tetris') {
+    //   startTetrisPhase();
     } else if (currentMinigameType === 'memoryMatrix') {
       startMemoryMatrixPhase();
     } else if (currentMinigameType === 'mathOperation') {

@@ -3,21 +3,22 @@ import { Player } from './components/Player';
 import { physicsWorld } from './utilities/worldRelated';
 
 export class SocketClient {
-    constructor(addPlayer, removePlayer, updatePlayerCount, username) {
+    constructor(username, addPlayer, removePlayer, updatePlayerCount, onMinigameSequenceReceived) {
         this.addPlayer = addPlayer;
         this.removePlayer = removePlayer;
         this.updatePlayerCount = updatePlayerCount;
         this.username = username;
         this.players = new Map();
+        this.onMinigameSequenceReceived = onMinigameSequenceReceived; // Callback for minigame sequence
 
         // Dynamic socket URL for production/development
         const socketUrl = this.getSocketUrl();
         console.log('🎮 Connecting to:', socketUrl, 'with username:', username);
 
-        // ✅ UPDATED: Pass username in auth object
+        // Pass username in auth object
         this.io = io(socketUrl, {
             auth: {
-                username: username // ✅ Send username during connection
+                username: username
             },
             transports: ['websocket', 'polling'],
             timeout: 10000
@@ -43,13 +44,20 @@ export class SocketClient {
             console.log("❌ Disconnected from server:", reason);
         });
 
+        // Handle minigame sequence from server
+        this.io.on("minigame-sequence", (sequence) => {
+            console.log("🎲 Received minigame sequence from server:", sequence);
+            if (this.onMinigameSequenceReceived) {
+                this.onMinigameSequenceReceived(sequence);
+            }
+        });
+
         // Handle initial connection with ALL players
         this.io.on("connection", (allPlayers) => {
             console.log("👥 Received all players:", allPlayers);
             for (const playerData of allPlayers) {
                 this.addRemotePlayer(playerData);
             }
-            // Update player count after adding all initial players
             if (this.updatePlayerCount) {
                 this.updatePlayerCount(this.players.size, this.players);
             }
@@ -58,11 +66,9 @@ export class SocketClient {
         // Handle new player connections
         this.io.on("player-connected", (playerData) => {
             console.log("🟢 New player connected:", playerData);
-            // Don't add ourselves
             if (playerData.id !== this.io.id) {
                 this.addRemotePlayer(playerData);
             }
-            // Update player count
             if (this.updatePlayerCount) {
                 this.updatePlayerCount(this.players.size, this.players);
             }
@@ -72,7 +78,6 @@ export class SocketClient {
         this.io.on("player-disconnected", (playerData) => {
             console.log("🔴 Player disconnected:", playerData.id);
             this.removeRemotePlayer(playerData.id);
-            // Update player count
             if (this.updatePlayerCount) {
                 this.updatePlayerCount(this.players.size, this.players);
             }
@@ -105,7 +110,6 @@ export class SocketClient {
     }
 
     addRemotePlayer(playerData) {
-        // Skip if player already exists
         if (this.players.has(playerData.id)) {
             return;
         }
@@ -135,7 +139,6 @@ export class SocketClient {
         }
     }
 
-    // Method to update username
     updateUsername(newUsername) {
         if (this.io.connected) {
             console.log("📝 Sending username update to server:", newUsername);
@@ -153,7 +156,6 @@ export class SocketClient {
         return this.io.id;
     }
 
-    // Helper to check connection status
     get isConnected() {
         return this.io.connected;
     }

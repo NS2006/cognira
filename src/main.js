@@ -28,6 +28,7 @@ const joinGameButton = document.getElementById("joinGameButton");
 const controlsButton = document.getElementById("controls");
 
 export let currentRound = 0;
+export let minigameSequence = []; // Store minigame sequence
 export let cardSystem, questionSystem, memoryMatrixSystem, mathOperationSystem;
 var scene, socketClient, ambientLight, dirLight, dirLightTarget, camera;
 let localPlayer = null;
@@ -59,8 +60,14 @@ export function initializeSocketConnection(username) {
     // Hide join button
     joinGameButton.style.display = "none";
 
-    // Initialize socket connection with the chosen username
-    socketClient = new SocketClient(addPlayer, removePlayer, updatePlayerCount, username);
+    // Initialize socket connection
+    socketClient = new SocketClient(username, addPlayer, removePlayer, updatePlayerCount, handleMinigameSequenceReceived);
+}
+
+// Handle received minigame sequence
+function handleMinigameSequenceReceived(sequence) {
+    minigameSequence = sequence;
+    console.log(`🎲 Minigame sequence stored: ${minigameSequence.join(', ')}`);
 }
 
 function updatePlayerCount(count, players) {

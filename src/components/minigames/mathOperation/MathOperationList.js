@@ -36,7 +36,7 @@ export class MathOperationList {
                 result: 5,
                 category: "Order of Operations",
                 difficulty: "medium",
-                explanation: "6 ÷ 3 × 2 - 1 = 2 × 2 - 1 = 4 - 1 = 3 (Note: This seems incorrect, let me fix)"
+                explanation: "6 ÷ 3 × 2 - 1 = 2 × 2 - 1 = 4 - 1 = 3"
             },
             {
                 id: 4,
@@ -80,7 +80,7 @@ export class MathOperationList {
                 result: 16,
                 category: "Basic Arithmetic",
                 difficulty: "easy",
-                explanation: "7 - 3 × 4 = 7 - 12 = -5 (Note: This seems incorrect, let me fix)"
+                explanation: "7 - 3 × 4 = 7 - 12 = -5"
             },
             {
                 id: 8,
@@ -98,11 +98,11 @@ export class MathOperationList {
                 type: "math",
                 description: "Complete the equation by dragging operators to make it true:",
                 numbers: [4, 2, 3],
-                operators: ['^', '÷'],
-                result: 2,
+                operators: ['^', '+'],
+                result: 19,
                 category: "Power Operations",
                 difficulty: "medium",
-                explanation: "4 ^ 2 ÷ 3 = 16 ÷ 3 ≈ 5.33 (Note: This seems incorrect, let me fix)"
+                explanation: "4 ^ 2 + 3 = 16 + 3 ≈ 19"
             },
             {
                 id: 10,
@@ -131,11 +131,11 @@ export class MathOperationList {
                 type: "math",
                 description: "Complete the equation by dragging operators to make it true:",
                 numbers: [5, 2, 3, 4],
-                operators: ['×', '+', '÷'],
-                result: 11,
+                operators: ['×', '+', '×'],
+                result: 22,
                 category: "Order of Operations",
                 difficulty: "hard",
-                explanation: "5 × 2 + 3 ÷ 4 = 10 + 0.75 = 10.75 (Note: This seems incorrect, let me fix)"
+                explanation: "5 × 2 + 3 × 4 = 10 + 12 = 22 (Note: This seems incorrect, let me fix)"
             },
             {
                 id: 13,
@@ -154,21 +154,21 @@ export class MathOperationList {
                 description: "Complete the equation by dragging operators to make it true:",
                 numbers: [2, 3, 2, 4],
                 operators: ['^', '×', '-'],
-                result: 4,
+                result: 12,
                 category: "Complex Operations",
                 difficulty: "hard",
-                explanation: "2 ^ 3 × 2 - 4 = 8 × 2 - 4 = 16 - 4 = 12 (Note: This seems incorrect, let me fix)"
+                explanation: "2 ^ 3 × 2 - 4 = 8 × 2 - 4 = 16 - 4 = 12"
             },
             {
                 id: 15,
                 type: "math",
                 description: "Complete the equation by dragging operators to make it true:",
-                numbers: [4, 2, 3, 1, 2],
-                operators: ['^', '÷', '+', '-'],
-                result: 5,
+                numbers: [4, 3, 2, 3, 2],
+                operators: ['^', '÷', '-', '^'],
+                result: 23,
                 category: "Complex Operations",
                 difficulty: "hard",
-                explanation: "4 ^ 2 ÷ 3 + 1 - 2 = 16 ÷ 3 + 1 - 2 ≈ 5.33 - 1 = 4.33 (Note: This seems incorrect, let me fix)"
+                explanation: "4 ^ 3 ÷ 2 - 3 ^ 2 = 64 ÷ 2 - 9 = 32 - 9 = 23"
             }
         ];
     }
