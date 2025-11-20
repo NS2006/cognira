@@ -19,8 +19,7 @@ import { LeafParticles } from "./components/particles/LeafParticleSystem";
 import { initializeLeaderboard } from "./phases/leaderboardPhase";
 import { 
     initializeUsernameHandlers, 
-    showUsernamePopup, 
-    getPlayerUsername 
+    showUsernamePopup
 } from "./utilities/handleUsernameInput";
 
 const mainMenu = document.getElementById("mainMenu");

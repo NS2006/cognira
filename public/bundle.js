@@ -41528,11 +41528,12 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Card = void 0;
 class Card {
-  constructor(id, title, descriptions, weight, positiveEffect, negativeEffect) {
+  constructor(id, title, weight, file, descriptions, positiveEffect, negativeEffect) {
     this.id = id;
     this.title = title;
-    this.descriptions = descriptions;
     this.weight = weight;
+    this.file = file;
+    this.descriptions = descriptions;
     this.positiveEffect = positiveEffect;
     this.negativeEffect = negativeEffect;
   }
@@ -41566,6 +41567,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.CardEffects = void 0;
+var _main = require("../main");
 const CardEffects = exports.CardEffects = {
   // moveOrStopPositive(player) {
   //     console.log("Move or Stop Positive");
@@ -41612,39 +41614,46 @@ const CardEffects = exports.CardEffects = {
   /* ============================================
      MOVE / STOP
   ============================================ */
-  move(player) {
-    console.log("Move effect: player can move");
-    player.canMove = true;
-  },
+  // move(player) {
+  //     console.log("Move effect: player can move");
+  //     player.canMove = true;
+  // },
+
   stop(player) {
     console.log("Stop effect: player cannot move");
-    player.canMove = false;
+    player.remainingSteps = 0;
   },
   /* ============================================
      STOP ALL (Falcon negative)
   ============================================ */
-  stopAll(players) {
-    console.log("Stop All effect: everyone is stopped");
-    players.forEach(p => {
-      p.canMove = false;
-    });
-  },
+  // stopAll(players) {
+  //     console.log("Stop All effect: everyone is stopped");
+
+  //     players.forEach(p => {
+  //         p.canMove = false;
+  //     });
+  // },
+
   /* ============================================
      IMMUNE (Mouse/Capybara)
   ============================================ */
   immune(player) {
     console.log("Immune effect applied");
-    player.isImmune = true;
+    player.immune = {
+      value: true,
+      round: _main.currentRound + 1
+    };
   },
   /* ============================================
      STEAL (LEAVE EMPTY for now)
   ============================================ */
-  steal(player, target, amount) {
-    console.log(`Steal effect placeholder: intended steal ${amount}`);
+  // steal(player, target, amount) {
+  //     console.log(`Steal effect placeholder: intended steal ${amount}`);
 
-    // Multiplayer logic will be added later
-    // Leaving blank
-  },
+  //     // Multiplayer logic will be added later
+  //     // Leaving blank
+  // },
+
   /* ============================================
      NO EFFECT
   ============================================ */
@@ -41653,7 +41662,7 @@ const CardEffects = exports.CardEffects = {
   }
 };
 
-},{}],42:[function(require,module,exports){
+},{"../main":61}],42:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41693,6 +41702,12 @@ var _Card = require("./Card.js");
 // }; 
 
 const cardDefinition = {
+  // bad_monkey: {
+  //     id: 'bad_monkey',
+  //     file: 'Bad Monkey',
+  //     positive: { type: 'value', amount: 6 },          // +6
+  //     negative: { type: 'stop_all' } // stop all
+  // },
   bad_monkey: {
     id: 'bad_monkey',
     file: 'Bad Monkey',
@@ -41702,8 +41717,8 @@ const cardDefinition = {
     },
     // +6
     negative: {
-      type: 'stop_all'
-    } // stop all
+      type: 'stop'
+    } // stop
   },
   bear: {
     id: 'bear',
@@ -41718,9 +41733,9 @@ const cardDefinition = {
       amount: -7
     } // -7
   },
-  cock: {
-    id: 'cock',
-    file: 'Cock',
+  chicken: {
+    id: 'chicken',
+    file: 'Chicken',
     positive: {
       type: 'multiplier',
       amount: 2
@@ -41769,7 +41784,8 @@ const cardDefinition = {
     id: 'pig',
     file: 'Pig',
     positive: {
-      type: 'move'
+      type: 'multiplier',
+      amount: 2
     },
     negative: {
       type: 'stop'
@@ -41779,19 +41795,19 @@ const cardDefinition = {
     id: 'raven',
     file: 'Raven',
     positive: {
-      type: 'steal',
-      amount: 1
+      type: 'value',
+      amount: 11
     },
     negative: {
-      type: 'stop'
+      type: 'none'
     }
   },
   snake: {
     id: 'snake',
     file: 'Snake',
     positive: {
-      type: 'steal',
-      amount: 5
+      type: 'value',
+      amount: 13
     },
     negative: {
       type: 'value',
@@ -41812,25 +41828,25 @@ const cardDefinition = {
 };
 
 // Helper to map effect descriptor to function
-function mapEffectDescriptorToFunction(effectDesc, isPositive) {
+function mapEffectDescriptorToFunction(effectDesc) {
   if (!effectDesc || !effectDesc.type) return _CardEffect.CardEffects.none;
   switch (effectDesc.type) {
     case 'value':
       return player => _CardEffect.CardEffects.value(player, effectDesc.amount);
     case 'multiplier':
       return player => _CardEffect.CardEffects.multiplier(player, effectDesc.amount);
-    case 'move':
-      return player => _CardEffect.CardEffects.move(player);
+    // case 'move':
+    //     return (player) => CardEffects.move(player);
     case 'stop':
       return player => _CardEffect.CardEffects.stop(player);
-    case 'stop_all':
-      // Needs access to all players; here, just log or no-op
-      return (player, players) => _CardEffect.CardEffects.stopAll(players || [player]);
+    // case 'stop_all':
+    //     // Needs access to all players; here, just log or no-op
+    //     return (player, players) => CardEffects.stopAll(players || [player]);
     case 'immune':
       return player => _CardEffect.CardEffects.immune(player);
-    case 'steal':
-      // Placeholder: needs target and amount
-      return (player, target) => _CardEffect.CardEffects.steal(player, target, effectDesc.amount);
+    // case 'steal':
+    //     // Placeholder: needs target and amount
+    //     return (player, target) => CardEffects.steal(player, target, effectDesc.amount);
     case 'none':
     default:
       return () => _CardEffect.CardEffects.none();
@@ -41849,8 +41865,10 @@ class CardList {
       // Provide file property to Card for image rendering
       const card = new _Card.Card(cardDef.id, cardDef.title || cardDef.id,
       // fallback to id if no title
-      cardDef.descriptions || [], cardDef.weight || 1, positiveEffect, negativeEffect);
-      card.file = cardDef.file; // for image path in Card.createCardElement
+      cardDef.weight || 1, cardDef.file, {
+        positive: cardDef.positive,
+        negative: cardDef.negative
+      }, positiveEffect, negativeEffect);
       return card;
     });
   }
@@ -42140,24 +42158,33 @@ class CardSystem {
   }
 
   // Apply card effects to player
-  applyCardEffect(cardType, isPositive, player) {
-    const card = this.cardList.getCardById(cardType);
+  applyCardEffect(cardId, isPositive, player) {
+    const card = this.cardList.getCardById(cardId);
     if (!card) {
-      console.warn(`Card not found: ${cardType}`);
+      console.warn(`Card not found: ${cardId}`);
       return null;
     }
-    console.log(`🔄 Applying ${isPositive ? 'positive' : 'negative'} ${cardType} to player ${player.playerId}`);
+    console.log(`🔄 Applying ${isPositive ? 'positive' : 'negative'} ${cardId} to player ${player.playerId}`);
     if (isPositive) {
+      if (player.immune.value == true && player.immune.round == _main.currentRound) {
+        // RESET IMMUNE
+        player.immune = {
+          value: false,
+          round: -1
+        };
+      }
       card.applyPositive(player);
     } else {
-      card.applyNegative(player);
+      if (player.immune.value == true && player.immune.round == _main.currentRound) {
+        // RESET IMMUNE
+        player.immune = {
+          value: false,
+          round: -1
+        };
+      } else {
+        card.applyNegative(player);
+      }
     }
-  }
-  applyPositiveEffect(cardType, player) {
-    return this.applyCardEffect(cardType, true, player);
-  }
-  applyNegativeEffect(cardType, player) {
-    return this.applyCardEffect(cardType, false, player);
   }
   hideCardSelection() {
     this.cardContainer.style.display = 'none';
@@ -42957,6 +42984,10 @@ class Player extends THREE.Object3D {
     this.remainingSteps = this.baseStep;
     this.selectedCard = null;
     this.winGame = false;
+    this.immune = {
+      value: false,
+      round: -1
+    };
     this._createPhysicsBody(initX);
     this._createPlayerModel();
 
@@ -46231,7 +46262,7 @@ const MAX_PLAYER = exports.MAX_PLAYER = 1;
 const COUNTDOWN_PHASE_TIME = exports.COUNTDOWN_PHASE_TIME = 1;
 const ROUND_PHASE_TIME = exports.ROUND_PHASE_TIME = 1;
 const CARD_PHASE_TIME = exports.CARD_PHASE_TIME = 3;
-const CARD_RESULT_PHASE_TIME = exports.CARD_RESULT_PHASE_TIME = 10;
+const CARD_RESULT_PHASE_TIME = exports.CARD_RESULT_PHASE_TIME = 5;
 const MOVEMENT_PHASE_TIME = exports.MOVEMENT_PHASE_TIME = 15;
 const LEADERBOARD_PHASE_TIME = exports.LEADERBOARD_PHASE_TIME = 1;
 const PHASE_TRANSITION_DELAY = exports.PHASE_TRANSITION_DELAY = 0.5;
@@ -46637,17 +46668,26 @@ function applyCardEffect(localPlayer, isMinigameWon) {
   let effectDescription = "No effect";
   if (isMinigameWon) {
     // Apply positive effect
-    if (card.positive && card.positive.type !== 'none') {
-      effectDescription = getEffectDescription(card.positive, true);
+    if (card.descriptions.positive && card.descriptions.positive.type !== 'none') {
+      effectDescription = getEffectDescription(card.descriptions.positive, true);
       console.log(`✅ Applied positive effect: ${effectDescription}`);
     }
   } else {
     // Apply negative effect
-    if (card.negative && card.negative.type !== 'none') {
-      effectDescription = getEffectDescription(card.negative, false);
-      console.log(`❌ Applied negative effect: ${effectDescription}`);
+    if (card.descriptions.negative && card.descriptions.negative.type !== 'none') {
+      if (localPlayer.immune.value == false) {
+        effectDescription = getEffectDescription(card.descriptions.negative, false);
+        console.log(`❌ Applied negative effect: ${effectDescription}`);
+      } else {
+        effectDescription = "Cancel negative effects. You are immune";
+        console.log(`Get Immune`);
+      }
     }
   }
+
+  // Apply card effect
+  _main.cardSystem.applyCardEffect(card.id, isMinigameWon, localPlayer);
+  (0, _main.updateStepsDisplay)();
   return effectDescription;
 }
 function getEffectDescription(effect, isPositive) {
@@ -46658,9 +46698,9 @@ function getEffectDescription(effect, isPositive) {
     case 'multiplier':
       return `${effect.amount}x multiplier`;
     case 'immune':
-      return "Immunity to negative effects";
+      return "Become immune to negative effects next round";
     case 'move':
-      return "Extra movement ability";
+      return "Able to move";
     case 'steal':
       return `Steal ${effect.amount} step${effect.amount > 1 ? 's' : ''}`;
     case 'stop':

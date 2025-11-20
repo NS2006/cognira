@@ -1,4 +1,4 @@
-import { clearPhaseTimer, setPhaseTimer, getLocalPlayer } from "../main.js";
+import { clearPhaseTimer, setPhaseTimer, getLocalPlayer, cardSystem, updateStepsDisplay, currentRound } from "../main.js";
 import { CARD_RESULT_PHASE_TIME, PHASE_TRANSITION_DELAY } from "../constants.js";
 import { startMovementPhase } from "./movePhase.js";
 
@@ -83,17 +83,26 @@ function applyCardEffect(localPlayer, isMinigameWon) {
     
     if (isMinigameWon) {
         // Apply positive effect
-        if (card.positive && card.positive.type !== 'none') {
-            effectDescription = getEffectDescription(card.positive, true);
+        if (card.descriptions.positive && card.descriptions.positive.type !== 'none') {
+            effectDescription = getEffectDescription(card.descriptions.positive, true);
             console.log(`✅ Applied positive effect: ${effectDescription}`);
         }
     } else {
         // Apply negative effect
-        if (card.negative && card.negative.type !== 'none') {
-            effectDescription = getEffectDescription(card.negative, false);
-            console.log(`❌ Applied negative effect: ${effectDescription}`);
+        if (card.descriptions.negative && card.descriptions.negative.type !== 'none') {
+            if(localPlayer.immune.value == false){
+                effectDescription = getEffectDescription(card.descriptions.negative, false);
+                console.log(`❌ Applied negative effect: ${effectDescription}`);
+            } else{
+                effectDescription = "Cancel negative effects. You are immune";
+                console.log(`Get Immune`);
+            }
         }
     }
+    
+    // Apply card effect
+    cardSystem.applyCardEffect(card.id, isMinigameWon, localPlayer);
+    updateStepsDisplay();
     
     return effectDescription;
 }
@@ -107,9 +116,9 @@ function getEffectDescription(effect, isPositive) {
         case 'multiplier':
             return `${effect.amount}x multiplier`;
         case 'immune':
-            return "Immunity to negative effects";
+            return "Become immune to negative effects next round";
         case 'move':
-            return "Extra movement ability";
+            return "Able to move";
         case 'steal':
             return `Steal ${effect.amount} step${effect.amount > 1 ? 's' : ''}`;
         case 'stop':

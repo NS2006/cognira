@@ -1,5 +1,5 @@
 import { CARD_PHASE_TIME } from '../constants.js';
-import { getLocalPlayer } from '../main.js';
+import { currentRound, getLocalPlayer } from '../main.js';
 import { CardList } from './CardList.js';
 
 export class CardSystem {
@@ -253,28 +253,37 @@ export class CardSystem {
     }
 
     // Apply card effects to player
-    applyCardEffect(cardType, isPositive, player) {
-        const card = this.cardList.getCardById(cardType);
+    applyCardEffect(cardId, isPositive, player) {
+        const card = this.cardList.getCardById(cardId);
         if (!card) {
-            console.warn(`Card not found: ${cardType}`);
+            console.warn(`Card not found: ${cardId}`);
             return null;
         }
 
-        console.log(`🔄 Applying ${isPositive ? 'positive' : 'negative'} ${cardType} to player ${player.playerId}`);
-
+        
+        console.log(`🔄 Applying ${isPositive ? 'positive' : 'negative'} ${cardId} to player ${player.playerId}`);
+        
         if (isPositive) {
+            if(player.immune.value == true && player.immune.round == currentRound){
+                // RESET IMMUNE
+                player.immune = {
+                    value: false,
+                    round: -1
+                };
+            }
+            
             card.applyPositive(player);
         } else {
-            card.applyNegative(player);
+            if(player.immune.value == true && player.immune.round == currentRound){
+                // RESET IMMUNE
+                player.immune = {
+                    value: false,
+                    round: -1
+                };
+            } else{
+                card.applyNegative(player);
+            }
         }
-    }
-
-    applyPositiveEffect(cardType, player) {
-        return this.applyCardEffect(cardType, true, player);
-    }
-
-    applyNegativeEffect(cardType, player) {
-        return this.applyCardEffect(cardType, false, player);
     }
 
     hideCardSelection() {

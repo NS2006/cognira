@@ -58,7 +58,7 @@ server.listen(PORT, '0.0.0.0', () => {
 socketio.on("connection", (socket) => {
     console.log("Socket connected", socket.id);
 
-    // ✅ NEW: Get username from handshake or use default
+    // Get username from handshake or use default
     const clientUsername = socket.handshake.auth.username || `Player${players.size + 1}`;
     
     console.log(`🎮 Player ${socket.id} joined with username: "${clientUsername}"`);

@@ -35,6 +35,10 @@ export class Player extends THREE.Object3D {
     this.remainingSteps = this.baseStep;
     this.selectedCard = null;
     this.winGame = false;
+    this.immune = {
+      value: false,
+      round: -1
+    };
 
     this._createPhysicsBody(initX);
     this._createPlayerModel();

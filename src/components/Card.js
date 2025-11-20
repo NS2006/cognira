@@ -1,9 +1,10 @@
 export class Card {
-    constructor(id, title, descriptions, weight, positiveEffect, negativeEffect) {
+    constructor(id, title, weight, file, descriptions, positiveEffect, negativeEffect) {
         this.id = id;
         this.title = title;
-        this.descriptions = descriptions;
         this.weight = weight;
+        this.file = file;
+        this.descriptions = descriptions;
         this.positiveEffect = positiveEffect;
         this.negativeEffect = negativeEffect;
     }
