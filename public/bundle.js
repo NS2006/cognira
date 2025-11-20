@@ -42114,11 +42114,6 @@ class CardSystem {
       if (c !== cardElement) c.classList.add('dimmed');
     });
     cardElement.classList.add('selected');
-
-    // Send card selection to server
-    if (this.socketClient?.selectCard) {
-      this.socketClient.selectCard(cardType);
-    }
     this.onCardSelect?.(cardType);
   }
   showCardSelection() {
@@ -42961,6 +42956,7 @@ class Player extends THREE.Object3D {
     this.baseStep = 2; // Base movement steps per turn
     this.remainingSteps = this.baseStep;
     this.selectedCard = null;
+    this.winGame = false;
     this._createPhysicsBody(initX);
     this._createPlayerModel();
 
@@ -43097,12 +43093,6 @@ class Player extends THREE.Object3D {
     if (!this._isValidMove(direction)) {
       return false;
     }
-
-    // Check step limit
-    if (this.remainingSteps <= 0) {
-      console.log(`Cannot queue more moves: Step limit reached (${this.remainingSteps} steps)`);
-      return false;
-    }
     this.movesQueue.push(direction);
     console.log(`Move queued: ${direction}. Queue: ${this.movesQueue.length}, Remaining: ${this.remainingSteps}`);
     return true;
@@ -43113,7 +43103,6 @@ class Player extends THREE.Object3D {
     if (direction === "backward") this.gridPosition.currentY -= 1;
     if (direction === "left") this.gridPosition.currentX -= 1;
     if (direction === "right") this.gridPosition.currentX += 1;
-    (0, _main.updateStepsDisplay)();
     console.log(`Step completed. Remaining steps: ${this.remainingSteps}`);
   }
 
@@ -43125,6 +43114,7 @@ class Player extends THREE.Object3D {
     // Reset to base step
     this.remainingSteps = this.baseStep;
     this.selectedCard = null;
+    this.winGame = false;
     (0, _main.updateStepsDisplay)();
     console.log(`Steps reset for player ${this.playerId}: ${this.remainingSteps} steps`);
   }
@@ -44360,12 +44350,14 @@ class MathOperationSystem {
     }
     this.questionContainer.style.display = 'none';
     (0, _worldRelated.pauseWorld)(false);
-    console.log(`🔄 [MathOperationSystem] Calling onGameComplete callback...`);
-    if (this.onGameComplete) {
-      this.onGameComplete(isCorrect);
-    } else {
-      console.error('❌ [MathOperationSystem] onGameComplete callback is not defined!');
-    }
+
+    // console.log(`🔄 [MathOperationSystem] Calling onGameComplete callback...`);
+
+    // if (this.onGameComplete) {
+    //     this.onGameComplete(isCorrect);
+    // } else {
+    //     console.error('❌ [MathOperationSystem] onGameComplete callback is not defined!');
+    // }
   }
   hideGame() {
     this.questionContainer.style.display = 'none';
@@ -44390,7 +44382,7 @@ class MathOperationSystem {
 }
 exports.MathOperationSystem = MathOperationSystem;
 
-},{"../../../constants.js":60,"../../../utilities/worldRelated.js":76,"./MathOperationList.js":52}],54:[function(require,module,exports){
+},{"../../../constants.js":60,"../../../utilities/worldRelated.js":78,"./MathOperationList.js":52}],54:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45042,12 +45034,14 @@ class MemoryMatrixSystem {
     }
     this.questionContainer.style.display = 'none';
     (0, _worldRelated.pauseWorld)(false);
-    console.log(`🔄 [MemoryMatrixSystem] Calling onGameComplete callback...`);
-    if (this.onGameComplete) {
-      this.onGameComplete(isCorrect, this.correctAnswerCount);
-    } else {
-      console.error('❌ [MemoryMatrixSystem] onGameComplete callback is not defined!');
-    }
+
+    // console.log(`🔄 [MemoryMatrixSystem] Calling onGameComplete callback...`);
+
+    // if (this.onGameComplete) {
+    //     this.onGameComplete(isCorrect, this.correctAnswerCount);
+    // } else {
+    //     console.error('❌ [MemoryMatrixSystem] onGameComplete callback is not defined!');
+    // }
   }
   hideGame() {
     this.questionContainer.style.display = 'none';
@@ -45074,7 +45068,7 @@ class MemoryMatrixSystem {
 }
 exports.MemoryMatrixSystem = MemoryMatrixSystem;
 
-},{"../../../constants.js":60,"../../../utilities/worldRelated.js":76,"./MemoryMatrixList.js":54}],56:[function(require,module,exports){
+},{"../../../constants.js":60,"../../../utilities/worldRelated.js":78,"./MemoryMatrixList.js":54}],56:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45869,7 +45863,7 @@ class QuestionSystem {
 }
 exports.QuestionSystem = QuestionSystem;
 
-},{"../../../constants.js":60,"../../../utilities/worldRelated.js":76,"./QuestionList.js":56}],58:[function(require,module,exports){
+},{"../../../constants.js":60,"../../../utilities/worldRelated.js":78,"./QuestionList.js":56}],58:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46225,7 +46219,7 @@ exports.LeafParticles = LeafParticles;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TILE_SIZE = exports.STEPS_UPDATE_INTERVAL = exports.ROUND_PHASE_TIME = exports.QUESTION_PHASE_TIME = exports.PHASE_TRANSITION_DELAY = exports.MOVEMENT_PHASE_TIME = exports.MESSAGE_FADE_OUT_TIME = exports.MESSAGE_DISPLAY_TIME = exports.MEMORY_MATRIX_PHASE_TIME = exports.MAX_PLAYER = exports.MATH_OPERATION_PHASE_TIME = exports.MAP_SIZE_Y = exports.MAP_SIZE_X = exports.LEADERBOARD_PHASE_TIME = exports.GAP_SIZE = exports.COUNTDOWN_PHASE_TIME = exports.CARD_PHASE_TIME = void 0;
+exports.TILE_SIZE = exports.STEPS_UPDATE_INTERVAL = exports.ROUND_PHASE_TIME = exports.QUESTION_PHASE_TIME = exports.PHASE_TRANSITION_DELAY = exports.MOVEMENT_PHASE_TIME = exports.MESSAGE_FADE_OUT_TIME = exports.MESSAGE_DISPLAY_TIME = exports.MEMORY_MATRIX_PHASE_TIME = exports.MAX_PLAYER = exports.MATH_OPERATION_PHASE_TIME = exports.MAP_SIZE_Y = exports.MAP_SIZE_X = exports.LEADERBOARD_PHASE_TIME = exports.GAP_SIZE = exports.COUNTDOWN_PHASE_TIME = exports.CARD_RESULT_PHASE_TIME = exports.CARD_PHASE_TIME = void 0;
 // 4 x 23 GRID
 const MAP_SIZE_X = exports.MAP_SIZE_X = 4;
 const MAP_SIZE_Y = exports.MAP_SIZE_Y = 51;
@@ -46234,17 +46228,18 @@ const GAP_SIZE = exports.GAP_SIZE = 6;
 const MAX_PLAYER = exports.MAX_PLAYER = 1;
 
 // Phase timing constants (in seconds)
-const COUNTDOWN_PHASE_TIME = exports.COUNTDOWN_PHASE_TIME = 3;
-const ROUND_PHASE_TIME = exports.ROUND_PHASE_TIME = 3;
-const CARD_PHASE_TIME = exports.CARD_PHASE_TIME = 10;
+const COUNTDOWN_PHASE_TIME = exports.COUNTDOWN_PHASE_TIME = 1;
+const ROUND_PHASE_TIME = exports.ROUND_PHASE_TIME = 1;
+const CARD_PHASE_TIME = exports.CARD_PHASE_TIME = 3;
+const CARD_RESULT_PHASE_TIME = exports.CARD_RESULT_PHASE_TIME = 10;
 const MOVEMENT_PHASE_TIME = exports.MOVEMENT_PHASE_TIME = 15;
-const LEADERBOARD_PHASE_TIME = exports.LEADERBOARD_PHASE_TIME = 8;
+const LEADERBOARD_PHASE_TIME = exports.LEADERBOARD_PHASE_TIME = 1;
 const PHASE_TRANSITION_DELAY = exports.PHASE_TRANSITION_DELAY = 0.5;
 
 // Minigame time
-const QUESTION_PHASE_TIME = exports.QUESTION_PHASE_TIME = 15;
-const MEMORY_MATRIX_PHASE_TIME = exports.MEMORY_MATRIX_PHASE_TIME = 30;
-const MATH_OPERATION_PHASE_TIME = exports.MATH_OPERATION_PHASE_TIME = 30;
+const QUESTION_PHASE_TIME = exports.QUESTION_PHASE_TIME = 1;
+const MEMORY_MATRIX_PHASE_TIME = exports.MEMORY_MATRIX_PHASE_TIME = 1;
+const MATH_OPERATION_PHASE_TIME = exports.MATH_OPERATION_PHASE_TIME = 1;
 
 // Animation and UI timing
 const MESSAGE_DISPLAY_TIME = exports.MESSAGE_DISPLAY_TIME = 3;
@@ -46266,6 +46261,7 @@ exports.getPhaseTimer = getPhaseTimer;
 exports.getSocketClient = getSocketClient;
 exports.hideGameUI = hideGameUI;
 exports.incrementRound = incrementRound;
+exports.initializeSocketConnection = initializeSocketConnection;
 exports.isGameInitialized = isGameInitialized;
 exports.questionSystem = exports.memoryMatrixSystem = exports.mathOperationSystem = void 0;
 exports.resetRound = resetRound;
@@ -46292,6 +46288,7 @@ var _lobby = require("./components/lobby");
 var _constants = require("./constants");
 var _LeafParticleSystem = require("./components/particles/LeafParticleSystem");
 var _leaderboardPhase = require("./phases/leaderboardPhase");
+var _handleUsernameInput = require("./utilities/handleUsernameInput");
 var _currentRound;
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 const mainMenu = document.getElementById("mainMenu");
@@ -46312,15 +46309,26 @@ let lobby;
 let leafParticles = null;
 const renderer = (0, _Renderer.Renderer)();
 initializeGame();
-joinGameButton.addEventListener("click", e => {
-  e.preventDefault();
+setupMainMenuHandlers();
+function setupMainMenuHandlers() {
+  // Initialize username handlers
+  (0, _handleUsernameInput.initializeUsernameHandlers)();
 
-  // Hide join button and show waiting message
+  // Join Game button click - show username popup
+  joinGameButton.addEventListener("click", e => {
+    e.preventDefault();
+    (0, _handleUsernameInput.showUsernamePopup)();
+  });
+}
+function initializeSocketConnection(username) {
+  console.log(`🎮 Initializing socket connection for: ${username}`);
+
+  // Hide join button
   joinGameButton.style.display = "none";
 
-  // Initialize socket connection
-  socketClient = new _socketClient.SocketClient(addPlayer, removePlayer, updatePlayerCount);
-});
+  // Initialize socket connection with the chosen username
+  socketClient = new _socketClient.SocketClient(addPlayer, removePlayer, updatePlayerCount, username);
+}
 function updatePlayerCount(count, players) {
   if (gameInitialized) {
     return;
@@ -46340,8 +46348,7 @@ function updatePlayerCount(count, players) {
     _LoadingManager.loadingManager.startLoading(1000, () => {
       console.log('Loading complete!');
       showGameUI();
-      animateFunction = (0, _animate.createAnimationLoop)(scene, camera, dirLight, dirLightTarget, _Map.map, renderer, getLocalPlayer, getSocketClient, leafParticles // Pass leafParticles to animation loop
-      );
+      animateFunction = (0, _animate.createAnimationLoop)(scene, camera, dirLight, dirLightTarget, _Map.map, renderer, getLocalPlayer, getSocketClient, leafParticles);
       renderer.setAnimationLoop(animateFunction);
       initializeGameSystems();
       // Show UI leaf decorations when the game actually starts
@@ -46396,7 +46403,6 @@ function updateRoundDisplay() {
   const roundDisplay = document.getElementById('currentRoundDisplay');
   if (roundDisplay) {
     roundDisplay.textContent = currentRound;
-    // Add animation for round change
     roundDisplay.classList.add('changed');
     setTimeout(() => roundDisplay.classList.remove('changed'), 500);
   }
@@ -46406,7 +46412,6 @@ function updateStepsDisplay() {
   const localPlayer = getLocalPlayer();
   if (stepsDisplay && localPlayer) {
     stepsDisplay.textContent = localPlayer.remainingSteps;
-    // Add animation for steps change
     stepsDisplay.classList.add('changed');
     setTimeout(() => stepsDisplay.classList.remove('changed'), 500);
   } else if (stepsDisplay) {
@@ -46425,15 +46430,11 @@ function hideGameUI() {
     gameInfo.style.display = 'none';
   }
 }
-
-// Function to increment round (call this when a new round starts)
 function incrementRound() {
   _currentRound = currentRound++, exports.currentRound = currentRound, _currentRound;
   updateRoundDisplay();
   console.log(`🔄 Round updated to: ${currentRound}`);
 }
-
-// Function to increment round (call this when a new round starts)
 function resetRound() {
   exports.currentRound = currentRound = 0;
   updateRoundDisplay();
@@ -46453,8 +46454,6 @@ function clearPhaseTimer() {
     clearTimeout(_phaseTimer);
     _phaseTimer = null;
   }
-
-  // Remove any phase messages
   const moveMsg = document.getElementById('movementPhaseMessage');
   if (moveMsg) {
     moveMsg.remove();
@@ -46463,7 +46462,6 @@ function clearPhaseTimer() {
 function initializeGame() {
   console.log("🟡 Initializing game...");
   scene = new THREE.Scene();
-  // Add fog system to the scene
   scene.fog = new THREE.FogExp2(0xaad0ff, 0.001);
   ambientLight = new THREE.AmbientLight();
   dirLight = (0, _DirectionalLight.DirectionalLight)();
@@ -46475,24 +46473,18 @@ function initializeGame() {
     scene.add(obj);
   });
   new _SkyBox.SkyBox(scene);
-
-  // Initialize leaf particles and add to scene
   leafParticles = new _LeafParticleSystem.LeafParticles(scene, 20, 150);
   (0, _Map.initializeMap)();
   (0, _leaderboardPhase.initializeLeaderboard)();
   (0, _Map.loadTrees)();
   (0, _Map.loadRiver)();
 }
-
-// Export for input system if needed
 function getLocalPlayer() {
   return localPlayer;
 }
 function getSocketClient() {
   return socketClient;
 }
-
-// Clean up when game ends
 function cleanupGame() {
   if (cardSystem) {
     cardSystem.stopCardInterval();
@@ -46502,15 +46494,13 @@ function cleanupGame() {
   }
   clearPhaseTimer();
   (0, _animate.resetAnimationState)();
-
-  // Stop animation loop
   if (animateFunction) {
     renderer.setAnimationLoop(null);
   }
   gameInitialized = false;
 }
 
-},{"./components/Camera":39,"./components/CardSystem":43,"./components/DirectionalLight":44,"./components/LoadingManager":45,"./components/Map":46,"./components/Renderer":48,"./components/SkyBox":49,"./components/lobby":51,"./components/minigames/mathOperation/MathOperationSystem":53,"./components/minigames/memoryMatrix/MemoryMatrixSystem":55,"./components/minigames/question/QuestionSystem":57,"./components/particles/LeafParticleSystem":59,"./constants":60,"./phases/countdownPhase":63,"./phases/leaderboardPhase":64,"./socketClient":72,"./utilities/animate":73,"./utilities/collectUserInputs":74,"three":36}],62:[function(require,module,exports){
+},{"./components/Camera":39,"./components/CardSystem":43,"./components/DirectionalLight":44,"./components/LoadingManager":45,"./components/Map":46,"./components/Renderer":48,"./components/SkyBox":49,"./components/lobby":51,"./components/minigames/mathOperation/MathOperationSystem":53,"./components/minigames/memoryMatrix/MemoryMatrixSystem":55,"./components/minigames/question/QuestionSystem":57,"./components/particles/LeafParticleSystem":59,"./constants":60,"./phases/countdownPhase":64,"./phases/leaderboardPhase":65,"./socketClient":73,"./utilities/animate":74,"./utilities/collectUserInputs":75,"./utilities/handleUsernameInput":76,"three":36}],62:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46566,7 +46556,200 @@ function endCardPhase() {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../constants.js":60,"../main.js":61,"./minigamePhase.js":65}],63:[function(require,module,exports){
+},{"../constants.js":60,"../main.js":61,"./minigamePhase.js":66}],63:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.endCardResultPhase = endCardResultPhase;
+exports.isCardResultPhaseActive = isCardResultPhaseActive;
+exports.startCardResultPhase = startCardResultPhase;
+var _main = require("../main.js");
+var _constants = require("../constants.js");
+var _movePhase = require("./movePhase.js");
+let cardResultPhaseActive = false;
+let cardResultPhaseTimer = null;
+function startCardResultPhase(isMinigameWon) {
+  if (cardResultPhaseActive) {
+    console.log("🎴 Card result phase already active, skipping");
+    return;
+  }
+  console.log(`🎴 Starting card result phase - Minigame ${isMinigameWon ? 'WON' : 'LOST'}`);
+  cardResultPhaseActive = true;
+  const localPlayer = (0, _main.getLocalPlayer)();
+  if (!localPlayer || !localPlayer.selectedCard) {
+    console.log("❌ No local player or selected card found, skipping card result phase");
+    endCardResultPhase();
+    return;
+  }
+
+  // Apply card effect based on minigame result
+  const effectDescription = applyCardEffect(localPlayer, isMinigameWon);
+
+  // Clear any existing timers
+  (0, _main.clearPhaseTimer)();
+
+  // Show simplified card result message
+  showCardResultMessage(localPlayer.selectedCard, isMinigameWon, effectDescription);
+
+  // Set timer to automatically move to next phase
+  cardResultPhaseTimer = setTimeout(() => {
+    console.log("🎴 Card result phase completed");
+    endCardResultPhase();
+  }, _constants.CARD_RESULT_PHASE_TIME * 1000);
+  (0, _main.setPhaseTimer)(cardResultPhaseTimer);
+}
+function endCardResultPhase() {
+  if (!cardResultPhaseActive) {
+    console.log("🎴 Card result phase not active, skipping end");
+    return;
+  }
+  console.log("🎴 Ending card result phase");
+  cardResultPhaseActive = false;
+
+  // Clear timers
+  if (cardResultPhaseTimer) {
+    clearTimeout(cardResultPhaseTimer);
+    cardResultPhaseTimer = null;
+  }
+  (0, _main.clearPhaseTimer)();
+
+  // Remove card result message
+  removeCardResultMessage();
+
+  // Add delay before next phase to ensure clean transition
+  setTimeout(() => {
+    console.log("🎴 Card result phase completed, moving to movement phase");
+    (0, _movePhase.startMovementPhase)();
+  }, _constants.PHASE_TRANSITION_DELAY * 1000);
+}
+function isCardResultPhaseActive() {
+  return cardResultPhaseActive;
+}
+function applyCardEffect(localPlayer, isMinigameWon) {
+  if (!localPlayer.selectedCard) {
+    console.log("❌ No card selected to apply effect");
+    return "No effect";
+  }
+  console.log(`🎴 Applying card effect: ${localPlayer.selectedCard.id}, Win: ${isMinigameWon}`);
+  const card = localPlayer.selectedCard;
+  let effectDescription = "No effect";
+  if (isMinigameWon) {
+    // Apply positive effect
+    if (card.positive && card.positive.type !== 'none') {
+      effectDescription = getEffectDescription(card.positive, true);
+      console.log(`✅ Applied positive effect: ${effectDescription}`);
+    }
+  } else {
+    // Apply negative effect
+    if (card.negative && card.negative.type !== 'none') {
+      effectDescription = getEffectDescription(card.negative, false);
+      console.log(`❌ Applied negative effect: ${effectDescription}`);
+    }
+  }
+  return effectDescription;
+}
+function getEffectDescription(effect, isPositive) {
+  const prefix = isPositive ? "+" : "";
+  switch (effect.type) {
+    case 'value':
+      return `${prefix}${effect.amount} steps`;
+    case 'multiplier':
+      return `${effect.amount}x multiplier`;
+    case 'immune':
+      return "Immunity to negative effects";
+    case 'move':
+      return "Extra movement ability";
+    case 'steal':
+      return `Steal ${effect.amount} step${effect.amount > 1 ? 's' : ''}`;
+    case 'stop':
+      return "Stop one player";
+    case 'stop_all':
+      return "Stop all players";
+    case 'none':
+      return "No effect";
+    default:
+      return "Unknown effect";
+  }
+}
+function showCardResultMessage(card, isMinigameWon, effectDescription) {
+  // Remove any existing message first
+  removeCardResultMessage();
+  const resultType = isMinigameWon ? 'win' : 'lose';
+  const title = isMinigameWon ? 'Victory! 🎉' : 'Defeat 💫';
+  const resultText = isMinigameWon ? 'You gained:' : 'You received:';
+
+  // Create simplified card result message with specific class names
+  const messageDiv = document.createElement('div');
+  messageDiv.id = 'cardResultMessage';
+  messageDiv.className = `card-result-${resultType}`;
+  messageDiv.innerHTML = `
+        <div class="card-result-popup-container">
+            <div class="card-result-popup-title">${title}</div>
+            
+            <div class="card-result-image-container">
+                <img 
+                    src="./assets/model/Cards/${card.file || card.id}.png" 
+                    alt="${card.id}" 
+                    class="card-result-popup-image"
+                >
+            </div>
+            
+            <div class="card-result-effect-info">
+                <div class="card-result-effect-text">${resultText}</div>
+                <div class="card-result-effect-description ${resultType}">${effectDescription}</div>
+            </div>
+
+            <div class="card-result-progress-container">
+                <div class="card-result-progress-text">Next phase in: <span id="cardResultTimer">${_constants.CARD_RESULT_PHASE_TIME}</span>s</div>
+            </div>
+        </div>
+    `;
+  document.body.appendChild(messageDiv);
+
+  // Start timer
+  startCardResultTimer();
+
+  // Auto-remove after specified time
+  setTimeout(() => {
+    messageDiv.style.opacity = '0';
+    messageDiv.style.transition = 'opacity 0.5s ease-out';
+    setTimeout(() => {
+      if (document.body.contains(messageDiv)) {
+        document.body.removeChild(messageDiv);
+      }
+    }, 500);
+  }, (_constants.CARD_RESULT_PHASE_TIME - 0.5) * 1000);
+}
+function removeCardResultMessage() {
+  const existingMessage = document.getElementById('cardResultMessage');
+  if (existingMessage) {
+    document.body.removeChild(existingMessage);
+  }
+}
+function startCardResultTimer() {
+  const timerElement = document.getElementById('cardResultTimer');
+  if (!timerElement) return;
+  let timeLeft = _constants.CARD_RESULT_PHASE_TIME;
+  const updateInterval = 1000; // Update every second
+
+  const timerInterval = setInterval(() => {
+    timeLeft--;
+    if (timeLeft <= 0) {
+      timeLeft = 0;
+      clearInterval(timerInterval);
+    }
+    timerElement.textContent = timeLeft;
+  }, updateInterval);
+
+  // Clear interval when phase ends
+  setTimeout(() => {
+    clearInterval(timerInterval);
+  }, _constants.CARD_RESULT_PHASE_TIME * 1000);
+}
+
+},{"../constants.js":60,"../main.js":61,"./movePhase.js":71}],64:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46640,7 +46823,7 @@ function hideInitialCountdownMessage() {
   }
 }
 
-},{"../constants":60,"../main":61,"../utilities/collectUserInputs":74,"./roundPhase":71}],64:[function(require,module,exports){
+},{"../constants":60,"../main":61,"../utilities/collectUserInputs":75,"./roundPhase":72}],65:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46898,7 +47081,7 @@ function initializeLeaderboard() {
   console.log("🏆 Leaderboard system initialized");
 }
 
-},{"../constants.js":60,"../main.js":61,"./roundPhase.js":71}],65:[function(require,module,exports){
+},{"../constants.js":60,"../main.js":61,"./roundPhase.js":72}],66:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46910,11 +47093,11 @@ exports.isMinigamePhaseActive = isMinigamePhaseActive;
 exports.startMinigamePhase = startMinigamePhase;
 var _main = require("../main.js");
 var _constants = require("../constants.js");
-var _movePhase = require("./movePhase.js");
 var _questionPhase = require("./minigames/questionPhase.js");
 var _tetrisPhase = require("./minigames/tetrisPhase.js");
 var _memoryMatrixPhase = require("./minigames/memoryMatrixPhase.js");
 var _mathOperationPhase = require("./minigames/mathOperationPhase.js");
+var _cardResultPhase = require("./cardResultPhase.js");
 let minigamePhaseActive = false;
 let currentMinigameType = null;
 function startMinigamePhase() {
@@ -46967,8 +47150,8 @@ function endMinigamePhase() {
 
   // Add delay before starting movement phase
   setTimeout(() => {
-    console.log("🔄 Transitioning to movement phase...");
-    (0, _movePhase.startMovementPhase)();
+    console.log("🔄 Transitioning to next phase...");
+    (0, _cardResultPhase.startCardResultPhase)((0, _main.getLocalPlayer)().winGame);
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 function getCurrentMinigameType() {
@@ -46978,7 +47161,7 @@ function isMinigamePhaseActive() {
   return minigamePhaseActive;
 }
 
-},{"../constants.js":60,"../main.js":61,"./minigames/mathOperationPhase.js":66,"./minigames/memoryMatrixPhase.js":67,"./minigames/questionPhase.js":68,"./minigames/tetrisPhase.js":69,"./movePhase.js":70}],66:[function(require,module,exports){
+},{"../constants.js":60,"../main.js":61,"./cardResultPhase.js":63,"./minigames/mathOperationPhase.js":67,"./minigames/memoryMatrixPhase.js":68,"./minigames/questionPhase.js":69,"./minigames/tetrisPhase.js":70}],67:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -47030,7 +47213,7 @@ function endMathOperationPhase(isCorrect = false) {
   _main.mathOperationSystem.onGameComplete = null;
   console.log(`🎯 Math operation game result: ${isCorrect ? 'CORRECT' : 'INCORRECT'}`);
   const localPlayer = (0, _main.getLocalPlayer)();
-  _main.cardSystem.applyCardEffect(localPlayer.selectedCard.id, isCorrect, localPlayer);
+  localPlayer.winGame = isCorrect;
 
   // Add a small delay before ending minigame phase to ensure clean transition
   setTimeout(() => {
@@ -47038,7 +47221,7 @@ function endMathOperationPhase(isCorrect = false) {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../../constants.js":60,"../../main.js":61,"../minigamePhase.js":65}],67:[function(require,module,exports){
+},{"../../constants.js":60,"../../main.js":61,"../minigamePhase.js":66}],68:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -47090,7 +47273,7 @@ function endMemoryMatrixPhase(isCorrect = false) {
   _main.memoryMatrixSystem.onGameComplete = null;
   console.log(`🎯 Memory matrix game result: ${isCorrect ? 'CORRECT' : 'INCORRECT'}`);
   const localPlayer = (0, _main.getLocalPlayer)();
-  _main.cardSystem.applyCardEffect(localPlayer.selectedCard.id, isCorrect, localPlayer);
+  localPlayer.winGame = isCorrect;
 
   // Add a small delay before ending minigame phase to ensure clean transition
   setTimeout(() => {
@@ -47098,7 +47281,7 @@ function endMemoryMatrixPhase(isCorrect = false) {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../../constants.js":60,"../../main.js":61,"../minigamePhase.js":65}],68:[function(require,module,exports){
+},{"../../constants.js":60,"../../main.js":61,"../minigamePhase.js":66}],69:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -47151,7 +47334,8 @@ function endQuestionPhase(isCorrect = false) {
   _main.questionSystem.onQuestionComplete = null;
   console.log(`🎯 Question result: ${isCorrect ? 'CORRECT' : 'INCORRECT'}`);
   const localPlayer = (0, _main.getLocalPlayer)();
-  _main.cardSystem.applyCardEffect(localPlayer.selectedCard.id, isCorrect, localPlayer);
+  localPlayer.winGame = isCorrect;
+  // cardSystem.applyCardEffect(localPlayer.selectedCard.id, isCorrect, localPlayer);
 
   // Add a small delay before ending minigame phase to ensure clean transition
   setTimeout(() => {
@@ -47159,7 +47343,7 @@ function endQuestionPhase(isCorrect = false) {
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 
-},{"../../constants.js":60,"../../main.js":61,"../minigamePhase.js":65}],69:[function(require,module,exports){
+},{"../../constants.js":60,"../../main.js":61,"../minigamePhase.js":66}],70:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -47224,7 +47408,7 @@ function endTetrisPhase(success = false) {
   // startMovementPhase();
 }
 
-},{"../../components/minigames/tetris/Tetris":58,"../../main":61}],70:[function(require,module,exports){
+},{"../../components/minigames/tetris/Tetris":58,"../../main":61}],71:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -47333,8 +47517,6 @@ function showMovementPhaseMessage() {
     ">
       <h2>🎯 Movement Phase</h2>
       <p>You have <strong>${_constants.MOVEMENT_PHASE_TIME} seconds</strong> to move!</p>
-      <p>Use arrow keys or on-screen controls</p>
-      <p>Remaining steps: <span id="remainingStepsDisplay">5</span></p>
     </div>
   `;
   document.body.appendChild(messageDiv);
@@ -47379,7 +47561,7 @@ function startStepsDisplayUpdater() {
   }, _constants.MOVEMENT_PHASE_TIME * 1000);
 }
 
-},{"../constants.js":60,"../main.js":61,"../utilities/collectUserInputs.js":74,"../utilities/showTime.js":75,"./leaderboardPhase.js":64}],71:[function(require,module,exports){
+},{"../constants.js":60,"../main.js":61,"../utilities/collectUserInputs.js":75,"../utilities/showTime.js":77,"./leaderboardPhase.js":65}],72:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -47532,7 +47714,7 @@ function startRoundProgressBar() {
   }, totalTime);
 }
 
-},{"../constants.js":60,"../main.js":61,"./cardPhase.js":62}],72:[function(require,module,exports){
+},{"../constants.js":60,"../main.js":61,"./cardPhase.js":62}],73:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -47543,19 +47725,24 @@ var _socket = require("socket.io-client");
 var _Player = require("./components/Player");
 var _worldRelated = require("./utilities/worldRelated");
 class SocketClient {
-  constructor(addPlayer, removePlayer, updatePlayerCount) {
+  constructor(addPlayer, removePlayer, updatePlayerCount, username) {
     this.addPlayer = addPlayer;
     this.removePlayer = removePlayer;
     this.updatePlayerCount = updatePlayerCount;
+    this.username = username;
     this.players = new Map();
 
     // Dynamic socket URL for production/development
     const socketUrl = this.getSocketUrl();
-    console.log('🎮 Connecting to:', socketUrl);
+    console.log('🎮 Connecting to:', socketUrl, 'with username:', username);
+
+    // ✅ UPDATED: Pass username in auth object
     this.io = (0, _socket.io)(socketUrl, {
+      auth: {
+        username: username // ✅ Send username during connection
+      },
       transports: ['websocket', 'polling'],
-      // ✅ Better compatibility
-      timeout: 10000 // ✅ 10 second timeout
+      timeout: 10000
     });
     this.handleSocketEvents();
   }
@@ -47563,7 +47750,7 @@ class SocketClient {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       return 'http://localhost:3000';
     } else {
-      return 'https://cognira-backend.up.railway.app'; // Railway URL
+      return 'https://cognira-backend.up.railway.app';
     }
   }
   handleSocketEvents() {
@@ -47617,6 +47804,18 @@ class SocketClient {
         player.move(position, rotation);
       }
     });
+
+    // Handle username updates from server
+    this.io.on("update-username", updatedPlayers => {
+      console.log("📝 Username update received:", updatedPlayers);
+      for (const playerData of updatedPlayers) {
+        const player = this.players.get(playerData.id);
+        if (player) {
+          player.setUsername(playerData.username);
+          console.log(`🔄 Updated username for ${playerData.id}: ${playerData.username}`);
+        }
+      }
+    });
     this.io.on("connect_error", error => {
       console.error("💥 Connection error:", error);
     });
@@ -47626,11 +47825,11 @@ class SocketClient {
     if (this.players.has(playerData.id)) {
       return;
     }
-    console.log("👤 Creating remote player:", playerData.id);
+    console.log("👤 Creating remote player:", playerData.id, "with username:", playerData.username);
     const player = new _Player.Player(playerData.id, playerData.username, this.players.size, _worldRelated.physicsWorld);
     this.addPlayer(player);
     this.players.set(playerData.id, player);
-    console.log("✅ Added remote player:", playerData.id, "Total players:", this.players.size);
+    console.log("✅ Added remote player:", playerData.username, "Total players:", this.players.size);
   }
   removeRemotePlayer(playerId) {
     const player = this.players.get(playerId);
@@ -47647,6 +47846,16 @@ class SocketClient {
       console.warn("⚠️ Cannot update position: Socket not connected");
     }
   }
+
+  // Method to update username
+  updateUsername(newUsername) {
+    if (this.io.connected) {
+      console.log("📝 Sending username update to server:", newUsername);
+      this.io.emit("update-username", newUsername);
+    } else {
+      console.warn("⚠️ Cannot update username: Socket not connected");
+    }
+  }
   disconnect() {
     this.io.disconnect();
   }
@@ -47661,7 +47870,7 @@ class SocketClient {
 }
 exports.SocketClient = SocketClient;
 
-},{"./components/Player":47,"./utilities/worldRelated":76,"socket.io-client":27}],73:[function(require,module,exports){
+},{"./components/Player":47,"./utilities/worldRelated":78,"socket.io-client":27}],74:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -47884,7 +48093,7 @@ function getAnimationState() {
   };
 }
 
-},{"../components/Map":46,"./worldRelated":76,"three":36}],74:[function(require,module,exports){
+},{"../components/Map":46,"./worldRelated":78,"three":36}],75:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -47936,13 +48145,14 @@ function handleMove(direction) {
   const localPlayer = (0, _main.getLocalPlayer)();
 
   // Check if remaining step is zero or not
-  if (localPlayer.remainingSteps === 0) {
+  if (localPlayer.remainingSteps <= 0) {
     console.log(`🎮 Movement not allowed: Remaining step is 0`);
     return;
   }
 
   // Decrease Remaining Steps
   localPlayer.remainingSteps = Math.max(0, localPlayer.remainingSteps - 1);
+  (0, _main.updateStepsDisplay)();
   console.log(`🎮 Move requested: ${direction}, Player exists: ${!!localPlayer}`);
   if (localPlayer) {
     console.log(`🎮 Queueing move: ${direction}`);
@@ -48049,7 +48259,148 @@ function refreshMovementUI() {
   updateMovementUI();
 }
 
-},{"../main.js":61,"../phases/movePhase.js":70}],75:[function(require,module,exports){
+},{"../main.js":61,"../phases/movePhase.js":71}],76:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getPlayerUsername = getPlayerUsername;
+exports.hideUsernamePopup = hideUsernamePopup;
+exports.initializeUsernameHandlers = initializeUsernameHandlers;
+exports.setPlayerUsername = setPlayerUsername;
+exports.showUsernamePopup = showUsernamePopup;
+var _main = require("../main.js");
+// DOM elements
+let usernamePopup, usernameInput, submitUsernameBtn, cancelUsernameBtn, charCount;
+let playerUsername = '';
+function initializeUsernameHandlers() {
+  // Get DOM elements
+  usernamePopup = document.getElementById("usernamePopup");
+  usernameInput = document.getElementById("usernameInput");
+  submitUsernameBtn = document.getElementById("submitUsername");
+  cancelUsernameBtn = document.getElementById("cancelUsername");
+  charCount = document.getElementById("charCount");
+
+  // Validate that all elements exist
+  if (!usernamePopup || !usernameInput || !submitUsernameBtn || !cancelUsernameBtn || !charCount) {
+    console.error("❌ Username popup elements not found in DOM");
+    return;
+  }
+
+  // Set up event listeners
+  setupEventListeners();
+  console.log("✅ Username input handlers initialized");
+}
+function setupEventListeners() {
+  // Cancel button in username popup
+  cancelUsernameBtn.addEventListener("click", hideUsernamePopup);
+
+  // Submit username button
+  submitUsernameBtn.addEventListener("click", handleUsernameSubmit);
+
+  // Enter key in username input
+  usernameInput.addEventListener("keypress", e => {
+    if (e.key === 'Enter' && !submitUsernameBtn.disabled) {
+      handleUsernameSubmit();
+    }
+  });
+
+  // Real-time input validation
+  usernameInput.addEventListener("input", validateUsernameInput);
+
+  // Close popup when clicking outside
+  usernamePopup.addEventListener("click", e => {
+    if (e.target === usernamePopup) {
+      hideUsernamePopup();
+    }
+  });
+
+  // Escape key to close popup
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && usernamePopup.style.display === 'flex') {
+      hideUsernamePopup();
+    }
+  });
+}
+function showUsernamePopup() {
+  if (!usernamePopup) {
+    console.error("❌ Username popup element not found");
+    return;
+  }
+  usernamePopup.style.display = 'flex';
+  usernameInput.value = '';
+  usernameInput.focus();
+  validateUsernameInput();
+  console.log("🎮 Username popup shown");
+}
+function hideUsernamePopup() {
+  if (!usernamePopup) return;
+  usernamePopup.style.display = 'none';
+  usernameInput.classList.remove('valid', 'invalid');
+  console.log("🎮 Username popup hidden");
+}
+function validateUsernameInput() {
+  if (!usernameInput || !submitUsernameBtn || !charCount) return;
+  const username = usernameInput.value.trim();
+  const charCountValue = username.length;
+
+  // Update character count
+  charCount.textContent = charCountValue;
+
+  // Validate username (1-15 characters, no empty or only spaces)
+  const isValid = username.length >= 1 && username.length <= 15 && username.replace(/\s/g, '').length > 0;
+
+  // Update input styling
+  usernameInput.classList.remove('valid', 'invalid');
+  if (username.length > 0) {
+    usernameInput.classList.add(isValid ? 'valid' : 'invalid');
+  }
+
+  // Update submit button state
+  submitUsernameBtn.disabled = !isValid;
+  return isValid;
+}
+function handleUsernameSubmit() {
+  if (!validateUsernameInput()) {
+    // Shake animation for invalid input
+    usernameInput.style.animation = 'shake 0.5s ease-in-out';
+    setTimeout(() => {
+      usernameInput.style.animation = '';
+    }, 500);
+    return;
+  }
+  const username = usernameInput.value.trim();
+
+  // Store the player's username
+  playerUsername = username;
+  console.log(`🎮 Player username set to: "${playerUsername}"`);
+
+  // Hide the popup
+  hideUsernamePopup();
+
+  // Initialize socket connection with username
+  (0, _main.initializeSocketConnection)(playerUsername);
+}
+function getPlayerUsername() {
+  return playerUsername;
+}
+function setPlayerUsername(username) {
+  playerUsername = username;
+}
+
+// Add shake animation for invalid input
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+`;
+document.head.appendChild(style);
+
+},{"../main.js":61}],77:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -48145,10 +48496,10 @@ function updateTimeDisplay(seconds) {
   if (timeDisplay) {
     // Color coding based on time remaining
     let color = '#00ff00'; // Green for plenty of time
-    if (seconds <= 10) color = '#ff0000'; // Red for critical time
-    else if (seconds <= 20) color = '#ffff00'; // Yellow for warning
+    if (seconds <= 5) color = '#ff0000'; // Red for critical time
+    else if (seconds <= 10) color = '#ffff00'; // Yellow for warning
 
-    timeDisplay.innerHTML = `Time: <span style="color: ${color}; font-weight: bold;">${seconds}s</span>`;
+    timeDisplay.innerHTML = `Use WASD to move <br> Time: <span style="color: ${color}; font-weight: bold;">${seconds}s</span>`;
   }
 }
 function startCountdown() {
@@ -48212,7 +48563,7 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-},{"../constants.js":60}],76:[function(require,module,exports){
+},{"../constants.js":60}],78:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

@@ -90,10 +90,10 @@ export function updateTimeDisplay(seconds) {
     if (timeDisplay) {
         // Color coding based on time remaining
         let color = '#00ff00'; // Green for plenty of time
-        if (seconds <= 10) color = '#ff0000'; // Red for critical time
-        else if (seconds <= 20) color = '#ffff00'; // Yellow for warning
+        if (seconds <= 5) color = '#ff0000'; // Red for critical time
+        else if (seconds <= 10) color = '#ffff00'; // Yellow for warning
         
-        timeDisplay.innerHTML = `Time: <span style="color: ${color}; font-weight: bold;">${seconds}s</span>`;
+        timeDisplay.innerHTML = `Use WASD to move <br> Time: <span style="color: ${color}; font-weight: bold;">${seconds}s</span>`;
     }
 }
 

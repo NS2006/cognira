@@ -47,7 +47,7 @@ export function endMemoryMatrixPhase(isCorrect = false) {
   console.log(`🎯 Memory matrix game result: ${isCorrect ? 'CORRECT' : 'INCORRECT'}`);
 
   const localPlayer = getLocalPlayer();
-  cardSystem.applyCardEffect(localPlayer.selectedCard.id, isCorrect, localPlayer);
+  localPlayer.winGame = isCorrect;
   
   // Add a small delay before ending minigame phase to ensure clean transition
   setTimeout(() => {

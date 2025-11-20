@@ -3,19 +3,24 @@ import { Player } from './components/Player';
 import { physicsWorld } from './utilities/worldRelated';
 
 export class SocketClient {
-    constructor(addPlayer, removePlayer, updatePlayerCount) {
+    constructor(addPlayer, removePlayer, updatePlayerCount, username) {
         this.addPlayer = addPlayer;
         this.removePlayer = removePlayer;
         this.updatePlayerCount = updatePlayerCount;
+        this.username = username;
         this.players = new Map();
 
         // Dynamic socket URL for production/development
         const socketUrl = this.getSocketUrl();
-        console.log('🎮 Connecting to:', socketUrl);
+        console.log('🎮 Connecting to:', socketUrl, 'with username:', username);
 
+        // ✅ UPDATED: Pass username in auth object
         this.io = io(socketUrl, {
-            transports: ['websocket', 'polling'], // ✅ Better compatibility
-            timeout: 10000 // ✅ 10 second timeout
+            auth: {
+                username: username // ✅ Send username during connection
+            },
+            transports: ['websocket', 'polling'],
+            timeout: 10000
         });
         this.handleSocketEvents();
     }
@@ -25,7 +30,7 @@ export class SocketClient {
             return 'http://localhost:3000';
         }
         else {
-            return 'https://cognira-backend.up.railway.app'; // Railway URL
+            return 'https://cognira-backend.up.railway.app';
         }
     }
 
@@ -82,6 +87,18 @@ export class SocketClient {
             }
         });
 
+        // Handle username updates from server
+        this.io.on("update-username", (updatedPlayers) => {
+            console.log("📝 Username update received:", updatedPlayers);
+            for (const playerData of updatedPlayers) {
+                const player = this.players.get(playerData.id);
+                if (player) {
+                    player.setUsername(playerData.username);
+                    console.log(`🔄 Updated username for ${playerData.id}: ${playerData.username}`);
+                }
+            }
+        });
+
         this.io.on("connect_error", (error) => {
             console.error("💥 Connection error:", error);
         });
@@ -93,12 +110,12 @@ export class SocketClient {
             return;
         }
 
-        console.log("👤 Creating remote player:", playerData.id);
+        console.log("👤 Creating remote player:", playerData.id, "with username:", playerData.username);
         const player = new Player(playerData.id, playerData.username, this.players.size, physicsWorld);
 
         this.addPlayer(player);
         this.players.set(playerData.id, player);
-        console.log("✅ Added remote player:", playerData.id, "Total players:", this.players.size);
+        console.log("✅ Added remote player:", playerData.username, "Total players:", this.players.size);
     }
 
     removeRemotePlayer(playerId) {
@@ -115,6 +132,16 @@ export class SocketClient {
             this.io.emit("update-player-position", position, rotation);
         } else {
             console.warn("⚠️ Cannot update position: Socket not connected");
+        }
+    }
+
+    // Method to update username
+    updateUsername(newUsername) {
+        if (this.io.connected) {
+            console.log("📝 Sending username update to server:", newUsername);
+            this.io.emit("update-username", newUsername);
+        } else {
+            console.warn("⚠️ Cannot update username: Socket not connected");
         }
     }
 

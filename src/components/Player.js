@@ -34,6 +34,7 @@ export class Player extends THREE.Object3D {
     this.baseStep = 2; // Base movement steps per turn
     this.remainingSteps = this.baseStep;
     this.selectedCard = null;
+    this.winGame = false;
 
     this._createPhysicsBody(initX);
     this._createPlayerModel();
@@ -209,12 +210,6 @@ export class Player extends THREE.Object3D {
       return false;
     }
 
-    // Check step limit
-    if (this.remainingSteps <= 0) {
-      console.log(`Cannot queue more moves: Step limit reached (${this.remainingSteps} steps)`);
-      return false;
-    }
-
     this.movesQueue.push(direction);
 
     console.log(`Move queued: ${direction}. Queue: ${this.movesQueue.length}, Remaining: ${this.remainingSteps}`);
@@ -229,8 +224,6 @@ export class Player extends THREE.Object3D {
     if (direction === "left") this.gridPosition.currentX -= 1;
     if (direction === "right") this.gridPosition.currentX += 1;
 
-    updateStepsDisplay();
-
     console.log(`Step completed. Remaining steps: ${this.remainingSteps}`);
   }
 
@@ -243,6 +236,8 @@ export class Player extends THREE.Object3D {
     this.remainingSteps = this.baseStep;
 
     this.selectedCard = null;
+
+    this.winGame = false;
 
     updateStepsDisplay();
 

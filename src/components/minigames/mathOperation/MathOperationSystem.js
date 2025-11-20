@@ -592,13 +592,13 @@ export class MathOperationSystem {
         this.questionContainer.style.display = 'none';
         pauseWorld(false);
 
-        console.log(`🔄 [MathOperationSystem] Calling onGameComplete callback...`);
+        // console.log(`🔄 [MathOperationSystem] Calling onGameComplete callback...`);
         
-        if (this.onGameComplete) {
-            this.onGameComplete(isCorrect);
-        } else {
-            console.error('❌ [MathOperationSystem] onGameComplete callback is not defined!');
-        }
+        // if (this.onGameComplete) {
+        //     this.onGameComplete(isCorrect);
+        // } else {
+        //     console.error('❌ [MathOperationSystem] onGameComplete callback is not defined!');
+        // }
     }
 
     hideGame() {

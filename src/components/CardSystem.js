@@ -223,10 +223,6 @@ export class CardSystem {
         });
         cardElement.classList.add('selected');
 
-        // Send card selection to server
-        if (this.socketClient?.selectCard) {
-            this.socketClient.selectCard(cardType);
-        }
 
         this.onCardSelect?.(cardType);
     }

@@ -33,6 +33,39 @@
     </div>
   </div>
 
+  <!-- Username Input Popup -->
+  <div id="usernamePopup" class="username-popup" style="display: none;">
+    <div class="username-popup-content">
+      <div class="username-header">
+        <h2>Enter Your Player Name</h2>
+        <p>Choose a name that will be displayed to other players</p>
+      </div>
+      
+      <div class="username-input-container">
+        <input 
+          type="text" 
+          id="usernameInput" 
+          class="username-input" 
+          placeholder="Enter your name..."
+          maxlength="15"
+          autocomplete="off"
+        />
+        <div class="username-char-count">
+          <span id="charCount">0</span>/15
+        </div>
+      </div>
+
+      <div class="username-buttons">
+        <button id="cancelUsername" class="username-btn cancel-btn">Cancel</button>
+        <button id="submitUsername" class="username-btn submit-btn" disabled>Join Game</button>
+      </div>
+
+      <div class="username-tips">
+        <p>💡 Tips: Use a unique name so friends can recognize you!</p>
+      </div>
+    </div>
+  </div>
+
   <!-- Lobby Container -->
   <div class="lobby-container" id="lobbyContainer" style="display: none;">
     <div class="lobby-header">

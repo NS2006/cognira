@@ -602,13 +602,13 @@ export class MemoryMatrixSystem {
         this.questionContainer.style.display = 'none';
         pauseWorld(false);
 
-        console.log(`🔄 [MemoryMatrixSystem] Calling onGameComplete callback...`);
+        // console.log(`🔄 [MemoryMatrixSystem] Calling onGameComplete callback...`);
         
-        if (this.onGameComplete) {
-            this.onGameComplete(isCorrect, this.correctAnswerCount);
-        } else {
-            console.error('❌ [MemoryMatrixSystem] onGameComplete callback is not defined!');
-        }
+        // if (this.onGameComplete) {
+        //     this.onGameComplete(isCorrect, this.correctAnswerCount);
+        // } else {
+        //     console.error('❌ [MemoryMatrixSystem] onGameComplete callback is not defined!');
+        // }
     }
 
     hideGame() {

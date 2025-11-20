@@ -48,7 +48,8 @@ export function endQuestionPhase(isCorrect = false) {
   console.log(`🎯 Question result: ${isCorrect ? 'CORRECT' : 'INCORRECT'}`);
 
   const localPlayer = getLocalPlayer();
-  cardSystem.applyCardEffect(localPlayer.selectedCard.id, isCorrect, localPlayer);
+  localPlayer.winGame = isCorrect;
+  // cardSystem.applyCardEffect(localPlayer.selectedCard.id, isCorrect, localPlayer);
   
   // Add a small delay before ending minigame phase to ensure clean transition
   setTimeout(() => {

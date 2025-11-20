@@ -17,6 +17,11 @@ import { Lobby } from "./components/lobby";
 import { MAX_PLAYER } from "./constants";
 import { LeafParticles } from "./components/particles/LeafParticleSystem";
 import { initializeLeaderboard } from "./phases/leaderboardPhase";
+import { 
+    initializeUsernameHandlers, 
+    showUsernamePopup, 
+    getPlayerUsername 
+} from "./utilities/handleUsernameInput";
 
 const mainMenu = document.getElementById("mainMenu");
 const gameCanvas = document.getElementById("gameCanvas");
@@ -36,116 +41,127 @@ let leafParticles = null;
 const renderer = Renderer();
 
 initializeGame();
+setupMainMenuHandlers();
 
-joinGameButton.addEventListener("click", (e) => {
-  e.preventDefault();
+function setupMainMenuHandlers() {
+    // Initialize username handlers
+    initializeUsernameHandlers();
 
-  // Hide join button and show waiting message
-  joinGameButton.style.display = "none";
+    // Join Game button click - show username popup
+    joinGameButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        showUsernamePopup();
+    });
+}
 
-  // Initialize socket connection
-  socketClient = new SocketClient(addPlayer, removePlayer, updatePlayerCount);
-});
+export function initializeSocketConnection(username) {
+    console.log(`🎮 Initializing socket connection for: ${username}`);
+    
+    // Hide join button
+    joinGameButton.style.display = "none";
+
+    // Initialize socket connection with the chosen username
+    socketClient = new SocketClient(addPlayer, removePlayer, updatePlayerCount, username);
+}
 
 function updatePlayerCount(count, players) {
-  if(gameInitialized){
-    return;
-  }
-
-  if (!lobby) {
-      lobby = new Lobby(socketClient);
+    if(gameInitialized){
+        return;
     }
-  lobby.show(players);
 
-  if (count >= MAX_PLAYER && !gameInitialized) {
-    lobby.hide();
+    if (!lobby) {
+        lobby = new Lobby(socketClient);
+    }
+    lobby.show(players);
 
-    gameInitialized = true;
+    if (count >= MAX_PLAYER && !gameInitialized) {
+        lobby.hide();
 
-    // Hide main menu
-    mainMenu.style.display = "none";
-    
-    controlsButton.style.display = "flex";
-    gameCanvas.style.display = "flex";
+        gameInitialized = true;
 
-    loadingManager.startLoading(1000, () => {
-      console.log('Loading complete!');
-      showGameUI();
-      
-      animateFunction = createAnimationLoop(
-        scene,
-        camera,
-        dirLight,
-        dirLightTarget,
-        map,
-        renderer,
-        getLocalPlayer,
-        getSocketClient,
-        leafParticles // Pass leafParticles to animation loop
-      );
-      
-      renderer.setAnimationLoop(animateFunction);
-      initializeGameSystems();
-      // Show UI leaf decorations when the game actually starts
-      document.querySelectorAll('.ui-leaf').forEach(el => {
-        el.style.display = 'flex';
-      });
-      startInitialCountdown();
-    });
-  }
+        // Hide main menu
+        mainMenu.style.display = "none";
+        
+        controlsButton.style.display = "flex";
+        gameCanvas.style.display = "flex";
+
+        loadingManager.startLoading(1000, () => {
+            console.log('Loading complete!');
+            showGameUI();
+            
+            animateFunction = createAnimationLoop(
+                scene,
+                camera,
+                dirLight,
+                dirLightTarget,
+                map,
+                renderer,
+                getLocalPlayer,
+                getSocketClient,
+                leafParticles
+            );
+            
+            renderer.setAnimationLoop(animateFunction);
+            initializeGameSystems();
+            // Show UI leaf decorations when the game actually starts
+            document.querySelectorAll('.ui-leaf').forEach(el => {
+                el.style.display = 'flex';
+            });
+            startInitialCountdown();
+        });
+    }
 }
 
 function addPlayer(player) {
-  console.log("=== addPlayer CALLED ===");
-  if (player.playerId === socketClient.id && !localPlayer) {
-    localPlayer = player;
-    localPlayer.setAsLocalPlayer();
-    console.log("✅ LOCAL PLAYER SET!:", player.playerId);
+    console.log("=== addPlayer CALLED ===");
+    if (player.playerId === socketClient.id && !localPlayer) {
+        localPlayer = player;
+        localPlayer.setAsLocalPlayer();
+        console.log("✅ LOCAL PLAYER SET!:", player.playerId);
 
-    // Set initial positions
-    dirLight.position.set(0, 0, 50);
-    dirLightTarget.position.set(0, 0, 0);
+        // Set initial positions
+        dirLight.position.set(0, 0, 50);
+        dirLightTarget.position.set(0, 0, 0);
 
-    // Set player grid position
-    localPlayer.gridPosition.currentX = socketClient.players.size % 4;
-    localPlayer.gridPosition.currentY = 0;
-  } else {
-    console.log("🌐 Remote player added:", player.playerId);
-  }
+        // Set player grid position
+        localPlayer.gridPosition.currentX = socketClient.players.size % 4;
+        localPlayer.gridPosition.currentY = 0;
+    } else {
+        console.log("🌐 Remote player added:", player.playerId);
+    }
 
-  scene.add(player);
-  console.log("Player added to scene. Total scene children:", scene.children.length);
+    scene.add(player);
+    console.log("Player added to scene. Total scene children:", scene.children.length);
 }
 
 function removePlayer(player) {
-  // Don't remove local player from our reference
-  if (player === localPlayer) {
-    console.log("Cannot remove local player");
-    return;
-  }
+    // Don't remove local player from our reference
+    if (player === localPlayer) {
+        console.log("Cannot remove local player");
+        return;
+    }
 
-  scene.remove(player);
-  console.log("Player removed from scene:", player.playerId);
+    scene.remove(player);
+    console.log("Player removed from scene:", player.playerId);
 }
 
 function initializeGameSystems() {
-  // Initialize system with socket client and callback
-  cardSystem = new CardSystem(socketClient);
-  questionSystem = new QuestionSystem(socketClient);
-  memoryMatrixSystem = new MemoryMatrixSystem(socketClient);
-  mathOperationSystem = new MathOperationSystem(socketClient);
+    // Initialize system with socket client and callback
+    cardSystem = new CardSystem(socketClient);
+    questionSystem = new QuestionSystem(socketClient);
+    memoryMatrixSystem = new MemoryMatrixSystem(socketClient);
+    mathOperationSystem = new MathOperationSystem(socketClient);
 
-  console.log("🔄 Initializing game systems...");
-  console.log("✅ QuestionSystem initialized, callback set:", !!questionSystem.onQuestionComplete);
-  console.log("✅ MemoryMatrixSystem initialized, callback set:", !!memoryMatrixSystem.onGameComplete);
-  console.log("✅ MathOperationSystem initialized, callback set:", !!mathOperationSystem.onGameComplete);
+    console.log("🔄 Initializing game systems...");
+    console.log("✅ QuestionSystem initialized, callback set:", !!questionSystem.onQuestionComplete);
+    console.log("✅ MemoryMatrixSystem initialized, callback set:", !!memoryMatrixSystem.onGameComplete);
+    console.log("✅ MathOperationSystem initialized, callback set:", !!mathOperationSystem.onGameComplete);
 }
 
 export function updateRoundDisplay() {
     const roundDisplay = document.getElementById('currentRoundDisplay');
     if (roundDisplay) {
         roundDisplay.textContent = currentRound;
-        // Add animation for round change
         roundDisplay.classList.add('changed');
         setTimeout(() => roundDisplay.classList.remove('changed'), 500);
     }
@@ -157,7 +173,6 @@ export function updateStepsDisplay() {
     
     if (stepsDisplay && localPlayer) {
         stepsDisplay.textContent = localPlayer.remainingSteps;
-        // Add animation for steps change
         stepsDisplay.classList.add('changed');
         setTimeout(() => stepsDisplay.classList.remove('changed'), 500);
     } else if (stepsDisplay) {
@@ -179,14 +194,12 @@ export function hideGameUI() {
     }
 }
 
-// Function to increment round (call this when a new round starts)
 export function incrementRound() {
     currentRound++;
     updateRoundDisplay();
     console.log(`🔄 Round updated to: ${currentRound}`);
 }
 
-// Function to increment round (call this when a new round starts)
 export function resetRound() {
     currentRound = 0;
     updateRoundDisplay();
@@ -194,92 +207,86 @@ export function resetRound() {
 }
 
 export function isGameInitialized(){
-  return gameInitialized;
+    return gameInitialized;
 }
 
 export function getPhaseTimer() {
-  return _phaseTimer;
+    return _phaseTimer;
 }
 
 export function setPhaseTimer(timer) {
-  _phaseTimer = timer;
+    _phaseTimer = timer;
 }
 
 export function clearPhaseTimer() {
-  if (_phaseTimer) {
-    clearTimeout(_phaseTimer);
-    _phaseTimer = null;
-  }
+    if (_phaseTimer) {
+        clearTimeout(_phaseTimer);
+        _phaseTimer = null;
+    }
 
-  // Remove any phase messages
-  const moveMsg = document.getElementById('movementPhaseMessage');
-  if (moveMsg) {
-    moveMsg.remove();
-  }
+    const moveMsg = document.getElementById('movementPhaseMessage');
+    if (moveMsg) {
+        moveMsg.remove();
+    }
 }
 
 function initializeGame() {
-  console.log("🟡 Initializing game...");
+    console.log("🟡 Initializing game...");
 
-  scene = new THREE.Scene();
-  // Add fog system to the scene
-  scene.fog = new THREE.FogExp2(0xaad0ff, 0.001);
+    scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0xaad0ff, 0.001);
 
-  ambientLight = new THREE.AmbientLight();
+    ambientLight = new THREE.AmbientLight();
 
-  dirLight = DirectionalLight();
+    dirLight = DirectionalLight();
 
-  dirLightTarget = new THREE.Object3D();
-  dirLight.target = dirLightTarget;
+    dirLightTarget = new THREE.Object3D();
+    dirLight.target = dirLightTarget;
 
-  camera = Camera();
-  let objects = [
-    camera,
-    map,
-    ambientLight,
-    dirLight,
-    dirLightTarget
-  ];
+    camera = Camera();
+    let objects = [
+        camera,
+        map,
+        ambientLight,
+        dirLight,
+        dirLightTarget
+    ];
 
-  objects.forEach(obj => {
-    scene.add(obj);
-  });
+    objects.forEach(obj => {
+        scene.add(obj);
+    });
 
-  new SkyBox(scene);
+    new SkyBox(scene);
 
-  // Initialize leaf particles and add to scene
-  leafParticles = new LeafParticles(scene, 20, 150);
+    leafParticles = new LeafParticles(scene, 20, 150);
 
-  initializeMap();
-  initializeLeaderboard();
-  loadTrees();
-  loadRiver();
+    initializeMap();
+    initializeLeaderboard();
+    loadTrees();
+    loadRiver();
 }
 
-// Export for input system if needed
 export function getLocalPlayer() {
-  return localPlayer;
+    return localPlayer;
 }
 
 export function getSocketClient() {
-  return socketClient;
+    return socketClient;
 }
 
-// Clean up when game ends
 export function cleanupGame() {
-  if (cardSystem) {
-    cardSystem.stopCardInterval();
-  }
-  if (questionSystem) {
-    questionSystem.hideQuestion();
-  }
-  clearPhaseTimer();
-  resetAnimationState();
-  
-  // Stop animation loop
-  if (animateFunction) {
-    renderer.setAnimationLoop(null);
-  }
+    if (cardSystem) {
+        cardSystem.stopCardInterval();
+    }
+    if (questionSystem) {
+        questionSystem.hideQuestion();
+    }
+    clearPhaseTimer();
+    resetAnimationState();
+    
+    if (animateFunction) {
+        renderer.setAnimationLoop(null);
+    }
 
-  gameInitialized = false;
+    gameInitialized = false;
 }

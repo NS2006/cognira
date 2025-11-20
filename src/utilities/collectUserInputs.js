@@ -1,4 +1,4 @@
-import { getLocalPlayer, isGameInitialized } from "../main.js";
+import { getLocalPlayer, isGameInitialized, updateStepsDisplay } from "../main.js";
 import { isMovementPhaseActive } from "../phases/movePhase.js";
 
 // Track which directions are currently held (to prevent repeat moves)
@@ -49,13 +49,15 @@ function handleMove(direction) {
     const localPlayer = getLocalPlayer();
     
     // Check if remaining step is zero or not
-    if (localPlayer.remainingSteps === 0) {
+    if (localPlayer.remainingSteps <= 0) {
         console.log(`🎮 Movement not allowed: Remaining step is 0`);
         return;
     }
 
     // Decrease Remaining Steps
     localPlayer.remainingSteps = Math.max(0, localPlayer.remainingSteps - 1);
+
+    updateStepsDisplay();
     
     console.log(`🎮 Move requested: ${direction}, Player exists: ${!!localPlayer}`);
     

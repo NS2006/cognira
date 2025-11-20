@@ -114,8 +114,6 @@ function showMovementPhaseMessage() {
     ">
       <h2>🎯 Movement Phase</h2>
       <p>You have <strong>${MOVEMENT_PHASE_TIME} seconds</strong> to move!</p>
-      <p>Use arrow keys or on-screen controls</p>
-      <p>Remaining steps: <span id="remainingStepsDisplay">5</span></p>
     </div>
   `;
 

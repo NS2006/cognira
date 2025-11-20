@@ -1,10 +1,10 @@
-import { clearPhaseTimer, updateStepsDisplay } from "../main.js";
+import { clearPhaseTimer, getLocalPlayer, updateStepsDisplay } from "../main.js";
 import { PHASE_TRANSITION_DELAY } from "../constants.js";
-import { startMovementPhase } from "./movePhase.js";
 import { startQuestionPhase } from "./minigames/questionPhase.js";
 import { startTetrisPhase } from "./minigames/tetrisPhase.js";
 import { startMemoryMatrixPhase } from "./minigames/memoryMatrixPhase.js";
 import { startMathOperationPhase } from "./minigames/mathOperationPhase.js";
+import { startCardResultPhase } from "./cardResultPhase.js";
 
 let minigamePhaseActive = false;
 let currentMinigameType = null;
@@ -64,8 +64,8 @@ export function endMinigamePhase() {
 
   // Add delay before starting movement phase
   setTimeout(() => {
-    console.log("🔄 Transitioning to movement phase...");
-    startMovementPhase();
+    console.log("🔄 Transitioning to next phase...");
+    startCardResultPhase(getLocalPlayer().winGame);
   }, PHASE_TRANSITION_DELAY * 1000);
 }
 
