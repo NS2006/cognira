@@ -1,11 +1,11 @@
 // 4 x 23 GRID
 export const MAP_SIZE_X = 4;
-export const MAP_SIZE_Y = 51;
+export const MAP_SIZE_Y = 5;
 
 export const TILE_SIZE = 42;
 export const GAP_SIZE = 6;
 
-export const MAX_PLAYER = 2;
+export const MAX_PLAYER = 3;
 
 
 // Phase timing constants (in seconds)
@@ -13,8 +13,8 @@ export const COUNTDOWN_PHASE_TIME = 1;
 export const ROUND_PHASE_TIME = 1;
 export const CARD_PHASE_TIME = 1;
 export const CARD_RESULT_PHASE_TIME = 1;
-export const MOVEMENT_PHASE_TIME = 10; 
-export const LEADERBOARD_PHASE_TIME = 1; 
+export const MOVEMENT_PHASE_TIME = 5; 
+export const LEADERBOARD_PHASE_TIME = 5; 
 export const PHASE_TRANSITION_DELAY = 0.5; 
 
 

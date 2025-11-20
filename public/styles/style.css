@@ -1856,3 +1856,23 @@ body {
     color: #666;
     font-size: 0.9em;
 }
+
+.leaderboard-item.finished {
+    background: rgba(255, 215, 0, 0.1) !important;
+    border-left: 4px solid gold !important;
+}
+
+.finish-badge {
+    background: gold;
+    color: black;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.player-position {
+    font-size: 0.8em;
+    opacity: 0.7;
+    margin-top: 2px;
+}

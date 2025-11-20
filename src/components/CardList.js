@@ -38,12 +38,12 @@ const cardDefinition = {
 //     positive: { type: 'value', amount: 6 },          // +6
 //     negative: { type: 'stop_all' } // stop all
 // },
-    bad_monkey: {
-        id: 'bad_monkey',
-        file: 'Bad Monkey',
-        positive: { type: 'value', amount: 6 },          // +6
-        negative: { type: 'stop' } // stop
-    },
+    // bad_monkey: {
+    //     id: 'bad_monkey',
+    //     file: 'Bad Monkey',
+    //     positive: { type: 'value', amount: 6 },          // +6
+    //     negative: { type: 'stop' } // stop
+    // },
     bear: {
         id: 'bear',
         file: 'Bear',
@@ -74,12 +74,12 @@ const cardDefinition = {
         positive: { type: 'immune' },
         negative: { type: 'none' }
     },
-    pig: {
-        id: 'pig',
-        file: 'Pig',
-        positive: { type: 'multiplier', amount: 2 },
-        negative: { type: 'stop' }
-    },
+    // pig: {
+    //     id: 'pig',
+    //     file: 'Pig',
+    //     positive: { type: 'multiplier', amount: 2 },
+    //     negative: { type: 'stop' }
+    // },
     raven: {
         id: 'raven',
         file: 'Raven',

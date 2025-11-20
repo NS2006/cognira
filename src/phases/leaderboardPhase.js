@@ -1,12 +1,19 @@
 import { clearPhaseTimer, setPhaseTimer, getSocketClient, currentRound } from "../main.js";
 import { startRoundPhase } from "./roundPhase.js";
 import { LEADERBOARD_PHASE_TIME, PHASE_TRANSITION_DELAY } from "../constants.js";
+import { shouldContinueGame, isPlayerFinished, getPlayerRank } from "../utilities/finishGame.js";
 
 let leaderboardPhaseActive = false;
 let leaderboardPhaseTimer = null;
 let previousRankings = new Map(); 
 
 export function startLeaderboardPhase() {
+    // Check if game should continue for this player
+    if (!shouldContinueGame()) {
+        console.log("🎯 Player has finished - skipping leaderboard phase");
+        return;
+    }
+
     if (leaderboardPhaseActive) {
         console.log("🏆 Leaderboard phase already active, skipping");
         return;
@@ -57,9 +64,13 @@ export function endLeaderboardPhase() {
 
     // Add delay before next phase to ensure clean transition
     setTimeout(() => {
-        // Move to next round phase
-        console.log("🏆 Leaderboard phase completed, moving to next round");
-        startRoundPhase();
+        // Only continue if game should continue
+        if (shouldContinueGame()) {
+            console.log("🏆 Leaderboard phase completed, moving to next round");
+            startRoundPhase();
+        } else {
+            console.log("🎯 Game finished - stopping at leaderboard phase");
+        }
     }, PHASE_TRANSITION_DELAY * 1000);
 }
 
@@ -94,7 +105,8 @@ function calculateRankings() {
                 username: player.playerUsername,
                 position: player.gridPosition,
                 rank: currentRank,
-                isLocalPlayer: player.isLocalPlayer
+                isLocalPlayer: player.isLocalPlayer,
+                isFinished: isPlayerFinished(player.playerId)
             });
             previousY = player.gridPosition.currentY;
             return;
@@ -108,17 +120,19 @@ function calculateRankings() {
                 username: player.playerUsername,
                 position: player.gridPosition,
                 rank: currentRank, // Same rank as previous
-                isLocalPlayer: player.isLocalPlayer
+                isLocalPlayer: player.isLocalPlayer,
+                isFinished: isPlayerFinished(player.playerId)
             });
         } else {
             // Different Y = increment rank
-            currentRank = index + 1; // Or currentRank++ if you prefer consecutive numbers
+            currentRank = index + 1;
             rankings.push({
                 playerId: player.playerId,
                 username: player.playerUsername,
                 position: player.gridPosition,
                 rank: currentRank,
-                isLocalPlayer: player.isLocalPlayer
+                isLocalPlayer: player.isLocalPlayer,
+                isFinished: isPlayerFinished(player.playerId)
             });
             previousY = player.gridPosition.currentY;
         }
@@ -185,16 +199,20 @@ function populateLeaderboardList(currentRankings) {
 
     currentRankings.forEach((player, index) => {
         const previousRank = getPreviousRank(player.playerId);
-        // Only show change if there was a previous rank AND it's different
         const hasChanged = previousRank !== null && previousRank !== player.rank;
-        const rankChange = hasChanged ? previousRank - player.rank : 0; // Positive = improved, Negative = dropped
+        const rankChange = hasChanged ? previousRank - player.rank : 0;
+        
+        const isFinished = player.isFinished;
+        const finishRank = isFinished ? getPlayerRank(player.playerId) : null;
 
         const playerElement = document.createElement('div');
-        playerElement.className = `leaderboard-item ${player.isLocalPlayer ? 'local-player' : ''} ${hasChanged ? 'ranking-changed' : ''}`;
+        playerElement.className = `leaderboard-item ${player.isLocalPlayer ? 'local-player' : ''} ${hasChanged ? 'ranking-changed' : ''} ${isFinished ? 'finished' : ''}`;
+        playerElement.dataset.playerId = player.playerId;
+        
         playerElement.innerHTML = `
             <div class="rank-section">
-                <div class="rank-number">${player.rank}</div>
-                ${hasChanged ? `
+                <div class="rank-number">${isFinished ? finishRank : player.rank}</div>
+                ${hasChanged && !isFinished ? `
                     <div class="rank-change ${rankChange > 0 ? 'improved' : 'dropped'}">
                         ${rankChange > 0 ? '↑' : '↓'} ${Math.abs(rankChange)}
                     </div>
@@ -202,9 +220,15 @@ function populateLeaderboardList(currentRankings) {
             </div>
             <div class="player-info">
                 <div class="player-name">${player.username} ${player.isLocalPlayer ? ' (You)' : ''}</div>
+                <div class="player-position">Y: ${player.position.currentY}</div>
             </div>
             <div class="player-medal">
-                ${player.rank === 1 ? '🥇' : player.rank === 2 ? '🥈' : player.rank === 3 ? '🥉' : ''}
+                ${isFinished ? 
+                    `<div class="finish-badge">
+                        Finished ${getRankSuffix(finishRank)}
+                    </div>` : 
+                    (player.rank === 1 ? '🥇' : player.rank === 2 ? '🥈' : player.rank === 3 ? '🥉' : '')
+                }
             </div>
         `;
 
@@ -213,6 +237,13 @@ function populateLeaderboardList(currentRankings) {
 
         leaderboardList.appendChild(playerElement);
     });
+}
+
+function getRankSuffix(rank) {
+    if (rank === 1) return '1st';
+    if (rank === 2) return '2nd';
+    if (rank === 3) return '3rd';
+    return `${rank}th`;
 }
 
 function getPreviousRank(playerId) {

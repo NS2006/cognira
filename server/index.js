@@ -130,11 +130,11 @@ socketio.on("connection", (socket) => {
         players.delete(socket.id);
         console.log("Total players:", players.size);
         
-        // ✅ NEW: Reset minigame sequence if all players disconnect
+        // Reset if all players disconnect
         if (players.size === 0) {
             sequenceGenerated = false;
             minigameSequence = [];
-            console.log('🎲 All players disconnected, minigame sequence reset');
+            console.log('🎲 All players disconnected, game state reset');
         }
     });
 
@@ -146,5 +146,11 @@ socketio.on("connection", (socket) => {
             player.rotation = rotation;
             socket.broadcast.emit("update-player-position", socket.id, position, rotation);
         }
+    });
+
+    socket.on("player-finished", (finishData) => {
+        console.log(`🏁 Player ${finishData.playerId} (${finishData.username}) finished`);
+        // Simply relay to other players
+        socket.broadcast.emit("player-finished", finishData);
     });
 });

@@ -1,6 +1,7 @@
 import { io } from 'socket.io-client';
 import { Player } from './components/Player';
 import { physicsWorld } from './utilities/worldRelated';
+import { MAP_SIZE_Y } from './constants.js';
 
 export class SocketClient {
     constructor(username, addPlayer, removePlayer, updatePlayerCount, onMinigameSequenceReceived) {
@@ -9,13 +10,13 @@ export class SocketClient {
         this.updatePlayerCount = updatePlayerCount;
         this.username = username;
         this.players = new Map();
-        this.onMinigameSequenceReceived = onMinigameSequenceReceived; // Callback for minigame sequence
+        this.finishedPlayers = new Map(); // Track finished players
+        this.onMinigameSequenceReceived = onMinigameSequenceReceived;
 
         // Dynamic socket URL for production/development
         const socketUrl = this.getSocketUrl();
         console.log('🎮 Connecting to:', socketUrl, 'with username:', username);
 
-        // Pass username in auth object
         this.io = io(socketUrl, {
             auth: {
                 username: username
@@ -104,6 +105,17 @@ export class SocketClient {
             }
         });
 
+        // Handle player finish events
+        this.io.on("player-finished", (finishData) => {
+            console.log("📡 Player finished event received:", finishData.username);
+            this.handleRemotePlayerFinish(finishData);
+            
+            // Dispatch custom event for UI to update
+            window.dispatchEvent(new CustomEvent('player-finished-ui', { 
+                detail: finishData 
+            }));
+        });
+
         this.io.on("connect_error", (error) => {
             console.error("💥 Connection error:", error);
         });
@@ -129,6 +141,138 @@ export class SocketClient {
             this.players.delete(playerId);
             console.log("🗑️ Removed remote player:", playerId);
         }
+    }
+
+    // Finish Game Logic Methods
+    checkPlayerFinish(player) {
+        if (!player || this.finishedPlayers.has(player.playerId)) {
+            return false;
+        }
+
+        // Check if player reached the end of the map
+        if (player.gridPosition.currentY >= MAP_SIZE_Y - 1) {
+            console.log(`🎉 ${player.playerUsername} reached the finish!`);
+            
+            const finishData = {
+                playerId: player.playerId,
+                username: player.playerUsername,
+                finishTime: Date.now(),
+                isLocalPlayer: player.isLocalPlayer
+            };
+
+            // Add to finished players
+            this.finishedPlayers.set(player.playerId, finishData);
+
+            // Broadcast to other players
+            this.broadcastPlayerFinish(finishData);
+
+            // Check if game should end
+            this.checkGameEndCondition();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    checkAllPlayersFinish() {
+        const players = Array.from(this.players.values());
+        
+        players.forEach(player => {
+            if (!this.finishedPlayers.has(player.playerId) && player.gridPosition.currentY >= MAP_SIZE_Y - 1) {
+                this.checkPlayerFinish(player);
+            }
+        });
+    }
+
+    broadcastPlayerFinish(finishData) {
+        if (!this.io.connected) return;
+
+        this.io.emit("player-finished", {
+            ...finishData,
+            isLocalPlayer: false
+        });
+    }
+
+    handleRemotePlayerFinish(finishData) {
+        if (this.finishedPlayers.has(finishData.playerId)) return;
+
+        console.log(`🎉 Remote player ${finishData.username} finished`);
+        this.finishedPlayers.set(finishData.playerId, finishData);
+
+        // Check if game should end
+        this.checkGameEndCondition();
+    }
+
+    checkGameEndCondition() {
+        const players = Array.from(this.players.values());
+        const unfinishedPlayers = players.filter(player => !this.finishedPlayers.has(player.playerId));
+
+        console.log(`🎯 ${unfinishedPlayers.length} players remaining, ${this.finishedPlayers.size} finished`);
+
+        // Game ends when only one player remains unfinished
+        if (unfinishedPlayers.length <= 1 && players.length > 1) {
+            console.log("🏁 Game end condition met");
+            // Dispatch event for UI to handle
+            window.dispatchEvent(new CustomEvent('game-finished'));
+            return true;
+        }
+        
+        return false;
+    }
+
+    // Getters for game state
+    isPlayerFinished(playerId) {
+        return this.finishedPlayers.has(playerId);
+    }
+
+    isGameFinished() {
+        const players = Array.from(this.players.values());
+        const unfinishedPlayers = players.filter(player => !this.finishedPlayers.has(player.playerId));
+        return unfinishedPlayers.length <= 1 && players.length > 1;
+    }
+
+    getPlayerRank(playerId) {
+        const finishedPlayersList = Array.from(this.finishedPlayers.values())
+            .sort((a, b) => a.finishTime - b.finishTime);
+        
+        const rank = finishedPlayersList.findIndex(p => p.playerId === playerId) + 1;
+        return rank > 0 ? rank : null;
+    }
+
+    getFinishedPlayersCount() {
+        return this.finishedPlayers.size;
+    }
+
+    getTotalPlayersCount() {
+        return this.players.size;
+    }
+
+    getRankedPlayers() {
+        const players = Array.from(this.players.values());
+        
+        // Get all players and mark finished ones
+        const allPlayerData = players.map(player => ({
+            ...player,
+            isFinished: this.finishedPlayers.has(player.playerId),
+            finishTime: this.finishedPlayers.get(player.playerId)?.finishTime || Date.now()
+        }));
+        
+        // Sort by finish time (finished players) then by position (unfinished players)
+        const sortedPlayers = allPlayerData.sort((a, b) => {
+            if (a.isFinished && b.isFinished) {
+                return a.finishTime - b.finishTime;
+            }
+            if (a.isFinished && !b.isFinished) return -1;
+            if (!a.isFinished && b.isFinished) return 1;
+            return b.gridPosition.currentY - a.gridPosition.currentY;
+        });
+        
+        // Assign ranks
+        return sortedPlayers.map((player, index) => ({
+            ...player,
+            rank: index + 1
+        }));
     }
 
     update(position, rotation) {

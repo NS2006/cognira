@@ -41708,18 +41708,12 @@ const cardDefinition = {
   //     positive: { type: 'value', amount: 6 },          // +6
   //     negative: { type: 'stop_all' } // stop all
   // },
-  bad_monkey: {
-    id: 'bad_monkey',
-    file: 'Bad Monkey',
-    positive: {
-      type: 'value',
-      amount: 6
-    },
-    // +6
-    negative: {
-      type: 'stop'
-    } // stop
-  },
+  // bad_monkey: {
+  //     id: 'bad_monkey',
+  //     file: 'Bad Monkey',
+  //     positive: { type: 'value', amount: 6 },          // +6
+  //     negative: { type: 'stop' } // stop
+  // },
   bear: {
     id: 'bear',
     file: 'Bear',
@@ -41780,17 +41774,12 @@ const cardDefinition = {
       type: 'none'
     }
   },
-  pig: {
-    id: 'pig',
-    file: 'Pig',
-    positive: {
-      type: 'multiplier',
-      amount: 2
-    },
-    negative: {
-      type: 'stop'
-    }
-  },
+  // pig: {
+  //     id: 'pig',
+  //     file: 'Pig',
+  //     positive: { type: 'multiplier', amount: 2 },
+  //     negative: { type: 'stop' }
+  // },
   raven: {
     id: 'raven',
     file: 'Raven',
@@ -42980,7 +42969,7 @@ class Player extends THREE.Object3D {
     this.isModelLoaded = false;
 
     // Initialize step system
-    this.baseStep = 2; // Base movement steps per turn
+    this.baseStep = 100; // Base movement steps per turn
     this.remainingSteps = this.baseStep;
     this.selectedCard = null;
     this.winGame = false;
@@ -44413,7 +44402,7 @@ class MathOperationSystem {
 }
 exports.MathOperationSystem = MathOperationSystem;
 
-},{"../../../constants.js":60,"../../../utilities/worldRelated.js":78,"./MathOperationList.js":52}],54:[function(require,module,exports){
+},{"../../../constants.js":60,"../../../utilities/worldRelated.js":79,"./MathOperationList.js":52}],54:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45099,7 +45088,7 @@ class MemoryMatrixSystem {
 }
 exports.MemoryMatrixSystem = MemoryMatrixSystem;
 
-},{"../../../constants.js":60,"../../../utilities/worldRelated.js":78,"./MemoryMatrixList.js":54}],56:[function(require,module,exports){
+},{"../../../constants.js":60,"../../../utilities/worldRelated.js":79,"./MemoryMatrixList.js":54}],56:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45894,7 +45883,7 @@ class QuestionSystem {
 }
 exports.QuestionSystem = QuestionSystem;
 
-},{"../../../constants.js":60,"../../../utilities/worldRelated.js":78,"./QuestionList.js":56}],58:[function(require,module,exports){
+},{"../../../constants.js":60,"../../../utilities/worldRelated.js":79,"./QuestionList.js":56}],58:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46253,18 +46242,18 @@ Object.defineProperty(exports, "__esModule", {
 exports.TILE_SIZE = exports.STEPS_UPDATE_INTERVAL = exports.ROUND_PHASE_TIME = exports.QUESTION_PHASE_TIME = exports.PHASE_TRANSITION_DELAY = exports.MOVEMENT_PHASE_TIME = exports.MESSAGE_FADE_OUT_TIME = exports.MESSAGE_DISPLAY_TIME = exports.MEMORY_MATRIX_PHASE_TIME = exports.MAX_PLAYER = exports.MATH_OPERATION_PHASE_TIME = exports.MAP_SIZE_Y = exports.MAP_SIZE_X = exports.LEADERBOARD_PHASE_TIME = exports.GAP_SIZE = exports.COUNTDOWN_PHASE_TIME = exports.CARD_RESULT_PHASE_TIME = exports.CARD_PHASE_TIME = void 0;
 // 4 x 23 GRID
 const MAP_SIZE_X = exports.MAP_SIZE_X = 4;
-const MAP_SIZE_Y = exports.MAP_SIZE_Y = 51;
+const MAP_SIZE_Y = exports.MAP_SIZE_Y = 5;
 const TILE_SIZE = exports.TILE_SIZE = 42;
 const GAP_SIZE = exports.GAP_SIZE = 6;
-const MAX_PLAYER = exports.MAX_PLAYER = 2;
+const MAX_PLAYER = exports.MAX_PLAYER = 3;
 
 // Phase timing constants (in seconds)
 const COUNTDOWN_PHASE_TIME = exports.COUNTDOWN_PHASE_TIME = 1;
 const ROUND_PHASE_TIME = exports.ROUND_PHASE_TIME = 1;
 const CARD_PHASE_TIME = exports.CARD_PHASE_TIME = 1;
 const CARD_RESULT_PHASE_TIME = exports.CARD_RESULT_PHASE_TIME = 1;
-const MOVEMENT_PHASE_TIME = exports.MOVEMENT_PHASE_TIME = 10;
-const LEADERBOARD_PHASE_TIME = exports.LEADERBOARD_PHASE_TIME = 1;
+const MOVEMENT_PHASE_TIME = exports.MOVEMENT_PHASE_TIME = 5;
+const LEADERBOARD_PHASE_TIME = exports.LEADERBOARD_PHASE_TIME = 5;
 const PHASE_TRANSITION_DELAY = exports.PHASE_TRANSITION_DELAY = 0.5;
 
 // Minigame time
@@ -46320,6 +46309,7 @@ var _constants = require("./constants");
 var _LeafParticleSystem = require("./components/particles/LeafParticleSystem");
 var _leaderboardPhase = require("./phases/leaderboardPhase");
 var _handleUsernameInput = require("./utilities/handleUsernameInput");
+var _finishGame = require("./utilities/finishGame");
 var _currentRound;
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 const mainMenu = document.getElementById("mainMenu");
@@ -46513,6 +46503,7 @@ function initializeGame() {
   new _SkyBox.SkyBox(scene);
   leafParticles = new _LeafParticleSystem.LeafParticles(scene, 20, 150);
   (0, _Map.initializeMap)();
+  (0, _finishGame.initializeFinishGame)();
   (0, _leaderboardPhase.initializeLeaderboard)();
   (0, _Map.loadTrees)();
   (0, _Map.loadRiver)();
@@ -46538,7 +46529,7 @@ function cleanupGame() {
   gameInitialized = false;
 }
 
-},{"./components/Camera":39,"./components/CardSystem":43,"./components/DirectionalLight":44,"./components/LoadingManager":45,"./components/Map":46,"./components/Renderer":48,"./components/SkyBox":49,"./components/lobby":51,"./components/minigames/mathOperation/MathOperationSystem":53,"./components/minigames/memoryMatrix/MemoryMatrixSystem":55,"./components/minigames/question/QuestionSystem":57,"./components/particles/LeafParticleSystem":59,"./constants":60,"./phases/countdownPhase":64,"./phases/leaderboardPhase":65,"./socketClient":73,"./utilities/animate":74,"./utilities/collectUserInputs":75,"./utilities/handleUsernameInput":76,"three":36}],62:[function(require,module,exports){
+},{"./components/Camera":39,"./components/CardSystem":43,"./components/DirectionalLight":44,"./components/LoadingManager":45,"./components/Map":46,"./components/Renderer":48,"./components/SkyBox":49,"./components/lobby":51,"./components/minigames/mathOperation/MathOperationSystem":53,"./components/minigames/memoryMatrix/MemoryMatrixSystem":55,"./components/minigames/question/QuestionSystem":57,"./components/particles/LeafParticleSystem":59,"./constants":60,"./phases/countdownPhase":64,"./phases/leaderboardPhase":65,"./socketClient":73,"./utilities/animate":74,"./utilities/collectUserInputs":75,"./utilities/finishGame":76,"./utilities/handleUsernameInput":77,"three":36}],62:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46883,10 +46874,16 @@ exports.startLeaderboardPhase = startLeaderboardPhase;
 var _main = require("../main.js");
 var _roundPhase = require("./roundPhase.js");
 var _constants = require("../constants.js");
+var _finishGame = require("../utilities/finishGame.js");
 let leaderboardPhaseActive = false;
 let leaderboardPhaseTimer = null;
 let previousRankings = new Map();
 function startLeaderboardPhase() {
+  // Check if game should continue for this player
+  if (!(0, _finishGame.shouldContinueGame)()) {
+    console.log("🎯 Player has finished - skipping leaderboard phase");
+    return;
+  }
   if (leaderboardPhaseActive) {
     console.log("🏆 Leaderboard phase already active, skipping");
     return;
@@ -46933,9 +46930,13 @@ function endLeaderboardPhase() {
 
   // Add delay before next phase to ensure clean transition
   setTimeout(() => {
-    // Move to next round phase
-    console.log("🏆 Leaderboard phase completed, moving to next round");
-    (0, _roundPhase.startRoundPhase)();
+    // Only continue if game should continue
+    if ((0, _finishGame.shouldContinueGame)()) {
+      console.log("🏆 Leaderboard phase completed, moving to next round");
+      (0, _roundPhase.startRoundPhase)();
+    } else {
+      console.log("🎯 Game finished - stopping at leaderboard phase");
+    }
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 function isLeaderboardPhaseActive() {
@@ -46967,7 +46968,8 @@ function calculateRankings() {
         username: player.playerUsername,
         position: player.gridPosition,
         rank: currentRank,
-        isLocalPlayer: player.isLocalPlayer
+        isLocalPlayer: player.isLocalPlayer,
+        isFinished: (0, _finishGame.isPlayerFinished)(player.playerId)
       });
       previousY = player.gridPosition.currentY;
       return;
@@ -46982,17 +46984,19 @@ function calculateRankings() {
         position: player.gridPosition,
         rank: currentRank,
         // Same rank as previous
-        isLocalPlayer: player.isLocalPlayer
+        isLocalPlayer: player.isLocalPlayer,
+        isFinished: (0, _finishGame.isPlayerFinished)(player.playerId)
       });
     } else {
       // Different Y = increment rank
-      currentRank = index + 1; // Or currentRank++ if you prefer consecutive numbers
+      currentRank = index + 1;
       rankings.push({
         playerId: player.playerId,
         username: player.playerUsername,
         position: player.gridPosition,
         rank: currentRank,
-        isLocalPlayer: player.isLocalPlayer
+        isLocalPlayer: player.isLocalPlayer,
+        isFinished: (0, _finishGame.isPlayerFinished)(player.playerId)
       });
       previousY = player.gridPosition.currentY;
     }
@@ -47053,16 +47057,17 @@ function populateLeaderboardList(currentRankings) {
   leaderboardList.innerHTML = '';
   currentRankings.forEach((player, index) => {
     const previousRank = getPreviousRank(player.playerId);
-    // Only show change if there was a previous rank AND it's different
     const hasChanged = previousRank !== null && previousRank !== player.rank;
-    const rankChange = hasChanged ? previousRank - player.rank : 0; // Positive = improved, Negative = dropped
-
+    const rankChange = hasChanged ? previousRank - player.rank : 0;
+    const isFinished = player.isFinished;
+    const finishRank = isFinished ? (0, _finishGame.getPlayerRank)(player.playerId) : null;
     const playerElement = document.createElement('div');
-    playerElement.className = `leaderboard-item ${player.isLocalPlayer ? 'local-player' : ''} ${hasChanged ? 'ranking-changed' : ''}`;
+    playerElement.className = `leaderboard-item ${player.isLocalPlayer ? 'local-player' : ''} ${hasChanged ? 'ranking-changed' : ''} ${isFinished ? 'finished' : ''}`;
+    playerElement.dataset.playerId = player.playerId;
     playerElement.innerHTML = `
             <div class="rank-section">
-                <div class="rank-number">${player.rank}</div>
-                ${hasChanged ? `
+                <div class="rank-number">${isFinished ? finishRank : player.rank}</div>
+                ${hasChanged && !isFinished ? `
                     <div class="rank-change ${rankChange > 0 ? 'improved' : 'dropped'}">
                         ${rankChange > 0 ? '↑' : '↓'} ${Math.abs(rankChange)}
                     </div>
@@ -47070,9 +47075,12 @@ function populateLeaderboardList(currentRankings) {
             </div>
             <div class="player-info">
                 <div class="player-name">${player.username} ${player.isLocalPlayer ? ' (You)' : ''}</div>
+                <div class="player-position">Y: ${player.position.currentY}</div>
             </div>
             <div class="player-medal">
-                ${player.rank === 1 ? '🥇' : player.rank === 2 ? '🥈' : player.rank === 3 ? '🥉' : ''}
+                ${isFinished ? `<div class="finish-badge">
+                        Finished ${getRankSuffix(finishRank)}
+                    </div>` : player.rank === 1 ? '🥇' : player.rank === 2 ? '🥈' : player.rank === 3 ? '🥉' : ''}
             </div>
         `;
 
@@ -47080,6 +47088,12 @@ function populateLeaderboardList(currentRankings) {
     playerElement.style.animationDelay = `${index * 0.1}s`;
     leaderboardList.appendChild(playerElement);
   });
+}
+function getRankSuffix(rank) {
+  if (rank === 1) return '1st';
+  if (rank === 2) return '2nd';
+  if (rank === 3) return '3rd';
+  return `${rank}th`;
 }
 function getPreviousRank(playerId) {
   return previousRankings.get(playerId) || null;
@@ -47128,7 +47142,7 @@ function initializeLeaderboard() {
   console.log("🏆 Leaderboard system initialized");
 }
 
-},{"../constants.js":60,"../main.js":61,"./roundPhase.js":72}],66:[function(require,module,exports){
+},{"../constants.js":60,"../main.js":61,"../utilities/finishGame.js":76,"./roundPhase.js":72}],66:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -47467,9 +47481,15 @@ var _collectUserInputs = require("../utilities/collectUserInputs.js");
 var _constants = require("../constants.js");
 var _showTime = require("../utilities/showTime.js");
 var _leaderboardPhase = require("./leaderboardPhase.js");
+var _finishGame = require("../utilities/finishGame.js");
 let movementPhaseActive = false;
 let movementPhaseTimer = null;
 function startMovementPhase() {
+  // Check if game should continue for this player
+  if (!(0, _finishGame.shouldContinueGame)()) {
+    console.log("🎯 Player has finished - skipping movement phase");
+    return;
+  }
   if (movementPhaseActive) {
     console.log("🚶 Movement phase already active, skipping");
     return;
@@ -47522,18 +47542,32 @@ function endMovementPhase() {
   // Disable movement controls during transition
   (0, _collectUserInputs.updateMovementUI)(false);
 
-  // Process any remaining moves and get final state
+  // Check if local player finished during this movement phase
   const localPlayer = (0, _main.getLocalPlayer)();
   if (localPlayer) {
     console.log(`🎯 Movement phase completed for player ${localPlayer.playerId}`);
     console.log(`📍 Final position: X=${localPlayer.gridPosition.currentX}, Y=${localPlayer.gridPosition.currentY}`);
     console.log(`👣 Remaining steps: ${localPlayer.remainingSteps}`);
+
+    // Check if player reached finish
+    const playerFinished = (0, _finishGame.checkPlayerFinish)(localPlayer);
+    if (playerFinished) {
+      console.log("🎉 Player finished - showing personal ranking");
+      (0, _finishGame.showPersonalRanking)(); // Show the personal ranking UI
+      (0, _main.clearPhaseTimer)();
+      return; // Don't continue to next phase
+    }
   }
 
   // Add delay before next phase to ensure clean transition
   setTimeout(() => {
-    console.log("🔄 Movement phase completed, ready for next phase");
-    (0, _leaderboardPhase.startLeaderboardPhase)();
+    // Only continue if player hasn't finished
+    if ((0, _finishGame.shouldContinueGame)()) {
+      console.log("🔄 Movement phase completed, ready for next phase");
+      (0, _leaderboardPhase.startLeaderboardPhase)();
+    } else {
+      console.log("🎯 Player finished - stopping at movement phase");
+    }
   }, _constants.PHASE_TRANSITION_DELAY * 1000);
 }
 function isMovementPhaseActive() {
@@ -47606,7 +47640,7 @@ function startStepsDisplayUpdater() {
   }, _constants.MOVEMENT_PHASE_TIME * 1000);
 }
 
-},{"../constants.js":60,"../main.js":61,"../utilities/collectUserInputs.js":75,"../utilities/showTime.js":77,"./leaderboardPhase.js":65}],72:[function(require,module,exports){
+},{"../constants.js":60,"../main.js":61,"../utilities/collectUserInputs.js":75,"../utilities/finishGame.js":76,"../utilities/showTime.js":78,"./leaderboardPhase.js":65}],72:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -47769,6 +47803,7 @@ exports.SocketClient = void 0;
 var _socket = require("socket.io-client");
 var _Player = require("./components/Player");
 var _worldRelated = require("./utilities/worldRelated");
+var _constants = require("./constants.js");
 class SocketClient {
   constructor(username, addPlayer, removePlayer, updatePlayerCount, onMinigameSequenceReceived) {
     this.addPlayer = addPlayer;
@@ -47776,13 +47811,12 @@ class SocketClient {
     this.updatePlayerCount = updatePlayerCount;
     this.username = username;
     this.players = new Map();
-    this.onMinigameSequenceReceived = onMinigameSequenceReceived; // Callback for minigame sequence
+    this.finishedPlayers = new Map(); // Track finished players
+    this.onMinigameSequenceReceived = onMinigameSequenceReceived;
 
     // Dynamic socket URL for production/development
     const socketUrl = this.getSocketUrl();
     console.log('🎮 Connecting to:', socketUrl, 'with username:', username);
-
-    // Pass username in auth object
     this.io = (0, _socket.io)(socketUrl, {
       auth: {
         username: username
@@ -47866,6 +47900,17 @@ class SocketClient {
         }
       }
     });
+
+    // Handle player finish events
+    this.io.on("player-finished", finishData => {
+      console.log("📡 Player finished event received:", finishData.username);
+      this.handleRemotePlayerFinish(finishData);
+
+      // Dispatch custom event for UI to update
+      window.dispatchEvent(new CustomEvent('player-finished-ui', {
+        detail: finishData
+      }));
+    });
     this.io.on("connect_error", error => {
       console.error("💥 Connection error:", error);
     });
@@ -47887,6 +47932,119 @@ class SocketClient {
       this.players.delete(playerId);
       console.log("🗑️ Removed remote player:", playerId);
     }
+  }
+
+  // Finish Game Logic Methods
+  checkPlayerFinish(player) {
+    if (!player || this.finishedPlayers.has(player.playerId)) {
+      return false;
+    }
+
+    // Check if player reached the end of the map
+    if (player.gridPosition.currentY >= _constants.MAP_SIZE_Y - 1) {
+      console.log(`🎉 ${player.playerUsername} reached the finish!`);
+      const finishData = {
+        playerId: player.playerId,
+        username: player.playerUsername,
+        finishTime: Date.now(),
+        isLocalPlayer: player.isLocalPlayer
+      };
+
+      // Add to finished players
+      this.finishedPlayers.set(player.playerId, finishData);
+
+      // Broadcast to other players
+      this.broadcastPlayerFinish(finishData);
+
+      // Check if game should end
+      this.checkGameEndCondition();
+      return true;
+    }
+    return false;
+  }
+  checkAllPlayersFinish() {
+    const players = Array.from(this.players.values());
+    players.forEach(player => {
+      if (!this.finishedPlayers.has(player.playerId) && player.gridPosition.currentY >= _constants.MAP_SIZE_Y - 1) {
+        this.checkPlayerFinish(player);
+      }
+    });
+  }
+  broadcastPlayerFinish(finishData) {
+    if (!this.io.connected) return;
+    this.io.emit("player-finished", {
+      ...finishData,
+      isLocalPlayer: false
+    });
+  }
+  handleRemotePlayerFinish(finishData) {
+    if (this.finishedPlayers.has(finishData.playerId)) return;
+    console.log(`🎉 Remote player ${finishData.username} finished`);
+    this.finishedPlayers.set(finishData.playerId, finishData);
+
+    // Check if game should end
+    this.checkGameEndCondition();
+  }
+  checkGameEndCondition() {
+    const players = Array.from(this.players.values());
+    const unfinishedPlayers = players.filter(player => !this.finishedPlayers.has(player.playerId));
+    console.log(`🎯 ${unfinishedPlayers.length} players remaining, ${this.finishedPlayers.size} finished`);
+
+    // Game ends when only one player remains unfinished
+    if (unfinishedPlayers.length <= 1 && players.length > 1) {
+      console.log("🏁 Game end condition met");
+      // Dispatch event for UI to handle
+      window.dispatchEvent(new CustomEvent('game-finished'));
+      return true;
+    }
+    return false;
+  }
+
+  // Getters for game state
+  isPlayerFinished(playerId) {
+    return this.finishedPlayers.has(playerId);
+  }
+  isGameFinished() {
+    const players = Array.from(this.players.values());
+    const unfinishedPlayers = players.filter(player => !this.finishedPlayers.has(player.playerId));
+    return unfinishedPlayers.length <= 1 && players.length > 1;
+  }
+  getPlayerRank(playerId) {
+    const finishedPlayersList = Array.from(this.finishedPlayers.values()).sort((a, b) => a.finishTime - b.finishTime);
+    const rank = finishedPlayersList.findIndex(p => p.playerId === playerId) + 1;
+    return rank > 0 ? rank : null;
+  }
+  getFinishedPlayersCount() {
+    return this.finishedPlayers.size;
+  }
+  getTotalPlayersCount() {
+    return this.players.size;
+  }
+  getRankedPlayers() {
+    const players = Array.from(this.players.values());
+
+    // Get all players and mark finished ones
+    const allPlayerData = players.map(player => ({
+      ...player,
+      isFinished: this.finishedPlayers.has(player.playerId),
+      finishTime: this.finishedPlayers.get(player.playerId)?.finishTime || Date.now()
+    }));
+
+    // Sort by finish time (finished players) then by position (unfinished players)
+    const sortedPlayers = allPlayerData.sort((a, b) => {
+      if (a.isFinished && b.isFinished) {
+        return a.finishTime - b.finishTime;
+      }
+      if (a.isFinished && !b.isFinished) return -1;
+      if (!a.isFinished && b.isFinished) return 1;
+      return b.gridPosition.currentY - a.gridPosition.currentY;
+    });
+
+    // Assign ranks
+    return sortedPlayers.map((player, index) => ({
+      ...player,
+      rank: index + 1
+    }));
   }
   update(position, rotation) {
     if (this.io.connected) {
@@ -47915,7 +48073,7 @@ class SocketClient {
 }
 exports.SocketClient = SocketClient;
 
-},{"./components/Player":47,"./utilities/worldRelated":78,"socket.io-client":27}],74:[function(require,module,exports){
+},{"./components/Player":47,"./constants.js":60,"./utilities/worldRelated":79,"socket.io-client":27}],74:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -48138,7 +48296,7 @@ function getAnimationState() {
   };
 }
 
-},{"../components/Map":46,"./worldRelated":78,"three":36}],75:[function(require,module,exports){
+},{"../components/Map":46,"./worldRelated":79,"three":36}],75:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -48310,6 +48468,346 @@ function refreshMovementUI() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.checkAllPlayersFinish = checkAllPlayersFinish;
+exports.checkPlayerFinish = checkPlayerFinish;
+exports.getPlayerRank = getPlayerRank;
+exports.initializeFinishGame = initializeFinishGame;
+exports.isGameFinished = isGameFinished;
+exports.isPlayerFinished = isPlayerFinished;
+exports.shouldContinueGame = shouldContinueGame;
+exports.showFinalPodium = showFinalPodium;
+exports.showPersonalRanking = showPersonalRanking;
+exports.updatePersonalRankingDisplay = updatePersonalRankingDisplay;
+var _main = require("../main.js");
+let personalRankingDisplayed = false;
+function initializeFinishGame() {
+  personalRankingDisplayed = false;
+  setupEventListeners();
+  console.log("🏁 Finish game UI initialized");
+}
+function setupEventListeners() {
+  // Listen for game finished event from SocketClient
+  window.addEventListener('game-finished', () => {
+    console.log("🎭 Game finished event received - showing final podium");
+    showFinalPodium();
+    (0, _main.clearPhaseTimer)();
+  });
+
+  // Listen for player finished events from SocketClient (custom event)
+  window.addEventListener('player-finished-ui', event => {
+    console.log("🎨 UI: Player finished event received:", event.detail.username);
+    // Update the personal ranking display if it's shown
+    if (personalRankingDisplayed) {
+      updatePersonalRankingDisplay();
+    }
+  });
+  console.log("✅ Event listeners setup for finish game UI");
+}
+function checkPlayerFinish(player) {
+  const socketClient = (0, _main.getSocketClient)();
+  const finished = socketClient.checkPlayerFinish(player);
+
+  // If this player finished, show their personal ranking
+  if (finished && player.isLocalPlayer) {
+    console.log("🎯 Local player finished - showing personal ranking");
+    showPersonalRanking();
+    (0, _main.clearPhaseTimer)();
+  }
+  return finished;
+}
+function checkAllPlayersFinish() {
+  const socketClient = (0, _main.getSocketClient)();
+  socketClient.checkAllPlayersFinish();
+}
+function shouldContinueGame() {
+  const localPlayer = (0, _main.getLocalPlayer)();
+  const socketClient = (0, _main.getSocketClient)();
+  return localPlayer && !socketClient.isPlayerFinished(localPlayer.playerId) && !socketClient.isGameFinished();
+}
+function isPlayerFinished(playerId) {
+  const socketClient = (0, _main.getSocketClient)();
+  return socketClient.isPlayerFinished(playerId);
+}
+function isGameFinished() {
+  const socketClient = (0, _main.getSocketClient)();
+  return socketClient.isGameFinished();
+}
+function getPlayerRank(playerId) {
+  const socketClient = (0, _main.getSocketClient)();
+  return socketClient.getPlayerRank(playerId);
+}
+
+// UI Functions
+function showPersonalRanking() {
+  const socketClient = (0, _main.getSocketClient)();
+  const localPlayer = (0, _main.getLocalPlayer)();
+  if (!localPlayer) return;
+
+  // Check if game is already finished - if so, show final podium instead
+  if (socketClient.isGameFinished()) {
+    console.log("🎯 Game is already finished - showing final podium instead");
+    showFinalPodium();
+    return;
+  }
+  removeAllGameUI();
+  personalRankingDisplayed = true;
+  const finishedCount = socketClient.getFinishedPlayersCount();
+  const totalPlayers = socketClient.getTotalPlayersCount();
+  const currentRank = socketClient.getPlayerRank(localPlayer.playerId);
+  console.log(`🎯 Showing personal ranking: Rank ${currentRank}, ${finishedCount}/${totalPlayers} finished`);
+  const personalRankDiv = document.createElement('div');
+  personalRankDiv.id = 'personalRanking';
+  personalRankDiv.innerHTML = createPersonalRankingHTML(currentRank, finishedCount, totalPlayers);
+  document.body.appendChild(personalRankDiv);
+}
+function updatePersonalRankingDisplay() {
+  const socketClient = (0, _main.getSocketClient)();
+  const finishedCount = socketClient.getFinishedPlayersCount();
+  const totalPlayers = socketClient.getTotalPlayersCount();
+  console.log(`🔄 Updating personal ranking: ${finishedCount}/${totalPlayers} finished`);
+  const standingsElement = document.querySelector('#personalRanking .current-standings');
+  if (standingsElement) {
+    standingsElement.innerHTML = createStandingsHTML(finishedCount, totalPlayers);
+  }
+
+  // Check if game ended while we were on personal ranking
+  if (socketClient.isGameFinished()) {
+    console.log("🎯 Game ended while on personal ranking - switching to final podium");
+    showFinalPodium();
+  }
+}
+function showFinalPodium() {
+  const socketClient = (0, _main.getSocketClient)();
+  const localPlayer = (0, _main.getLocalPlayer)();
+  removeAllGameUI();
+  personalRankingDisplayed = false;
+  const rankedPlayers = socketClient.getRankedPlayers();
+  const localPlayerRank = localPlayer ? rankedPlayers.find(p => p.playerId === localPlayer.playerId)?.rank : null;
+  console.log("🎭 Showing final podium with ranked players:", rankedPlayers.map(p => `${p.username} (${p.rank})`));
+  const finalPodiumDiv = document.createElement('div');
+  finalPodiumDiv.id = 'finalPodium';
+  finalPodiumDiv.innerHTML = createFinalPodiumHTML(rankedPlayers, localPlayerRank);
+  document.body.appendChild(finalPodiumDiv);
+  document.getElementById('returnToLobby').addEventListener('click', () => {
+    window.location.reload();
+  });
+}
+
+// HTML Template Functions
+function createPersonalRankingHTML(rank, finishedCount, totalPlayers) {
+  return `
+        <div style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            color: white;
+        ">
+            <div style="
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                padding: 50px;
+                border-radius: 20px;
+                max-width: 500px;
+                width: 90%;
+                text-align: center;
+                animation: popIn 0.5s ease-out;
+            ">
+                <div style="font-size: 5em; margin-bottom: 20px;">${getRankEmoji(rank)}</div>
+                <h1 style="font-size: 2.5em; margin-bottom: 10px; color: gold;">FINISHED!</h1>
+                <div style="font-size: 1.2em; margin-bottom: 30px; opacity: 0.9;">
+                    You finished in
+                </div>
+                <div style="
+                    font-size: 4em;
+                    font-weight: bold;
+                    color: gold;
+                    margin: 20px 0;
+                    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+                ">
+                    ${getRankSuffix(rank)} Place
+                </div>
+                <div class="current-standings" style="
+                    background: rgba(255, 255, 255, 0.1);
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 30px 0;
+                    border-left: 4px solid gold;
+                ">
+                    ${createStandingsHTML(finishedCount, totalPlayers)}
+                </div>
+                <div style="
+                    padding: 15px;
+                    background: rgba(255, 215, 0, 0.2);
+                    border-radius: 10px;
+                    margin-top: 20px;
+                    font-size: 0.9em;
+                    border: 1px solid gold;
+                ">
+                    🎉 Congratulations! You've completed the race!
+                </div>
+            </div>
+        </div>
+        <style>
+            @keyframes popIn {
+                0% { transform: scale(0.8); opacity: 0; }
+                100% { transform: scale(1); opacity: 1; }
+            }
+        </style>
+    `;
+}
+function createStandingsHTML(finishedCount, totalPlayers) {
+  return `
+        <div style="font-size: 1.1em; margin-bottom: 10px;">🏆 Current Standings</div>
+        <div style="font-size: 0.9em; opacity: 0.8;">
+            ${finishedCount} of ${totalPlayers} players finished
+        </div>
+        <div style="margin-top: 10px; font-size: 0.8em; opacity: 0.7;">
+            Waiting for ${totalPlayers - finishedCount} players...
+        </div>
+    `;
+}
+function createFinalPodiumHTML(rankedPlayers, localPlayerRank) {
+  return `
+        <div style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            color: white;
+        ">
+            <div style="
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                padding: 40px;
+                border-radius: 20px;
+                max-width: 800px;
+                width: 90%;
+                max-height: 90vh;
+                overflow-y: auto;
+                text-align: center;
+                animation: popIn 0.5s ease-out;
+            ">
+                <h1 style="font-size: 3em; margin-bottom: 10px; color: gold;">🏆 RACE COMPLETED 🏆</h1>
+                <div style="margin-bottom: 30px; opacity: 0.9;">All players have finished!</div>
+                
+                <!-- Personal Result -->
+                <div style="
+                    background: rgba(255, 255, 255, 0.1);
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin: 20px 0;
+                    border: 2px solid gold;
+                ">
+                    <div style="font-size: 1.5em; margin-bottom: 10px; color: gold;">Your Final Result</div>
+                    <div style="font-size: 3em; margin: 10px 0;">${getRankEmoji(localPlayerRank)}</div>
+                    <div style="font-size: 2em; font-weight: bold; color: gold;">
+                        ${getRankSuffix(localPlayerRank)} Place
+                    </div>
+                </div>
+                
+                <!-- Final Rankings -->
+                <div style="
+                    background: rgba(255, 255, 255, 0.1);
+                    border-radius: 10px;
+                    padding: 20px;
+                    margin-top: 20px;
+                ">
+                    <h3 style="margin-bottom: 20px; color: gold;">Final Rankings</h3>
+                    ${rankedPlayers.map(player => `
+                        <div style="
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            padding: 12px 15px;
+                            margin: 8px 0;
+                            background: ${player.isLocalPlayer ? 'rgba(255, 215, 0, 0.2)' : 'rgba(255, 255, 255, 0.1)'};
+                            border-radius: 8px;
+                            ${player.isLocalPlayer ? 'border: 2px solid gold;' : ''}
+                        ">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span style="font-weight: bold; width: 30px; text-align: center; font-size: 1.1em;">
+                                    ${player.rank}
+                                </span>
+                                <span style="font-size: 1.1em;">
+                                    ${player.playerUsername} ${player.isLocalPlayer ? '<strong>(You)</strong>' : ''}
+                                </span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 1.2em;">${getRankEmoji(player.rank)}</span>
+                                <span style="opacity: 0.8;">${getRankSuffix(player.rank)}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <button id="returnToLobby" style="
+                    margin-top: 30px;
+                    padding: 15px 30px;
+                    font-size: 1.2em;
+                    background: gold;
+                    color: black;
+                    border: none;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-weight: bold;
+                ">
+                    Return to Lobby
+                </button>
+            </div>
+        </div>
+        <style>
+            @keyframes popIn {
+                0% { transform: scale(0.8); opacity: 0; }
+                100% { transform: scale(1); opacity: 1; }
+            }
+        </style>
+    `;
+}
+function removeAllGameUI() {
+  const elementsToRemove = ['movementPhaseMessage', 'leaderboardContainer', 'playerFinishMessage', 'personalRanking', 'finalPodium'];
+  elementsToRemove.forEach(id => {
+    const element = document.getElementById(id);
+    if (element && document.body.contains(element)) {
+      document.body.removeChild(element);
+    }
+  });
+  const gameInfo = document.getElementById('gameInfo');
+  if (gameInfo) {
+    gameInfo.style.display = 'none';
+  }
+}
+function getRankSuffix(rank) {
+  if (rank === 1) return '1st';
+  if (rank === 2) return '2nd';
+  if (rank === 3) return '3rd';
+  return `${rank}th`;
+}
+function getRankEmoji(rank) {
+  if (rank === 1) return '🥇';
+  if (rank === 2) return '🥈';
+  if (rank === 3) return '🥉';
+  return '🎯';
+}
+
+},{"../main.js":61}],77:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports.getPlayerUsername = getPlayerUsername;
 exports.hideUsernamePopup = hideUsernamePopup;
 exports.initializeUsernameHandlers = initializeUsernameHandlers;
@@ -48445,7 +48943,7 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-},{"../main.js":61}],77:[function(require,module,exports){
+},{"../main.js":61}],78:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -48608,7 +49106,7 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-},{"../constants.js":60}],78:[function(require,module,exports){
+},{"../constants.js":60}],79:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

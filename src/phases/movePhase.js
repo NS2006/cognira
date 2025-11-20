@@ -9,82 +9,102 @@ import {
 } from "../constants.js";
 import { hideTimeDisplay, PhaseTimes, showPhaseTime } from "../utilities/showTime.js";
 import { startLeaderboardPhase } from "./leaderboardPhase.js";
+import { checkPlayerFinish, shouldContinueGame, showPersonalRanking } from "../utilities/finishGame.js";
 
 let movementPhaseActive = false;
 let movementPhaseTimer = null;
 
 export function startMovementPhase() {
-  if (movementPhaseActive) {
-    console.log("🚶 Movement phase already active, skipping");
-    return;
-  }
+    // Check if game should continue for this player
+    if (!shouldContinueGame()) {
+        console.log("🎯 Player has finished - skipping movement phase");
+        return;
+    }
 
-  console.log(`🚶 Starting movement phase (${MOVEMENT_PHASE_TIME} seconds)`);
-  movementPhaseActive = true;
+    if (movementPhaseActive) {
+        console.log("🚶 Movement phase already active, skipping");
+        return;
+    }
 
-  
-  // Clear any existing timers
-  clearPhaseTimer();
-  
-  // Small delay before enabling movement to ensure clean transition
-  setTimeout(() => {
-    showPhaseTime('movement', PhaseTimes.MOVEMENT);
+    console.log(`🚶 Starting movement phase (${MOVEMENT_PHASE_TIME} seconds)`);
+    movementPhaseActive = true;
+
+    // Clear any existing timers
+    clearPhaseTimer();
     
-    // Enable movement controls
-    updateMovementUI();
+    // Small delay before enabling movement to ensure clean transition
+    setTimeout(() => {
+        showPhaseTime('movement', PhaseTimes.MOVEMENT);
+        
+        // Enable movement controls
+        updateMovementUI();
 
-    // Display movement instructions
-    showMovementPhaseMessage();
+        // Display movement instructions
+        showMovementPhaseMessage();
 
-    // Set timer to automatically end movement phase
-    movementPhaseTimer = setTimeout(() => {
-      console.log("⏰ Movement phase time limit reached");
-      endMovementPhase();
-    }, MOVEMENT_PHASE_TIME * 1000);
-    
-    // Also set the main phase timer for consistency
-    setPhaseTimer(movementPhaseTimer);
-  }, PHASE_TRANSITION_DELAY * 1000);
+        // Set timer to automatically end movement phase
+        movementPhaseTimer = setTimeout(() => {
+            console.log("⏰ Movement phase time limit reached");
+            endMovementPhase();
+        }, MOVEMENT_PHASE_TIME * 1000);
+        
+        // Also set the main phase timer for consistency
+        setPhaseTimer(movementPhaseTimer);
+    }, PHASE_TRANSITION_DELAY * 1000);
 }
 
 export function endMovementPhase() {
-  if (!movementPhaseActive) {
-    console.log("🚶 Movement phase not active, skipping end");
-    return;
-  }
+    if (!movementPhaseActive) {
+        console.log("🚶 Movement phase not active, skipping end");
+        return;
+    }
 
-  console.log("🚶 Ending movement phase");
-  movementPhaseActive = false;
+    console.log("🚶 Ending movement phase");
+    movementPhaseActive = false;
 
-  hideTimeDisplay();
+    hideTimeDisplay();
 
-  // Clear timers
-  if (movementPhaseTimer) {
-    clearTimeout(movementPhaseTimer);
-    movementPhaseTimer = null;
-  }
-  clearPhaseTimer();
+    // Clear timers
+    if (movementPhaseTimer) {
+        clearTimeout(movementPhaseTimer);
+        movementPhaseTimer = null;
+    }
+    clearPhaseTimer();
 
-  // Remove movement phase message
-  removeMovementPhaseMessage();
+    // Remove movement phase message
+    removeMovementPhaseMessage();
 
-  // Disable movement controls during transition
-  updateMovementUI(false);
+    // Disable movement controls during transition
+    updateMovementUI(false);
 
-  // Process any remaining moves and get final state
-  const localPlayer = getLocalPlayer();
-  if (localPlayer) {
-    console.log(`🎯 Movement phase completed for player ${localPlayer.playerId}`);
-    console.log(`📍 Final position: X=${localPlayer.gridPosition.currentX}, Y=${localPlayer.gridPosition.currentY}`);
-    console.log(`👣 Remaining steps: ${localPlayer.remainingSteps}`);
-  }
+    // Check if local player finished during this movement phase
+    const localPlayer = getLocalPlayer();
+    if (localPlayer) {
+        console.log(`🎯 Movement phase completed for player ${localPlayer.playerId}`);
+        console.log(`📍 Final position: X=${localPlayer.gridPosition.currentX}, Y=${localPlayer.gridPosition.currentY}`);
+        console.log(`👣 Remaining steps: ${localPlayer.remainingSteps}`);
+        
+        // Check if player reached finish
+        const playerFinished = checkPlayerFinish(localPlayer);
+        
+        if (playerFinished) {
+            console.log("🎉 Player finished - showing personal ranking");
+            showPersonalRanking(); // Show the personal ranking UI
+            clearPhaseTimer();
+            return; // Don't continue to next phase
+        }
+    }
 
-  // Add delay before next phase to ensure clean transition
-  setTimeout(() => {
-    console.log("🔄 Movement phase completed, ready for next phase");
-    
-    startLeaderboardPhase();
-  }, PHASE_TRANSITION_DELAY * 1000);
+    // Add delay before next phase to ensure clean transition
+    setTimeout(() => {
+        // Only continue if player hasn't finished
+        if (shouldContinueGame()) {
+            console.log("🔄 Movement phase completed, ready for next phase");
+            startLeaderboardPhase();
+        } else {
+            console.log("🎯 Player finished - stopping at movement phase");
+        }
+    }, PHASE_TRANSITION_DELAY * 1000);
 }
 
 export function isMovementPhaseActive() {

@@ -21,6 +21,7 @@ import {
     initializeUsernameHandlers, 
     showUsernamePopup
 } from "./utilities/handleUsernameInput";
+import { initializeFinishGame } from "./utilities/finishGame";
 
 const mainMenu = document.getElementById("mainMenu");
 const gameCanvas = document.getElementById("gameCanvas");
@@ -267,6 +268,7 @@ function initializeGame() {
     leafParticles = new LeafParticles(scene, 20, 150);
 
     initializeMap();
+    initializeFinishGame();
     initializeLeaderboard();
     loadTrees();
     loadRiver();
