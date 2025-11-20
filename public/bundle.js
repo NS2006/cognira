@@ -42969,7 +42969,7 @@ class Player extends THREE.Object3D {
     this.isModelLoaded = false;
 
     // Initialize step system
-    this.baseStep = 100; // Base movement steps per turn
+    this.baseStep = 2; // Base movement steps per turn
     this.remainingSteps = this.baseStep;
     this.selectedCard = null;
     this.winGame = false;
@@ -44370,14 +44370,12 @@ class MathOperationSystem {
     }
     this.questionContainer.style.display = 'none';
     (0, _worldRelated.pauseWorld)(false);
-
-    // console.log(`🔄 [MathOperationSystem] Calling onGameComplete callback...`);
-
-    // if (this.onGameComplete) {
-    //     this.onGameComplete(isCorrect);
-    // } else {
-    //     console.error('❌ [MathOperationSystem] onGameComplete callback is not defined!');
-    // }
+    console.log(`🔄 [MathOperationSystem] Calling onGameComplete callback...`);
+    if (this.onGameComplete) {
+      this.onGameComplete(isCorrect);
+    } else {
+      console.error('❌ [MathOperationSystem] onGameComplete callback is not defined!');
+    }
   }
   hideGame() {
     this.questionContainer.style.display = 'none';
@@ -45054,14 +45052,12 @@ class MemoryMatrixSystem {
     }
     this.questionContainer.style.display = 'none';
     (0, _worldRelated.pauseWorld)(false);
-
-    // console.log(`🔄 [MemoryMatrixSystem] Calling onGameComplete callback...`);
-
-    // if (this.onGameComplete) {
-    //     this.onGameComplete(isCorrect, this.correctAnswerCount);
-    // } else {
-    //     console.error('❌ [MemoryMatrixSystem] onGameComplete callback is not defined!');
-    // }
+    console.log(`🔄 [MemoryMatrixSystem] Calling onGameComplete callback...`);
+    if (this.onGameComplete) {
+      this.onGameComplete(isCorrect, this.correctAnswerCount);
+    } else {
+      console.error('❌ [MemoryMatrixSystem] onGameComplete callback is not defined!');
+    }
   }
   hideGame() {
     this.questionContainer.style.display = 'none';
@@ -46240,26 +46236,26 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.TILE_SIZE = exports.STEPS_UPDATE_INTERVAL = exports.ROUND_PHASE_TIME = exports.QUESTION_PHASE_TIME = exports.PHASE_TRANSITION_DELAY = exports.MOVEMENT_PHASE_TIME = exports.MESSAGE_FADE_OUT_TIME = exports.MESSAGE_DISPLAY_TIME = exports.MEMORY_MATRIX_PHASE_TIME = exports.MAX_PLAYER = exports.MATH_OPERATION_PHASE_TIME = exports.MAP_SIZE_Y = exports.MAP_SIZE_X = exports.LEADERBOARD_PHASE_TIME = exports.GAP_SIZE = exports.COUNTDOWN_PHASE_TIME = exports.CARD_RESULT_PHASE_TIME = exports.CARD_PHASE_TIME = void 0;
-// 4 x 23 GRID
+// GRID
 const MAP_SIZE_X = exports.MAP_SIZE_X = 4;
-const MAP_SIZE_Y = exports.MAP_SIZE_Y = 5;
+const MAP_SIZE_Y = exports.MAP_SIZE_Y = 34;
 const TILE_SIZE = exports.TILE_SIZE = 42;
 const GAP_SIZE = exports.GAP_SIZE = 6;
-const MAX_PLAYER = exports.MAX_PLAYER = 3;
+const MAX_PLAYER = exports.MAX_PLAYER = 4;
 
 // Phase timing constants (in seconds)
-const COUNTDOWN_PHASE_TIME = exports.COUNTDOWN_PHASE_TIME = 1;
-const ROUND_PHASE_TIME = exports.ROUND_PHASE_TIME = 1;
-const CARD_PHASE_TIME = exports.CARD_PHASE_TIME = 1;
-const CARD_RESULT_PHASE_TIME = exports.CARD_RESULT_PHASE_TIME = 1;
-const MOVEMENT_PHASE_TIME = exports.MOVEMENT_PHASE_TIME = 5;
-const LEADERBOARD_PHASE_TIME = exports.LEADERBOARD_PHASE_TIME = 5;
+const COUNTDOWN_PHASE_TIME = exports.COUNTDOWN_PHASE_TIME = 3;
+const ROUND_PHASE_TIME = exports.ROUND_PHASE_TIME = 3;
+const CARD_PHASE_TIME = exports.CARD_PHASE_TIME = 10;
+const CARD_RESULT_PHASE_TIME = exports.CARD_RESULT_PHASE_TIME = 5;
+const MOVEMENT_PHASE_TIME = exports.MOVEMENT_PHASE_TIME = 10;
+const LEADERBOARD_PHASE_TIME = exports.LEADERBOARD_PHASE_TIME = 8;
 const PHASE_TRANSITION_DELAY = exports.PHASE_TRANSITION_DELAY = 0.5;
 
 // Minigame time
-const QUESTION_PHASE_TIME = exports.QUESTION_PHASE_TIME = 1;
-const MEMORY_MATRIX_PHASE_TIME = exports.MEMORY_MATRIX_PHASE_TIME = 1;
-const MATH_OPERATION_PHASE_TIME = exports.MATH_OPERATION_PHASE_TIME = 1;
+const QUESTION_PHASE_TIME = exports.QUESTION_PHASE_TIME = 20;
+const MEMORY_MATRIX_PHASE_TIME = exports.MEMORY_MATRIX_PHASE_TIME = 40;
+const MATH_OPERATION_PHASE_TIME = exports.MATH_OPERATION_PHASE_TIME = 40;
 
 // Animation and UI timing
 const MESSAGE_DISPLAY_TIME = exports.MESSAGE_DISPLAY_TIME = 3;
@@ -47075,7 +47071,6 @@ function populateLeaderboardList(currentRankings) {
             </div>
             <div class="player-info">
                 <div class="player-name">${player.username} ${player.isLocalPlayer ? ' (You)' : ''}</div>
-                <div class="player-position">Y: ${player.position.currentY}</div>
             </div>
             <div class="player-medal">
                 ${isFinished ? `<div class="finish-badge">

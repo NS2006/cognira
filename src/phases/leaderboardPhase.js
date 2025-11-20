@@ -220,7 +220,6 @@ function populateLeaderboardList(currentRankings) {
             </div>
             <div class="player-info">
                 <div class="player-name">${player.username} ${player.isLocalPlayer ? ' (You)' : ''}</div>
-                <div class="player-position">Y: ${player.position.currentY}</div>
             </div>
             <div class="player-medal">
                 ${isFinished ? 

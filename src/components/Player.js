@@ -31,7 +31,7 @@ export class Player extends THREE.Object3D {
     this.isModelLoaded = false;
 
     // Initialize step system
-    this.baseStep = 100; // Base movement steps per turn
+    this.baseStep = 2; // Base movement steps per turn
     this.remainingSteps = this.baseStep;
     this.selectedCard = null;
     this.winGame = false;
