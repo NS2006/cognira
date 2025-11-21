@@ -46240,7 +46240,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.TILE_SIZE = exports.STEPS_UPDATE_INTERVAL = exports.ROUND_PHASE_TIME = exports.QUESTION_PHASE_TIME = exports.PHASE_TRANSITION_DELAY = exports.MOVEMENT_PHASE_TIME = exports.MESSAGE_FADE_OUT_TIME = exports.MESSAGE_DISPLAY_TIME = exports.MEMORY_MATRIX_PHASE_TIME = exports.MAX_PLAYER = exports.MATH_OPERATION_PHASE_TIME = exports.MAP_SIZE_Y = exports.MAP_SIZE_X = exports.LEADERBOARD_PHASE_TIME = exports.GAP_SIZE = exports.COUNTDOWN_PHASE_TIME = exports.CARD_RESULT_PHASE_TIME = exports.CARD_PHASE_TIME = void 0;
 // GRID
 const MAP_SIZE_X = exports.MAP_SIZE_X = 4;
-const MAP_SIZE_Y = exports.MAP_SIZE_Y = 100;
+const MAP_SIZE_Y = exports.MAP_SIZE_Y = 50;
 const TILE_SIZE = exports.TILE_SIZE = 42;
 const GAP_SIZE = exports.GAP_SIZE = 6;
 const MAX_PLAYER = exports.MAX_PLAYER = 4;
@@ -47661,8 +47661,8 @@ function startRoundPhase() {
   (0, _main.incrementRound)();
   const localPlayer = (0, _main.getLocalPlayer)();
 
-  // Get additional one base step every new round
-  localPlayer.baseStep++;
+  // Get additional two base step every new round
+  localPlayer.baseStep += 2;
 
   // Reset step
   localPlayer.resetSteps();
