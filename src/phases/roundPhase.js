@@ -18,7 +18,7 @@ export function startRoundPhase() {
     const localPlayer = getLocalPlayer();
     
     // Get additional two base step every new round
-    localPlayer.baseStep += 2; 
+    localPlayer.baseStep += 3; 
     
     // Reset step
     localPlayer.resetSteps();

@@ -1,4 +1,4 @@
-import { clearPhaseTimer, setPhaseTimer, questionSystem, cardSystem, getLocalPlayer } from "../../main.js";
+import { clearPhaseTimer, setPhaseTimer, questionSystem, getLocalPlayer } from "../../main.js";
 import { endMinigamePhase } from "../minigamePhase.js";
 import { QUESTION_PHASE_TIME, PHASE_TRANSITION_DELAY } from "../../constants.js";
 

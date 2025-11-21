@@ -47662,7 +47662,7 @@ function startRoundPhase() {
   const localPlayer = (0, _main.getLocalPlayer)();
 
   // Get additional two base step every new round
-  localPlayer.baseStep += 2;
+  localPlayer.baseStep += 3;
 
   // Reset step
   localPlayer.resetSteps();
