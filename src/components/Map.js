@@ -224,19 +224,20 @@ export function loadRiver() {
   loader.load(
     '/assets/model/River.gltf',
     (gltf) => {
-      const river = gltf.scene;
+      const river1 = gltf.scene.clone();
+      river1.position.set(50, 500, -40);
+      river1.rotation.x = Math.PI / 2;
+      river1.scale.set(55,200, 55);
+      map.add(river1);
 
-      // Set position — ground level
-      river.position.set(50, 500, -40);
+      // // SECOND river
+      // const river2 = gltf.scene.clone();
+      // river2.position.set(55, 10500, -40); // extend forward
+      // river2.rotation.x = Math.PI / 2;
+      // river2.scale.set(55, 55, 55);
+      // map.add(river2);
 
-      river.rotation.x = Math.PI / 2;
-      // Optional: scale or rotate if needed
-      river.scale.set(55, 55, 55);
-      // river.rotation.y = Math.PI / 2;
-
-      // Add to map or scene
-      map.add(river);
-      console.log('✅ River loaded');
+      console.log("✅ Rivers loaded");
     },
     undefined,
     (error) => {
@@ -244,6 +245,7 @@ export function loadRiver() {
     }
   );
 }
+
 
 function getMapBounds() {
   const box = new THREE.Box3().setFromObject(map);

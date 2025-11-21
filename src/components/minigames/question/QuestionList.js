@@ -60,7 +60,7 @@ export class QuestionList {
             {
                 id: 5,
                 type: "logic",
-                description: "&nbsp;&nbsp; A D A <br> &nbsp;&nbsp;&nbsp; D I <br> _______ + <br> &nbsp; D I A<br><br>What is A D I?",
+                description: "&nbsp;&nbsp; A D A <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D I <br> _______ + <br> &nbsp; D I A<br><br>What is A D I?",
                 image: null,
                 options: [
                     { id: 'A', text: "4 5 1", correct: false },
