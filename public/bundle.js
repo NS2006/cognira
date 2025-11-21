@@ -42910,18 +42910,20 @@ function loadModel(path) {
 }
 function loadRiver() {
   loader.load('/assets/model/River.gltf', gltf => {
-    const river = gltf.scene;
+    const river1 = gltf.scene.clone();
+    river1.position.set(50, 500, -40);
+    river1.rotation.x = Math.PI / 2;
+    river1.scale.set(55, 200, 55);
+    map.add(river1);
 
-    // Set position — ground level
-    river.position.set(50, 500, -40);
-    river.rotation.x = Math.PI / 2;
-    // Optional: scale or rotate if needed
-    river.scale.set(55, 55, 55);
-    // river.rotation.y = Math.PI / 2;
+    // // SECOND river
+    // const river2 = gltf.scene.clone();
+    // river2.position.set(55, 10500, -40); // extend forward
+    // river2.rotation.x = Math.PI / 2;
+    // river2.scale.set(55, 55, 55);
+    // map.add(river2);
 
-    // Add to map or scene
-    map.add(river);
-    console.log('✅ River loaded');
+    console.log("✅ Rivers loaded");
   }, undefined, error => {
     console.error('❌ Error loading river.gltf:', error);
   });
@@ -45191,7 +45193,7 @@ class QuestionList {
     }, {
       id: 5,
       type: "logic",
-      description: "&nbsp;&nbsp; A D A <br> &nbsp;&nbsp;&nbsp; D I <br> _______ + <br> &nbsp; D I A<br><br>What is A D I?",
+      description: "&nbsp;&nbsp; A D A <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D I <br> _______ + <br> &nbsp; D I A<br><br>What is A D I?",
       image: null,
       options: [{
         id: 'A',
@@ -46238,7 +46240,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.TILE_SIZE = exports.STEPS_UPDATE_INTERVAL = exports.ROUND_PHASE_TIME = exports.QUESTION_PHASE_TIME = exports.PHASE_TRANSITION_DELAY = exports.MOVEMENT_PHASE_TIME = exports.MESSAGE_FADE_OUT_TIME = exports.MESSAGE_DISPLAY_TIME = exports.MEMORY_MATRIX_PHASE_TIME = exports.MAX_PLAYER = exports.MATH_OPERATION_PHASE_TIME = exports.MAP_SIZE_Y = exports.MAP_SIZE_X = exports.LEADERBOARD_PHASE_TIME = exports.GAP_SIZE = exports.COUNTDOWN_PHASE_TIME = exports.CARD_RESULT_PHASE_TIME = exports.CARD_PHASE_TIME = void 0;
 // GRID
 const MAP_SIZE_X = exports.MAP_SIZE_X = 4;
-const MAP_SIZE_Y = exports.MAP_SIZE_Y = 34;
+const MAP_SIZE_Y = exports.MAP_SIZE_Y = 100;
 const TILE_SIZE = exports.TILE_SIZE = 42;
 const GAP_SIZE = exports.GAP_SIZE = 6;
 const MAX_PLAYER = exports.MAX_PLAYER = 4;
