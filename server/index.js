@@ -12,7 +12,7 @@ const server = createServer(app);
 const PORT = process.env.PORT || 3000;
 
 // Minigame types
-const minigameTypes = ['question'];
+const minigameTypes = ['question', 'question', 'memoryMatrix', 'mathOperation'];
 
 // Production CORS settings
 const allowedOrigins = process.env.NODE_ENV === 'production' 

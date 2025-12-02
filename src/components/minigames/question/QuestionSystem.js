@@ -48,6 +48,7 @@ export class QuestionSystem {
 
         this.createAnswerButtons();
         this.questionContainer.style.display = 'block';
+        this.questionOptions.style.display = 'grid';
         this.questionActive = true;
         this.startQuestionTimer(this.QUESTION_TIME);
     }

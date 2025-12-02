@@ -45105,16 +45105,16 @@ class QuestionList {
       image: null,
       options: [{
         id: 'A',
-        text: "6 1 2",
-        correct: true
+        text: "5 3 1",
+        correct: false
       }, {
         id: 'B',
         text: "5 2 1",
         correct: false
       }, {
         id: 'C',
-        text: "5 3 1",
-        correct: false
+        text: "6 1 2",
+        correct: true
       }, {
         id: 'D',
         text: "6 2 2",
@@ -45128,8 +45128,8 @@ class QuestionList {
       image: null,
       options: [{
         id: 'A',
-        text: "3",
-        correct: true
+        text: "7",
+        correct: false
       }, {
         id: 'B',
         text: "1",
@@ -45140,8 +45140,8 @@ class QuestionList {
         correct: false
       }, {
         id: 'D',
-        text: "7",
-        correct: false
+        text: "3",
+        correct: true
       }],
       category: "Numeric Logic"
     }, {
@@ -45151,12 +45151,12 @@ class QuestionList {
       image: null,
       options: [{
         id: 'A',
-        text: "NS",
-        correct: true
-      }, {
-        id: 'B',
         text: "JPP",
         correct: false
+      }, {
+        id: 'B',
+        text: "NS",
+        correct: true
       }, {
         id: 'C',
         text: "KF",
@@ -45243,12 +45243,12 @@ class QuestionList {
       image: null,
       options: [{
         id: 'A',
-        text: "98",
-        correct: true
-      }, {
-        id: 'B',
         text: "97",
         correct: false
+      }, {
+        id: 'B',
+        text: "98",
+        correct: true
       }, {
         id: 'C',
         text: "89",
@@ -45289,8 +45289,8 @@ class QuestionList {
       image: null,
       options: [{
         id: 'A',
-        text: "42",
-        correct: true
+        text: "44",
+        correct: false
       }, {
         id: 'B',
         text: "40",
@@ -45301,8 +45301,8 @@ class QuestionList {
         correct: false
       }, {
         id: 'D',
-        text: "44",
-        correct: false
+        text: "42",
+        correct: true
       }],
       category: "Numeric Logic"
     }, {
@@ -45312,16 +45312,16 @@ class QuestionList {
       image: null,
       options: [{
         id: 'A',
-        text: "Blue > Red",
-        correct: true
+        text: "Red = Blue",
+        correct: false
       }, {
         id: 'B',
         text: "Red > Blue",
         correct: false
       }, {
         id: 'C',
-        text: "Red = Blue",
-        correct: false
+        text: "Blue > Red",
+        correct: true
       }, {
         id: 'D',
         text: "Impossible to determine",
@@ -45335,8 +45335,8 @@ class QuestionList {
       image: null,
       options: [{
         id: 'A',
-        text: "D",
-        correct: true
+        text: "C",
+        correct: false
       }, {
         id: 'B',
         text: "A",
@@ -45347,8 +45347,8 @@ class QuestionList {
         correct: false
       }, {
         id: 'D',
-        text: "C",
-        correct: false
+        text: "D",
+        correct: true
       }],
       category: "Logic Reasoning"
     }, {
@@ -45381,19 +45381,19 @@ class QuestionList {
       image: null,
       options: [{
         id: 'A',
-        text: "26",
+        text: "4168",
         correct: false
       }, {
         id: 'B',
-        text: "22",
+        text: "4167",
         correct: false
       }, {
         id: 'C',
-        text: "26",
-        correct: false
+        text: "4157",
+        correct: true
       }, {
         id: 'D',
-        text: "26",
+        text: "4158",
         correct: false
       }],
       category: "Logic Puzzle"
@@ -45408,7 +45408,7 @@ class QuestionList {
         correct: true
       }, {
         id: 'B',
-        text: "50",
+        text: "52",
         correct: false
       }, {
         id: 'C',
@@ -45427,8 +45427,8 @@ class QuestionList {
       image: null,
       options: [{
         id: 'A',
-        text: "2 minutes",
-        correct: true
+        text: "6 minutes",
+        correct: false
       }, {
         id: 'B',
         text: "4 minutes",
@@ -45439,8 +45439,8 @@ class QuestionList {
         correct: false
       }, {
         id: 'D',
-        text: "6 minutes",
-        correct: false
+        text: "2 minutes",
+        correct: true
       }],
       category: "Logic Reasoning"
     }, {
@@ -45473,12 +45473,12 @@ class QuestionList {
       image: null,
       options: [{
         id: 'A',
-        text: "42",
-        correct: true
-      }, {
-        id: 'B',
         text: "44",
         correct: false
+      }, {
+        id: 'B',
+        text: "42",
+        correct: true
       }, {
         id: 'C',
         text: "40",
@@ -45496,8 +45496,8 @@ class QuestionList {
       image: null,
       options: [{
         id: 'A',
-        text: "95",
-        correct: true
+        text: "98",
+        correct: false
       }, {
         id: 'B',
         text: "90",
@@ -45508,8 +45508,8 @@ class QuestionList {
         correct: false
       }, {
         id: 'D',
-        text: "98",
-        correct: false
+        text: "95",
+        correct: true
       }],
       category: "Numeric Logic"
     }, {
@@ -45519,16 +45519,16 @@ class QuestionList {
       image: null,
       options: [{
         id: 'A',
-        text: "It becomes smaller than the original",
-        correct: true
+        text: "It becomes larger",
+        correct: false
       }, {
         id: 'B',
         text: "It returns to the original",
         correct: false
       }, {
         id: 'C',
-        text: "It becomes larger",
-        correct: false
+        text: "It becomes smaller than the original",
+        correct: true
       }, {
         id: 'D',
         text: "Impossible to determine",
@@ -45542,16 +45542,16 @@ class QuestionList {
       image: null,
       options: [{
         id: 'A',
-        text: "40",
-        correct: true
+        text: "44",
+        correct: false
       }, {
         id: 'B',
         text: "36",
         correct: false
       }, {
         id: 'C',
-        text: "44",
-        correct: false
+        text: "40",
+        correct: true
       }, {
         id: 'D',
         text: "52",
@@ -45565,16 +45565,16 @@ class QuestionList {
       image: null,
       options: [{
         id: 'A',
-        text: "C",
-        correct: true
-      }, {
-        id: 'B',
         text: "A",
         correct: false
       }, {
-        id: 'C',
+        id: 'B',
         text: "B",
         correct: false
+      }, {
+        id: 'C',
+        text: "C",
+        correct: true
       }, {
         id: 'D',
         text: "D",
@@ -45588,16 +45588,16 @@ class QuestionList {
       image: null,
       options: [{
         id: 'A',
-        text: "30",
-        correct: true
+        text: "28",
+        correct: false
       }, {
         id: 'B',
         text: "32",
         correct: false
       }, {
         id: 'C',
-        text: "28",
-        correct: false
+        text: "30",
+        correct: true
       }, {
         id: 'D',
         text: "24",
@@ -45634,12 +45634,12 @@ class QuestionList {
       image: null,
       options: [{
         id: 'A',
-        text: "22",
-        correct: true
-      }, {
-        id: 'B',
         text: "20",
         correct: false
+      }, {
+        id: 'B',
+        text: "22",
+        correct: true
       }, {
         id: 'C',
         text: "24",
@@ -45657,12 +45657,12 @@ class QuestionList {
       image: null,
       options: [{
         id: 'A',
-        text: "30",
-        correct: true
-      }, {
-        id: 'B',
         text: "28",
         correct: false
+      }, {
+        id: 'B',
+        text: "30",
+        correct: true
       }, {
         id: 'C',
         text: "26",
@@ -45680,16 +45680,16 @@ class QuestionList {
       image: null,
       options: [{
         id: 'A',
-        text: "150 km",
-        correct: true
+        text: "180 km",
+        correct: false
       }, {
         id: 'B',
         text: "120 km",
         correct: false
       }, {
         id: 'C',
-        text: "180 km",
-        correct: false
+        text: "150 km",
+        correct: true
       }, {
         id: 'D',
         text: "140 km",
@@ -45699,7 +45699,7 @@ class QuestionList {
     }];
   }
   getRandomQuestion() {
-    const types = ['logic', 'spatial'];
+    const types = ['logic'];
     const chosenType = types[Math.floor(Math.random() * types.length)];
     const filteredQuestions = this.questions.filter(q => q.type === chosenType);
     if (filteredQuestions.length === 0) {
@@ -45777,6 +45777,7 @@ class QuestionSystem {
     }
     this.createAnswerButtons();
     this.questionContainer.style.display = 'block';
+    this.questionOptions.style.display = 'grid';
     this.questionActive = true;
     this.startQuestionTimer(this.QUESTION_TIME);
   }
@@ -46237,21 +46238,22 @@ exports.LeafParticles = LeafParticles;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TILE_SIZE = exports.STEPS_UPDATE_INTERVAL = exports.ROUND_PHASE_TIME = exports.QUESTION_PHASE_TIME = exports.PHASE_TRANSITION_DELAY = exports.MOVEMENT_PHASE_TIME = exports.MESSAGE_FADE_OUT_TIME = exports.MESSAGE_DISPLAY_TIME = exports.MEMORY_MATRIX_PHASE_TIME = exports.MAX_PLAYER = exports.MATH_OPERATION_PHASE_TIME = exports.MAP_SIZE_Y = exports.MAP_SIZE_X = exports.LEADERBOARD_PHASE_TIME = exports.GAP_SIZE = exports.COUNTDOWN_PHASE_TIME = exports.CARD_RESULT_PHASE_TIME = exports.CARD_PHASE_TIME = void 0;
+exports.TILE_SIZE = exports.STEPS_UPDATE_INTERVAL = exports.ROUND_PHASE_TIME = exports.QUESTION_PHASE_TIME = exports.PHASE_TRANSITION_DELAY = exports.MOVEMENT_PHASE_TIME = exports.MESSAGE_FADE_OUT_TIME = exports.MESSAGE_DISPLAY_TIME = exports.MEMORY_MATRIX_PHASE_TIME = exports.MAX_PLAYER = exports.MATH_OPERATION_PHASE_TIME = exports.MAP_SIZE_Y = exports.MAP_SIZE_X = exports.LEADERBOARD_PHASE_TIME = exports.GAP_SIZE = exports.COUNTDOWN_PHASE_TIME = exports.CARD_RESULT_PHASE_TIME = exports.CARD_PHASE_TIME = exports.ADDITIONAL_STEP = void 0;
 // GRID
 const MAP_SIZE_X = exports.MAP_SIZE_X = 4;
 const MAP_SIZE_Y = exports.MAP_SIZE_Y = 50;
 const TILE_SIZE = exports.TILE_SIZE = 42;
 const GAP_SIZE = exports.GAP_SIZE = 6;
 const MAX_PLAYER = exports.MAX_PLAYER = 4;
+const ADDITIONAL_STEP = exports.ADDITIONAL_STEP = 4;
 
 // Phase timing constants (in seconds)
 const COUNTDOWN_PHASE_TIME = exports.COUNTDOWN_PHASE_TIME = 3;
 const ROUND_PHASE_TIME = exports.ROUND_PHASE_TIME = 3;
 const CARD_PHASE_TIME = exports.CARD_PHASE_TIME = 10;
 const CARD_RESULT_PHASE_TIME = exports.CARD_RESULT_PHASE_TIME = 5;
-const MOVEMENT_PHASE_TIME = exports.MOVEMENT_PHASE_TIME = 10;
-const LEADERBOARD_PHASE_TIME = exports.LEADERBOARD_PHASE_TIME = 8;
+const MOVEMENT_PHASE_TIME = exports.MOVEMENT_PHASE_TIME = 15;
+const LEADERBOARD_PHASE_TIME = exports.LEADERBOARD_PHASE_TIME = 4;
 const PHASE_TRANSITION_DELAY = exports.PHASE_TRANSITION_DELAY = 0.5;
 
 // Minigame time
@@ -47662,7 +47664,7 @@ function startRoundPhase() {
   const localPlayer = (0, _main.getLocalPlayer)();
 
   // Get additional two base step every new round
-  localPlayer.baseStep += 3;
+  localPlayer.baseStep += _constants.ADDITIONAL_STEP;
 
   // Reset step
   localPlayer.resetSteps();
@@ -47729,7 +47731,7 @@ function showRoundTransitionMessage() {
     roundSubtitle = "Finding Your Pace!";
   }
   if (_main.currentRound !== 1) {
-    roundSubtitle += "<br><br> +1 base step";
+    roundSubtitle += `<br><br> +${_constants.ADDITIONAL_STEP} base step`;
   }
 
   // Create round transition message

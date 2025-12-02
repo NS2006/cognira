@@ -11,9 +11,9 @@ export class QuestionList {
                 description: "&nbsp;&nbsp;&nbsp; A B <br> &nbsp;&nbsp;&nbsp; A B <br> _______ + <br> &nbsp; B C C <br><br>What is A B C?",
                 image: null,
                 options: [
-                    { id: 'A', text: "6 1 2", correct: true },
+                    { id: 'A', text: "5 3 1", correct: false },
                     { id: 'B', text: "5 2 1", correct: false },
-                    { id: 'C', text: "5 3 1", correct: false },
+                    { id: 'C', text: "6 1 2", correct: true },
                     { id: 'D', text: "6 2 2", correct: false }
                 ],
                 category: "Numeric Logic"
@@ -24,10 +24,10 @@ export class QuestionList {
                 description: "What is the last digit of 3<sup>205</sup>?",
                 image: null,
                 options: [
-                    { id: 'A', text: "3", correct: true },
+                    { id: 'A', text: "7", correct: false },
                     { id: 'B', text: "1", correct: false },
                     { id: 'C', text: "9", correct: false },
-                    { id: 'D', text: "7", correct: false }
+                    { id: 'D', text: "3", correct: true }
                 ],
                 category: "Numeric Logic"
             },
@@ -37,8 +37,8 @@ export class QuestionList {
                 description: "NS, JPP, FL, TS, and KF compete in a running race. The current position is NS, JPP, TS, KF, and FL, so NS is the nearest to the finish line. After 3 seconds, KF gets ahead of TS. At the same time, JPP gets ahead of NS. At the last 4 seconds, FL finally gets ahead of NS. Now, who is at the third position?",
                 image: null,
                 options: [
-                    { id: 'A', text: "NS", correct: true },
-                    { id: 'B', text: "JPP", correct: false },
+                    { id: 'A', text: "JPP", correct: false },
+                    { id: 'B', text: "NS", correct: true },
                     { id: 'C', text: "KF", correct: false },
                     { id: 'D', text: "TS", correct: false }
                 ],
@@ -89,8 +89,8 @@ export class QuestionList {
                 description: "If 12 → 21, 34 → 43, 56 → 65, then 89 → ?",
                 image: null,
                 options: [
-                    { id: 'A', text: "98", correct: true },
-                    { id: 'B', text: "97", correct: false },
+                    { id: 'A', text: "97", correct: false },
+                    { id: 'B', text: "98", correct: true },
                     { id: 'C', text: "89", correct: false },
                     { id: 'D', text: "90", correct: false }
                 ],
@@ -115,10 +115,10 @@ export class QuestionList {
                 description: "Which number completes the pattern?<br><br>7, 10, 15, 22, 31, ?",
                 image: null,
                 options: [
-                    { id: 'A', text: "42", correct: true },
+                    { id: 'A', text: "44", correct: false },
                     { id: 'B', text: "40", correct: false },
                     { id: 'C', text: "38", correct: false },
-                    { id: 'D', text: "44", correct: false }
+                    { id: 'D', text: "42", correct: true }
                 ],
                 category: "Numeric Logic"
             },
@@ -128,9 +128,9 @@ export class QuestionList {
                 description: "A box contains red, blue, and green marbles. If 2 blue marbles are removed, the number of blue marbles becomes equal to the number of red marbles. What happens if 1 additional red marble is also removed?",
                 image: null,
                 options: [
-                    { id: 'A', text: "Blue > Red", correct: true },
+                    { id: 'A', text: "Red = Blue", correct: false },
                     { id: 'B', text: "Red > Blue", correct: false },
-                    { id: 'C', text: "Red = Blue", correct: false },
+                    { id: 'C', text: "Blue > Red", correct: true },
                     { id: 'D', text: "Impossible to determine", correct: false }
                 ],
                 category: "Logic Reasoning"
@@ -141,10 +141,10 @@ export class QuestionList {
                 description: "In a race, A is ahead of B. C is behind B. D is ahead of C but behind A. Who is in the 2nd position?",
                 image: null,
                 options: [
-                    { id: 'A', text: "D", correct: true },
+                    { id: 'A', text: "C", correct: false },
                     { id: 'B', text: "A", correct: false },
                     { id: 'C', text: "B", correct: false },
-                    { id: 'D', text: "C", correct: false }
+                    { id: 'D', text: "D", correct: true }
                 ],
                 category: "Logic Reasoning"
             },
@@ -167,10 +167,10 @@ export class QuestionList {
                 description: "If A = 1, B = 2, C = 3, ..., Z = 26, what is the value of DOG?",
                 image: null,
                 options: [
-                    { id: 'A', text: "26", correct: false },
-                    { id: 'B', text: "22", correct: false },
-                    { id: 'C', text: "26", correct: false },
-                    { id: 'D', text: "26", correct: false }
+                    { id: 'A', text: "4168", correct: false },
+                    { id: 'B', text: "4167", correct: false },
+                    { id: 'C', text: "4157", correct: true },
+                    { id: 'D', text: "4158", correct: false }
                 ],
                 category: "Logic Puzzle"
             },
@@ -181,7 +181,7 @@ export class QuestionList {
                 image: null,
                 options: [
                     { id: 'A', text: "48", correct: true },
-                    { id: 'B', text: "50", correct: false },
+                    { id: 'B', text: "52", correct: false },
                     { id: 'C', text: "36", correct: false },
                     { id: 'D', text: "60", correct: false }
                 ],
@@ -193,10 +193,10 @@ export class QuestionList {
                 description: "If 2 cats catch 2 mice in 2 minutes, how long will 6 cats take to catch 6 mice?",
                 image: null,
                 options: [
-                    { id: 'A', text: "2 minutes", correct: true },
+                    { id: 'A', text: "6 minutes", correct: false },
                     { id: 'B', text: "4 minutes", correct: false },
                     { id: 'C', text: "1 minute", correct: false },
-                    { id: 'D', text: "6 minutes", correct: false }
+                    { id: 'D', text: "2 minutes", correct: true }
                 ],
                 category: "Logic Reasoning"
             },
@@ -219,8 +219,8 @@ export class QuestionList {
                 description: "Find the missing number:<br><br>5 → 12<br>7 → 20<br>9 → 30<br>11 → ?",
                 image: null,
                 options: [
-                    { id: 'A', text: "42", correct: true },
-                    { id: 'B', text: "44", correct: false },
+                    { id: 'A', text: "44", correct: false },
+                    { id: 'B', text: "42", correct: true },
                     { id: 'C', text: "40", correct: false },
                     { id: 'D', text: "36", correct: false }
                 ],
@@ -232,10 +232,10 @@ export class QuestionList {
                 description: "Which number completes the sequence?<br><br>2, 5, 11, 23, 47, ?",
                 image: null,
                 options: [
-                    { id: 'A', text: "95", correct: true },
+                    { id: 'A', text: "98", correct: false },
                     { id: 'B', text: "90", correct: false },
                     { id: 'C', text: "93", correct: false },
-                    { id: 'D', text: "98", correct: false }
+                    { id: 'D', text: "95", correct: true }
                 ],
                 category: "Numeric Logic"
             },
@@ -245,9 +245,9 @@ export class QuestionList {
                 description: "A number increases by 20%, and then decreases by 20%. What is the overall result?",
                 image: null,
                 options: [
-                    { id: 'A', text: "It becomes smaller than the original", correct: true },
+                    { id: 'A', text: "It becomes larger", correct: false },
                     { id: 'B', text: "It returns to the original", correct: false },
-                    { id: 'C', text: "It becomes larger", correct: false },
+                    { id: 'C', text: "It becomes smaller than the original", correct: true },
                     { id: 'D', text: "Impossible to determine", correct: false }
                 ],
                 category: "Logic Reasoning"
@@ -258,9 +258,9 @@ export class QuestionList {
                 description: "Which number replaces the question mark?<br><br>8, 16, 24, 32, ?, 48",
                 image: null,
                 options: [
-                    { id: 'A', text: "40", correct: true },
+                    { id: 'A', text: "44", correct: false },
                     { id: 'B', text: "36", correct: false },
-                    { id: 'C', text: "44", correct: false },
+                    { id: 'C', text: "40", correct: true },
                     { id: 'D', text: "52", correct: false }
                 ],
                 category: "Numeric Logic"
@@ -271,9 +271,9 @@ export class QuestionList {
                 description: "A, B, C, and D are in a line. A is not first. B is immediately behind A. C is ahead of D but not first. Who is in the first position?",
                 image: null,
                 options: [
-                    { id: 'A', text: "C", correct: true },
-                    { id: 'B', text: "A", correct: false },
-                    { id: 'C', text: "B", correct: false },
+                    { id: 'A', text: "A", correct: false },
+                    { id: 'B', text: "B", correct: false },
+                    { id: 'C', text: "C", correct: true },
                     { id: 'D', text: "D", correct: false }
                 ],
                 category: "Logic Reasoning"
@@ -284,9 +284,9 @@ export class QuestionList {
                 description: "What is the missing number?<br><br>3 → 6<br>4 → 12<br>5 → 20<br>6 → ?",
                 image: null,
                 options: [
-                    { id: 'A', text: "30", correct: true },
+                    { id: 'A', text: "28", correct: false },
                     { id: 'B', text: "32", correct: false },
-                    { id: 'C', text: "28", correct: false },
+                    { id: 'C', text: "30", correct: true },
                     { id: 'D', text: "24", correct: false }
                 ],
                 category: "Numeric Logic"
@@ -310,8 +310,8 @@ export class QuestionList {
                 description: "Which number comes next?<br><br>1, 2, 4, 7, 11, 16, ?",
                 image: null,
                 options: [
-                    { id: 'A', text: "22", correct: true },
-                    { id: 'B', text: "20", correct: false },
+                    { id: 'A', text: "20", correct: false },
+                    { id: 'B', text: "22", correct: true },
                     { id: 'C', text: "24", correct: false },
                     { id: 'D', text: "19", correct: false }
                 ],
@@ -323,8 +323,8 @@ export class QuestionList {
                 description: "If TODAY = 65, TIME = 52, and YEAR = 56, what is DAY?",
                 image: null,
                 options: [
-                    { id: 'A', text: "30", correct: true },
-                    { id: 'B', text: "28", correct: false },
+                    { id: 'A', text: "28", correct: false },
+                    { id: 'B', text: "30", correct: true },
                     { id: 'C', text: "26", correct: false },
                     { id: 'D', text: "32", correct: false }
                 ],
@@ -336,9 +336,9 @@ export class QuestionList {
                 description: "A car travels 60 km in 1 hour. How far will it travel in 2.5 hours at the same speed?",
                 image: null,
                 options: [
-                    { id: 'A', text: "150 km", correct: true },
+                    { id: 'A', text: "180 km", correct: false },
                     { id: 'B', text: "120 km", correct: false },
-                    { id: 'C', text: "180 km", correct: false },
+                    { id: 'C', text: "150 km", correct: true },
                     { id: 'D', text: "140 km", correct: false }
                 ],
                 category: "Logic Reasoning"
@@ -347,7 +347,7 @@ export class QuestionList {
     }
 
     getRandomQuestion() {
-        const types = ['logic', 'spatial'];
+        const types = ['logic'];
         const chosenType = types[Math.floor(Math.random() * types.length)];
         const filteredQuestions = this.questions.filter(q => q.type === chosenType);
         

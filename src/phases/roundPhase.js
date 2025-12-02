@@ -1,6 +1,6 @@
 import { clearPhaseTimer, setPhaseTimer, currentRound, incrementRound, getLocalPlayer, updateRoundDisplay, updateStepsDisplay } from "../main.js";
 import { startCardPhase } from "./cardPhase.js";
-import { PHASE_TRANSITION_DELAY, ROUND_PHASE_TIME } from "../constants.js";
+import { ADDITIONAL_STEP, PHASE_TRANSITION_DELAY, ROUND_PHASE_TIME } from "../constants.js";
 
 let roundPhaseActive = false;
 let roundPhaseTimer = null;
@@ -18,7 +18,7 @@ export function startRoundPhase() {
     const localPlayer = getLocalPlayer();
     
     // Get additional two base step every new round
-    localPlayer.baseStep += 3; 
+    localPlayer.baseStep += ADDITIONAL_STEP; 
     
     // Reset step
     localPlayer.resetSteps();
@@ -93,7 +93,7 @@ function showRoundTransitionMessage() {
     }
 
     if (currentRound !== 1){
-        roundSubtitle += "<br><br> +1 base step";
+        roundSubtitle += `<br><br> +${ADDITIONAL_STEP} base step`;
     }
 
     // Create round transition message

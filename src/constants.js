@@ -7,14 +7,16 @@ export const GAP_SIZE = 6;
 
 export const MAX_PLAYER = 4;
 
+export const ADDITIONAL_STEP = 4;
+
 
 // Phase timing constants (in seconds)
 export const COUNTDOWN_PHASE_TIME = 3;
 export const ROUND_PHASE_TIME = 3;
 export const CARD_PHASE_TIME = 10;
 export const CARD_RESULT_PHASE_TIME = 5;
-export const MOVEMENT_PHASE_TIME = 10; 
-export const LEADERBOARD_PHASE_TIME = 8; 
+export const MOVEMENT_PHASE_TIME = 15; 
+export const LEADERBOARD_PHASE_TIME = 4; 
 export const PHASE_TRANSITION_DELAY = 0.5; 
 
 
