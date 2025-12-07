@@ -47829,7 +47829,7 @@ class SocketClient {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       return 'http://localhost:3000';
     } else {
-      return 'https://cognira-backend.up.railway.app';
+      return 'https://cognira.railway.internal';
     }
   }
   handleSocketEvents() {
