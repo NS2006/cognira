@@ -32,7 +32,7 @@ export class SocketClient {
             return 'http://localhost:3000';
         }
         else {
-            return 'https://cognira.railway.internal';
+            return 'https://cognira-backend.up.railway.app';
         }
     }
 

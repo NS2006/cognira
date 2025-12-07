@@ -20,7 +20,7 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
         'https://cognira.netlify.app',
         'http://localhost:3000',
         'http://127.0.0.1:3000',
-        'https://cognira.railway.internal' 
+        'https://cognira-backend.up.railway.app'
       ]
     : ['http://localhost:3000', 'http://127.0.0.1:3000'];
 
